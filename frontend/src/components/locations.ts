@@ -2,7 +2,7 @@ import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 interface Location {
-  id: number;
+  id: string;
   name: string;
   description?: string;
   created_at: string;

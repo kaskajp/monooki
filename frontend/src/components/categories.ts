@@ -2,10 +2,11 @@ import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 interface Category {
-  id: number;
+  id: string;
   name: string;
   created_at: string;
   updated_at: string;
+  item_count?: number;
 }
 
 @customElement('categories-page')
@@ -94,46 +95,111 @@ export class CategoriesPage extends LitElement {
       background: #f85149;
     }
 
-    .categories-grid {
-      display: grid;
-      gap: 1.5rem;
-      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    }
-
-    .category-card {
+    .categories-table {
       background: #161b22;
       border: 1px solid #30363d;
       border-radius: 12px;
-      padding: 1.5rem;
-      transition: all 0.2s ease;
+      overflow: hidden;
+      width: 100%;
     }
 
-    .category-card:hover {
-      border-color: #58a6ff;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    .table-header {
+      background: #21262d;
+      border-bottom: 1px solid #30363d;
     }
 
-    .category-card h3 {
-      margin: 0 0 0.5rem 0;
-      color: #f0f6fc;
-      font-size: 18px;
-      font-weight: 600;
+    .table-row {
+      border-bottom: 1px solid #30363d;
+      transition: background 0.2s ease;
     }
 
-    .category-meta {
-      font-size: 12px;
-      color: #8b949e;
-      margin-bottom: 1rem;
-      padding: 0.5rem;
+    .table-row:hover {
       background: #0d1117;
-      border-radius: 6px;
-      border: 1px solid #21262d;
+    }
+
+    .table-row:last-child {
+      border-bottom: none;
+    }
+
+    .table-cell {
+      padding: 1rem 1.5rem;
+      vertical-align: middle;
+    }
+
+    .table-header .table-cell {
+      font-weight: 600;
+      color: #f0f6fc;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.75rem 1.5rem;
+    }
+
+    .category-name {
+      font-weight: 600;
+      color: #f0f6fc;
+      font-size: 16px;
+    }
+
+    .category-date {
+      color: #8b949e;
+      font-size: 14px;
+    }
+
+    .category-count {
+      color: #58a6ff;
+      font-weight: 500;
+      font-size: 14px;
     }
 
     .category-actions {
       display: flex;
       gap: 0.5rem;
+      justify-content: flex-end;
+    }
+
+    .btn-small {
+      padding: 0.5rem 0.75rem;
+      font-size: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 1rem 1.5rem;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #21262d;
+      font-weight: 600;
+      color: #f0f6fc;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.75rem 1.5rem;
+      border-bottom: 1px solid #30363d;
+    }
+
+    td {
+      border-bottom: 1px solid #30363d;
+    }
+
+    tr:hover {
+      background: #0d1117;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .actions-cell {
+      text-align: right;
+      width: 150px;
     }
 
     .form-overlay {
@@ -372,23 +438,42 @@ export class CategoriesPage extends LitElement {
           <p>No categories yet. Create your first category to get started!</p>
         </div>
       ` : html`
-        <div class="categories-grid">
-          ${this.categories.map(category => html`
-            <div class="category-card">
-              <h3>${category.name}</h3>
-              <div class="category-meta">
-                Created: ${new Date(category.created_at).toLocaleDateString()}
-              </div>
-              <div class="category-actions">
-                <button class="btn btn-secondary" @click="${() => this.showEditForm(category)}">
-                  Edit
-                </button>
-                <button class="btn btn-danger" @click="${() => this.deleteCategory(category)}">
-                  Delete
-                </button>
-              </div>
-            </div>
-          `)}
+        <div class="categories-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Items</th>
+                <th>Created</th>
+                <th class="actions-cell">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${this.categories.map(category => html`
+                <tr>
+                  <td>
+                    <div class="category-name">${category.name}</div>
+                  </td>
+                  <td>
+                    <div class="category-count">${category.item_count || 0}</div>
+                  </td>
+                  <td>
+                    <div class="category-date">${new Date(category.created_at).toLocaleDateString()}</div>
+                  </td>
+                  <td class="actions-cell">
+                    <div class="category-actions">
+                      <button class="btn btn-secondary btn-small" @click="${() => this.showEditForm(category)}">
+                        Edit
+                      </button>
+                      <button class="btn btn-danger btn-small" @click="${() => this.deleteCategory(category)}">
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              `)}
+            </tbody>
+          </table>
         </div>
       `}
 

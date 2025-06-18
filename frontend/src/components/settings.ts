@@ -2,7 +2,7 @@ import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 interface CustomField {
-  id: number;
+  id: string;
   name: string;
   field_type: 'text' | 'number' | 'date' | 'textarea' | 'checkbox' | 'enum';
   required: boolean;

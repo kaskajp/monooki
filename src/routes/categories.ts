@@ -26,10 +26,16 @@ router.get('/', async (req: any, res: any) => {
     const workspace_id = req.user.workspace_id;
     const db = getDatabase();
     
-    const categories = await db.all(
-      'SELECT * FROM categories WHERE workspace_id = ? ORDER BY name',
-      [workspace_id]
-    );
+    const categories = await db.all(`
+      SELECT 
+        c.*,
+        COUNT(i.id) as item_count
+      FROM categories c
+      LEFT JOIN items i ON c.id = i.category_id AND i.workspace_id = c.workspace_id
+      WHERE c.workspace_id = ?
+      GROUP BY c.id, c.name, c.workspace_id, c.created_at, c.updated_at
+      ORDER BY c.name
+    `, [workspace_id]);
 
     res.json(categories);
   } catch (error) {

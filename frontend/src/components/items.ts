@@ -2,13 +2,13 @@ import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 
 interface Item {
-  id: number;
+  id: string;
   name: string;
   description?: string;
-  location_id?: number;
-  location?: { id: number; name: string };
-  category_id?: number;
-  category?: { id: number; name: string };
+  location_id?: string;
+  location?: { id: string; name: string };
+  category_id?: string;
+  category?: { id: string; name: string };
   quantity?: number;
   model_number?: string;
   serial_number?: string;
@@ -33,7 +33,7 @@ interface Photo {
 }
 
 interface CustomField {
-  id: number;
+  id: string;
   name: string;
   field_type: 'text' | 'number' | 'date' | 'textarea' | 'checkbox' | 'enum';
   required: boolean;
@@ -41,12 +41,12 @@ interface CustomField {
 }
 
 interface Category {
-  id: number;
+  id: string;
   name: string;
 }
 
 interface Location {
-  id: number;
+  id: string;
   name: string;
 }
 
@@ -659,8 +659,8 @@ export class ItemsPage extends LitElement {
         item.name.toLowerCase().includes(this.searchTerm.toLowerCase()) ||
         (item.description && item.description.toLowerCase().includes(this.searchTerm.toLowerCase()));
       
-      const matchesCategory = !this.selectedCategory || 
-        item.category_id?.toString() === this.selectedCategory;
+          const matchesCategory = !this.selectedCategory ||
+      item.category_id === this.selectedCategory;
       
       const matchesLocation = !this.selectedLocation || 
         item.location_id?.toString() === this.selectedLocation;
@@ -756,8 +756,8 @@ export class ItemsPage extends LitElement {
 
     const submitData = {
       ...this.formData,
-      location_id: this.formData.location_id ? parseInt(this.formData.location_id) : null,
-      category_id: this.formData.category_id ? parseInt(this.formData.category_id) : null,
+      location_id: this.formData.location_id || null,
+      category_id: this.formData.category_id || null,
       quantity: this.formData.quantity ? parseInt(this.formData.quantity) : null,
       purchase_price: this.formData.purchase_price ? parseFloat(this.formData.purchase_price) : null,
       custom_fields: Object.keys(this.customFieldValues).length > 0 ? this.customFieldValues : null
