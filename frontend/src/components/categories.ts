@@ -28,74 +28,112 @@ export class CategoriesPage extends LitElement {
   static styles = css`
     :host {
       display: block;
-      padding: 20px;
+      padding: 2rem;
+      background: #0d1117;
+      color: #f0f6fc;
+      min-height: 100vh;
+      color-scheme: dark;
     }
 
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 2rem;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 32px;
+      font-weight: 600;
+      color: #f0f6fc;
     }
 
     .btn {
-      padding: 8px 16px;
+      padding: 0.75rem 1rem;
       border: none;
-      border-radius: 4px;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 14px;
+      font-weight: 500;
       text-decoration: none;
-      display: inline-block;
-      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      font-family: inherit;
     }
 
     .btn-primary {
-      background: #007bff;
+      background: #238636;
       color: white;
+    }
+
+    .btn-primary:hover {
+      background: #2ea043;
+      transform: translateY(-1px);
     }
 
     .btn-secondary {
-      background: #6c757d;
-      color: white;
+      background: #21262d;
+      color: #f0f6fc;
+      border: 1px solid #30363d;
+    }
+
+    .btn-secondary:hover {
+      background: #30363d;
+      border-color: #58a6ff;
     }
 
     .btn-danger {
-      background: #dc3545;
+      background: #da3633;
       color: white;
     }
 
-    .btn:hover {
-      opacity: 0.9;
+    .btn-danger:hover {
+      background: #f85149;
     }
 
     .categories-grid {
       display: grid;
-      gap: 16px;
+      gap: 1.5rem;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     }
 
     .category-card {
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 16px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .category-card:hover {
+      border-color: #58a6ff;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
     }
 
     .category-card h3 {
-      margin: 0 0 8px 0;
-      color: #333;
+      margin: 0 0 0.5rem 0;
+      color: #f0f6fc;
+      font-size: 18px;
+      font-weight: 600;
     }
 
     .category-meta {
       font-size: 12px;
-      color: #666;
-      margin-bottom: 16px;
+      color: #8b949e;
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      background: #0d1117;
+      border-radius: 6px;
+      border: 1px solid #21262d;
     }
 
     .category-actions {
       display: flex;
-      gap: 8px;
+      gap: 0.5rem;
     }
 
     .form-overlay {
@@ -104,60 +142,102 @@ export class CategoriesPage extends LitElement {
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0, 0, 0, 0.8);
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 1000;
+      backdrop-filter: blur(4px);
     }
 
     .form-container {
-      background: white;
-      padding: 24px;
-      border-radius: 8px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      padding: 2rem;
+      border-radius: 12px;
       width: 90%;
       max-width: 400px;
+      color-scheme: dark;
+      box-shadow: 0 16px 70px rgba(0, 0, 0, 0.5);
+    }
+
+    .form-container h2 {
+      margin: 0 0 1.5rem 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: #f0f6fc;
     }
 
     .form-group {
-      margin-bottom: 16px;
+      margin-bottom: 1.5rem;
     }
 
     .form-group label {
       display: block;
-      margin-bottom: 4px;
+      margin-bottom: 0.5rem;
       font-weight: 500;
+      color: #f0f6fc;
+      font-size: 14px;
     }
 
     .form-group input {
       width: 100%;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      padding: 0.75rem;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 8px;
       box-sizing: border-box;
+      color: #f0f6fc;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .form-group input::placeholder {
+      color: #8b949e;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #58a6ff;
+      box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
     }
 
     .form-actions {
       display: flex;
-      gap: 8px;
+      gap: 0.75rem;
       justify-content: flex-end;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #30363d;
     }
 
     .loading {
       text-align: center;
-      padding: 40px;
-      color: #666;
+      padding: 3rem;
+      color: #8b949e;
+      font-size: 16px;
     }
 
     .empty-state {
       text-align: center;
-      padding: 40px;
-      color: #666;
+      padding: 3rem;
+      color: #8b949e;
+    }
+
+    .empty-state p {
+      font-size: 16px;
+      margin: 0;
     }
 
     .error {
-      color: #dc3545;
-      margin-bottom: 16px;
+      color: #f85149;
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      background: rgba(248, 81, 73, 0.1);
+      border: 1px solid rgba(248, 81, 73, 0.2);
+      border-radius: 6px;
+      border-left: 3px solid #f85149;
     }
   `;
 

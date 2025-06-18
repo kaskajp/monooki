@@ -39,50 +39,76 @@ export class SettingsPage extends LitElement {
   static styles = css`
     :host {
       display: block;
-      padding: 20px;
+      padding: 2rem;
+      background: #0d1117;
+      color: #f0f6fc;
+      min-height: 100vh;
+      color-scheme: dark;
     }
 
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 2rem;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 32px;
+      font-weight: 600;
+      color: #f0f6fc;
     }
 
     .btn {
-      padding: 8px 16px;
+      padding: 0.75rem 1rem;
       border: none;
-      border-radius: 4px;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 14px;
+      font-weight: 500;
       text-decoration: none;
-      display: inline-block;
-      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      font-family: inherit;
     }
 
     .btn-primary {
-      background: #007bff;
+      background: #238636;
       color: white;
+    }
+
+    .btn-primary:hover {
+      background: #2ea043;
+      transform: translateY(-1px);
     }
 
     .btn-secondary {
-      background: #6c757d;
-      color: white;
+      background: #21262d;
+      color: #f0f6fc;
+      border: 1px solid #30363d;
+    }
+
+    .btn-secondary:hover {
+      background: #30363d;
+      border-color: #58a6ff;
     }
 
     .btn-danger {
-      background: #dc3545;
+      background: #da3633;
       color: white;
     }
 
-    .btn:hover {
-      opacity: 0.9;
+    .btn-danger:hover {
+      background: #f85149;
     }
 
     .custom-fields-list {
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 8px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
       overflow: hidden;
     }
 
@@ -90,8 +116,13 @@ export class SettingsPage extends LitElement {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 16px;
-      border-bottom: 1px solid #eee;
+      padding: 1.5rem;
+      border-bottom: 1px solid #30363d;
+      transition: background 0.2s ease;
+    }
+
+    .custom-field-item:hover {
+      background: #0d1117;
     }
 
     .custom-field-item:last-child {
@@ -99,35 +130,43 @@ export class SettingsPage extends LitElement {
     }
 
     .custom-field-info h3 {
-      margin: 0 0 4px 0;
-      color: #333;
+      margin: 0 0 0.5rem 0;
+      color: #f0f6fc;
+      font-size: 16px;
+      font-weight: 600;
     }
 
     .custom-field-meta {
       font-size: 12px;
-      color: #666;
+      color: #8b949e;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .custom-field-type {
-      background: #f8f9fa;
-      padding: 2px 8px;
-      border-radius: 4px;
+      background: #21262d;
+      color: #58a6ff;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
       font-size: 11px;
       text-transform: uppercase;
-      margin-right: 8px;
+      font-weight: 500;
+      border: 1px solid #30363d;
     }
 
     .required-badge {
-      background: #dc3545;
+      background: #f85149;
       color: white;
-      padding: 2px 6px;
-      border-radius: 4px;
+      padding: 0.25rem 0.5rem;
+      border-radius: 6px;
       font-size: 10px;
+      font-weight: 500;
     }
 
     .custom-field-actions {
       display: flex;
-      gap: 8px;
+      gap: 0.5rem;
     }
 
     .form-overlay {
@@ -136,110 +175,167 @@ export class SettingsPage extends LitElement {
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0, 0, 0, 0.8);
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 1000;
+      backdrop-filter: blur(4px);
     }
 
     .form-container {
-      background: white;
-      padding: 24px;
-      border-radius: 8px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      padding: 2rem;
+      border-radius: 12px;
       width: 90%;
       max-width: 500px;
+      color-scheme: dark;
+      box-shadow: 0 16px 70px rgba(0, 0, 0, 0.5);
+    }
+
+    .form-container h2 {
+      margin: 0 0 1.5rem 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: #f0f6fc;
     }
 
     .form-group {
-      margin-bottom: 16px;
+      margin-bottom: 1.5rem;
     }
 
     .form-group label {
       display: block;
-      margin-bottom: 4px;
+      margin-bottom: 0.5rem;
       font-weight: 500;
+      color: #f0f6fc;
+      font-size: 14px;
     }
 
     .form-group input,
     .form-group select {
       width: 100%;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      padding: 0.75rem;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 8px;
       box-sizing: border-box;
+      color: #f0f6fc;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .form-group input::placeholder {
+      color: #8b949e;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #58a6ff;
+      box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
     }
 
     .checkbox-group {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 0.5rem;
     }
 
     .checkbox-group input[type="checkbox"] {
       width: auto;
+      margin: 0;
+    }
+
+    .checkbox-group label {
+      margin: 0;
+      font-size: 14px;
     }
 
     .form-actions {
       display: flex;
-      gap: 8px;
+      gap: 0.75rem;
       justify-content: flex-end;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #30363d;
     }
 
     .loading {
       text-align: center;
-      padding: 40px;
-      color: #666;
+      padding: 3rem;
+      color: #8b949e;
+      font-size: 16px;
     }
 
     .empty-state {
       text-align: center;
-      padding: 40px;
-      color: #666;
+      padding: 3rem;
+      color: #8b949e;
+    }
+
+    .empty-state p {
+      font-size: 16px;
+      margin: 0;
     }
 
     .section {
-      margin-bottom: 32px;
+      margin-bottom: 2rem;
     }
 
     .section-title {
-      margin-bottom: 16px;
-      padding-bottom: 8px;
-      border-bottom: 2px solid #eee;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #30363d;
+      font-size: 20px;
+      font-weight: 600;
+      color: #f0f6fc;
     }
 
     .btn-small {
-      padding: 4px 8px;
+      padding: 0.5rem 0.75rem;
       font-size: 12px;
     }
 
     .options-section {
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      padding: 12px;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 1rem;
+      background: #0d1117;
+      margin-top: 1rem;
+    }
+
+    .options-section h4 {
+      margin: 0 0 1rem 0;
+      color: #f0f6fc;
+      font-size: 14px;
+      font-weight: 600;
     }
 
     .option-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 0;
-      border-bottom: 1px solid #eee;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid #30363d;
     }
 
     .option-item:last-of-type {
       border-bottom: none;
-      margin-bottom: 12px;
+      margin-bottom: 1rem;
     }
 
     .option-text {
       flex: 1;
       font-size: 14px;
+      color: #f0f6fc;
     }
 
     .add-option {
       display: flex;
-      gap: 8px;
+      gap: 0.5rem;
       align-items: center;
     }
 
@@ -249,9 +345,10 @@ export class SettingsPage extends LitElement {
     }
 
     .field-options {
-      margin-top: 4px;
-      color: #666;
+      margin-top: 0.5rem;
+      color: #8b949e;
       font-size: 12px;
+      font-style: italic;
     }
   `;
 

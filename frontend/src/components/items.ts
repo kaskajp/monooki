@@ -112,95 +112,149 @@ export class ItemsPage extends LitElement {
   static styles = css`
     :host {
       display: block;
-      padding: 20px;
+      padding: 2rem;
+      background: #0d1117;
+      color: #f0f6fc;
+      min-height: 100vh;
+      color-scheme: dark;
     }
 
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 2rem;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 32px;
+      font-weight: 600;
+      color: #f0f6fc;
     }
 
     .filters {
       display: flex;
-      gap: 16px;
-      margin-bottom: 20px;
+      gap: 1rem;
+      margin-bottom: 2rem;
       flex-wrap: wrap;
+      padding: 1.5rem;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
     }
 
     .filter-group {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: 0.5rem;
+      min-width: 200px;
     }
 
     .filter-group label {
       font-size: 12px;
       font-weight: 500;
-      color: #666;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
 
     .filter-group input,
     .filter-group select {
-      padding: 6px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      padding: 0.75rem;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 8px;
       font-size: 14px;
+      color: #f0f6fc;
+      transition: all 0.2s ease;
+    }
+
+    .filter-group input::placeholder {
+      color: #8b949e;
+    }
+
+    .filter-group input:focus,
+    .filter-group select:focus {
+      outline: none;
+      border-color: #58a6ff;
+      box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
     }
 
     .btn {
-      padding: 8px 16px;
+      padding: 0.75rem 1rem;
       border: none;
-      border-radius: 4px;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 14px;
+      font-weight: 500;
       text-decoration: none;
-      display: inline-block;
-      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all 0.2s ease;
+      font-family: inherit;
     }
 
     .btn-primary {
-      background: #007bff;
+      background: #238636;
       color: white;
+    }
+
+    .btn-primary:hover {
+      background: #2ea043;
+      transform: translateY(-1px);
     }
 
     .btn-secondary {
-      background: #6c757d;
-      color: white;
+      background: #21262d;
+      color: #f0f6fc;
+      border: 1px solid #30363d;
+    }
+
+    .btn-secondary:hover {
+      background: #30363d;
+      border-color: #58a6ff;
     }
 
     .btn-danger {
-      background: #dc3545;
+      background: #da3633;
       color: white;
     }
 
-    .btn:hover {
-      opacity: 0.9;
+    .btn-danger:hover {
+      background: #f85149;
     }
 
     .items-grid {
       display: grid;
-      gap: 16px;
+      gap: 1.5rem;
       grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
     }
 
     .item-card {
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 16px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: all 0.2s ease;
       display: flex;
       flex-direction: column;
+    }
+
+    .item-card:hover {
+      border-color: #58a6ff;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
     }
 
     .item-photo {
       width: 100%;
       height: 200px;
       object-fit: cover;
-      border-radius: 4px;
-      margin-bottom: 12px;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      border: 1px solid #30363d;
     }
 
     .item-content {
@@ -208,69 +262,85 @@ export class ItemsPage extends LitElement {
     }
 
     .item-card h3 {
-      margin: 0 0 8px 0;
-      color: #333;
+      margin: 0 0 0.5rem 0;
+      color: #f0f6fc;
+      font-size: 18px;
+      font-weight: 600;
     }
 
     .item-description {
-      color: #666;
-      margin-bottom: 12px;
+      color: #8b949e;
+      margin-bottom: 1rem;
       font-size: 14px;
+      line-height: 1.5;
     }
 
     .item-details {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 12px;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
       font-size: 13px;
     }
 
     .item-detail {
       display: flex;
       justify-content: space-between;
+      padding: 0.5rem;
+      background: #0d1117;
+      border-radius: 6px;
+      border: 1px solid #21262d;
     }
 
     .item-detail-label {
       font-weight: 500;
-      color: #666;
+      color: #8b949e;
     }
 
     .item-detail-value {
-      color: #333;
+      color: #f0f6fc;
+      font-weight: 500;
     }
 
     .custom-fields {
-      margin-bottom: 16px;
+      margin-bottom: 1rem;
     }
 
     .custom-fields h4 {
-      margin: 0 0 8px 0;
-      font-size: 13px;
-      color: #333;
+      margin: 0 0 0.5rem 0;
+      font-size: 14px;
+      color: #f0f6fc;
+      font-weight: 600;
     }
 
     .custom-field {
       display: flex;
       justify-content: space-between;
-      padding: 4px 0;
+      padding: 0.5rem;
       font-size: 12px;
-      border-bottom: 1px solid #eee;
+      background: #0d1117;
+      border-radius: 6px;
+      border: 1px solid #21262d;
+      margin-bottom: 0.25rem;
     }
 
     .custom-field:last-child {
-      border-bottom: none;
+      margin-bottom: 0;
     }
 
     .item-meta {
       font-size: 12px;
-      color: #666;
-      margin-bottom: 16px;
+      color: #8b949e;
+      margin-bottom: 1rem;
+      padding: 0.5rem;
+      background: #0d1117;
+      border-radius: 6px;
+      border: 1px solid #21262d;
     }
 
     .item-actions {
       display: flex;
-      gap: 8px;
+      gap: 0.5rem;
     }
 
     .form-overlay {
@@ -279,27 +349,38 @@ export class ItemsPage extends LitElement {
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0,0,0,0.5);
+      background: rgba(0, 0, 0, 0.8);
       display: flex;
       justify-content: center;
       align-items: center;
       z-index: 1000;
+      backdrop-filter: blur(4px);
     }
 
     .form-container {
-      background: white;
-      padding: 24px;
-      border-radius: 8px;
+      background: #161b22;
+      border: 1px solid #30363d;
+      padding: 2rem;
+      border-radius: 12px;
       width: 90%;
-      max-width: 600px;
+      max-width: 700px;
       max-height: 90vh;
       overflow-y: auto;
+      color-scheme: dark;
+      box-shadow: 0 16px 70px rgba(0, 0, 0, 0.5);
+    }
+
+    .form-container h2 {
+      margin: 0 0 1.5rem 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: #f0f6fc;
     }
 
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 16px;
+      gap: 1rem;
     }
 
     .form-group-full {
@@ -307,82 +388,121 @@ export class ItemsPage extends LitElement {
     }
 
     .form-group {
-      margin-bottom: 16px;
+      margin-bottom: 1rem;
     }
 
     .form-group label {
       display: block;
-      margin-bottom: 4px;
+      margin-bottom: 0.5rem;
       font-weight: 500;
+      color: #f0f6fc;
+      font-size: 14px;
     }
 
     .form-group input,
     .form-group textarea,
     .form-group select {
       width: 100%;
-      padding: 8px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      padding: 0.75rem;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 8px;
       box-sizing: border-box;
+      color: #f0f6fc;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .form-group input::placeholder,
+    .form-group textarea::placeholder {
+      color: #8b949e;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #58a6ff;
+      box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
     }
 
     .form-group textarea {
       resize: vertical;
-      min-height: 80px;
+      min-height: 100px;
     }
 
     .custom-fields-section {
       grid-column: 1 / -1;
-      border: 1px solid #eee;
-      border-radius: 4px;
-      padding: 16px;
-      margin-bottom: 16px;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      background: #0d1117;
     }
 
     .custom-fields-section h4 {
-      margin: 0 0 12px 0;
-      color: #333;
+      margin: 0 0 1rem 0;
+      color: #f0f6fc;
+      font-size: 16px;
+      font-weight: 600;
     }
 
     .photos-section {
       grid-column: 1 / -1;
-      border: 1px solid #eee;
-      border-radius: 4px;
-      padding: 16px;
-      margin-bottom: 16px;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+      background: #0d1117;
     }
 
     .photos-section h4 {
-      margin: 0 0 12px 0;
-      color: #333;
+      margin: 0 0 1rem 0;
+      color: #f0f6fc;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .photos-section h5 {
+      margin: 1rem 0 0.5rem 0;
+      color: #f0f6fc;
+      font-size: 14px;
+      font-weight: 500;
     }
 
     .photo-upload {
-      margin-bottom: 16px;
+      margin-bottom: 1rem;
     }
 
     .photo-upload input[type="file"] {
-      margin-bottom: 8px;
+      margin-bottom: 0.5rem;
+      padding: 0.5rem;
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      color: #f0f6fc;
+      font-size: 14px;
     }
 
     .photo-preview {
       display: flex;
-      gap: 8px;
+      gap: 0.5rem;
       flex-wrap: wrap;
-      margin-bottom: 12px;
+      margin-bottom: 1rem;
     }
 
     .photo-preview img {
       width: 80px;
       height: 80px;
       object-fit: cover;
-      border-radius: 4px;
-      border: 1px solid #ddd;
+      border-radius: 6px;
+      border: 1px solid #30363d;
     }
 
     .existing-photos {
       display: flex;
-      gap: 8px;
+      gap: 0.5rem;
       flex-wrap: wrap;
     }
 
@@ -395,15 +515,15 @@ export class ItemsPage extends LitElement {
       width: 80px;
       height: 80px;
       object-fit: cover;
-      border-radius: 4px;
-      border: 1px solid #ddd;
+      border-radius: 6px;
+      border: 1px solid #30363d;
     }
 
     .delete-photo-btn {
       position: absolute;
       top: -8px;
       right: -8px;
-      background: #dc3545;
+      background: #f85149;
       color: white;
       border: none;
       border-radius: 50%;
@@ -414,24 +534,39 @@ export class ItemsPage extends LitElement {
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .delete-photo-btn:hover {
+      background: #da3633;
+      transform: scale(1.1);
     }
 
     .form-actions {
       display: flex;
-      gap: 8px;
+      gap: 0.75rem;
       justify-content: flex-end;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #30363d;
     }
 
     .loading {
       text-align: center;
-      padding: 40px;
-      color: #666;
+      padding: 3rem;
+      color: #8b949e;
+      font-size: 16px;
     }
 
     .empty-state {
       text-align: center;
-      padding: 40px;
-      color: #666;
+      padding: 3rem;
+      color: #8b949e;
+    }
+
+    .empty-state p {
+      font-size: 16px;
+      margin: 0;
     }
   `;
 

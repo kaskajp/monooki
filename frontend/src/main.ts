@@ -10,223 +10,337 @@ import './components/items.js';
 import './components/settings.js';
 
 @customElement('monooki-app')
-class MonookiApp extends LitElement {
+export class MonookiApp extends LitElement {
+  @state()
+  private isAuthenticated = false;
+
+  @state()
+  private currentView = 'dashboard';
+
   private router = new Router(this, [
     { path: '/', render: () => this.renderDashboard() },
-    { path: '/login', render: () => this.renderLogin() },
-    { path: '/register', render: () => this.renderRegister() },
-    { path: '/items', render: () => this.renderItems() },
-    { path: '/items/new', render: () => this.renderItemForm() },
-    { path: '/items/:id', render: ({ id }) => this.renderItemForm(id) },
-    { path: '/locations', render: () => this.renderLocations() },
-    { path: '/categories', render: () => this.renderCategories() },
-    { path: '/settings', render: () => this.renderSettings() },
+    { path: '/items', render: () => html`<items-page></items-page>` },
+    { path: '/locations', render: () => html`<locations-page></locations-page>` },
+    { path: '/categories', render: () => html`<categories-page></categories-page>` },
+    { path: '/settings', render: () => html`<settings-page></settings-page>` },
   ]);
-
-  @state()
-  isAuthenticated = false;
-
-  @state()
-  currentUser: any = null;
-
-  @state()
-  loading = true;
 
   static styles = css`
     :host {
       display: block;
       min-height: 100vh;
+      background: #0d1117;
+      color: #f0f6fc;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+      color-scheme: dark;
     }
-    
+
+    * {
+      box-sizing: border-box;
+    }
+
+    .app-container {
+      display: flex;
+      min-height: 100vh;
+    }
+
     .main-content {
-      padding: 20px 0;
+      flex: 1;
+      background: #0d1117;
+      overflow-y: auto;
+      color-scheme: dark;
     }
-    
+
+    .auth-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+      padding: 2rem;
+    }
+
+    .auth-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 16px 70px rgba(0, 0, 0, 0.5);
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .auth-header h1 {
+      margin: 0 0 0.5rem 0;
+      font-size: 24px;
+      font-weight: 600;
+      color: #f0f6fc;
+    }
+
+    .auth-header p {
+      margin: 0;
+      color: #8b949e;
+      font-size: 14px;
+    }
+
+    .auth-toggle {
+      text-align: center;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #30363d;
+    }
+
+    .auth-toggle button {
+      background: none;
+      border: none;
+      color: #58a6ff;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: underline;
+      padding: 0;
+    }
+
+    .auth-toggle button:hover {
+      color: #79c0ff;
+    }
+
     .dashboard {
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .dashboard-header {
+      margin-bottom: 2rem;
+    }
+
+    .dashboard-header h1 {
+      margin: 0 0 0.5rem 0;
+      font-size: 32px;
+      font-weight: 600;
+      color: #f0f6fc;
+    }
+
+    .dashboard-header p {
+      margin: 0;
+      color: #8b949e;
+      font-size: 16px;
+    }
+
+    .dashboard-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-      margin-top: 20px;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
     }
-    
-    .stat-card {
-      background: white;
-      padding: 20px;
+
+    .dashboard-card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .dashboard-card:hover {
+      border-color: #58a6ff;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .dashboard-card h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: #f0f6fc;
+    }
+
+    .dashboard-card p {
+      margin: 0 0 1rem 0;
+      color: #8b949e;
+      font-size: 14px;
+    }
+
+    .dashboard-card .metric {
+      font-size: 24px;
+      font-weight: 600;
+      color: #58a6ff;
+    }
+
+    .quick-actions {
+      margin-top: 2rem;
+    }
+
+    .quick-actions h2 {
+      margin: 0 0 1rem 0;
+      font-size: 20px;
+      font-weight: 600;
+      color: #f0f6fc;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .action-btn {
+      background: #238636;
+      color: white;
+      border: none;
       border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      text-align: center;
+      padding: 0.75rem 1.5rem;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
     }
-    
-    .stat-number {
-      font-size: 2rem;
-      font-weight: bold;
-      color: #007bff;
-      margin-bottom: 10px;
+
+    .action-btn:hover {
+      background: #2ea043;
+      transform: translateY(-1px);
     }
-    
-    .stat-label {
-      color: #666;
-      font-size: 0.9rem;
+
+    .action-btn.secondary {
+      background: #21262d;
+      color: #f0f6fc;
+      border: 1px solid #30363d;
+    }
+
+    .action-btn.secondary:hover {
+      background: #30363d;
+      border-color: #58a6ff;
+    }
+
+    @media (max-width: 768px) {
+      .dashboard {
+        padding: 1rem;
+      }
+
+      .dashboard-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
     }
   `;
 
-  async connectedCallback() {
+  connectedCallback() {
     super.connectedCallback();
-    await this.checkAuth();
+    this.checkAuthStatus();
   }
 
-  private async checkAuth() {
-    try {
-      const token = localStorage.getItem('token');
-      if (token) {
-        // Verify token is still valid by making a request
-        const response = await fetch('/api/items', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        
-        if (response.ok) {
-          this.isAuthenticated = true;
-          this.currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-        } else {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-        }
-      }
-    } catch (error) {
-      console.error('Auth check failed:', error);
-    } finally {
-      this.loading = false;
-    }
+  private checkAuthStatus() {
+    const token = localStorage.getItem('token');
+    this.isAuthenticated = !!token;
   }
 
-  private handleLogin = (event: CustomEvent) => {
-    const { token, user } = event.detail;
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
+  private handleLogin() {
     this.isAuthenticated = true;
-    this.currentUser = user;
     this.router.goto('/');
-  };
+  }
 
-  private handleLogout = () => {
+  private handleLogout() {
     localStorage.removeItem('token');
-    localStorage.removeItem('user');
     this.isAuthenticated = false;
-    this.currentUser = null;
-    this.router.goto('/login');
-  };
+    this.requestUpdate();
+  }
 
   private renderDashboard() {
     return html`
-      <div class="container">
-        <h1>Dashboard</h1>
-        <div class="dashboard">
-          <div class="stat-card">
-            <div class="stat-number">-</div>
-            <div class="stat-label">Total Items</div>
+      <div class="dashboard">
+        <div class="dashboard-header">
+          <h1>Welcome to Monooki</h1>
+          <p>Manage your home inventory with ease</p>
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="dashboard-card">
+            <h3>Items</h3>
+            <p>Total items in your inventory</p>
+            <div class="metric">-</div>
           </div>
-          <div class="stat-card">
-            <div class="stat-number">-</div>
-            <div class="stat-label">Locations</div>
+
+          <div class="dashboard-card">
+            <h3>Locations</h3>
+            <p>Organized storage locations</p>
+            <div class="metric">-</div>
           </div>
-          <div class="stat-card">
-            <div class="stat-number">-</div>
-            <div class="stat-label">Categories</div>
+
+          <div class="dashboard-card">
+            <h3>Categories</h3>
+            <p>Item categories for organization</p>
+            <div class="metric">-</div>
+          </div>
+
+          <div class="dashboard-card">
+            <h3>Recent Activity</h3>
+            <p>Latest inventory updates</p>
+            <div class="metric">-</div>
+          </div>
+        </div>
+
+        <div class="quick-actions">
+          <h2>Quick Actions</h2>
+          <div class="action-buttons">
+            <a href="/items" class="action-btn">
+              <span>📦</span> Add Item
+            </a>
+            <a href="/locations" class="action-btn secondary">
+              <span>📍</span> Manage Locations
+            </a>
+            <a href="/categories" class="action-btn secondary">
+              <span>🏷️</span> Manage Categories
+            </a>
+            <a href="/settings" class="action-btn secondary">
+              <span>⚙️</span> Settings
+            </a>
           </div>
         </div>
       </div>
     `;
   }
 
-  private renderLogin() {
-    return html`
-      <div class="container">
-        <login-form @login-success="${this.handleLogin}"></login-form>
-      </div>
-    `;
-  }
-
-  private renderRegister() {
-    return html`
-      <div class="container">
-        <register-form @register-success="${this.handleLogin}"></register-form>
-      </div>
-    `;
-  }
-
-  private renderItems() {
-    return html`
-      <div class="container">
-        <items-page></items-page>
-      </div>
-    `;
-  }
-
-  private renderItemForm(id?: string) {
-    return html`
-      <div class="container">
-        <h1>${id ? 'Edit' : 'Add'} Item</h1>
-        <p>Item form coming soon...</p>
-      </div>
-    `;
-  }
-
-  private renderLocations() {
-    return html`
-      <div class="container">
-        <locations-page></locations-page>
-      </div>
-    `;
-  }
-
-  private renderCategories() {
-    return html`
-      <div class="container">
-        <categories-page></categories-page>
-      </div>
-    `;
-  }
-
-  private renderSettings() {
-    return html`
-      <div class="container">
-        <settings-page></settings-page>
-      </div>
-    `;
-  }
-
   render() {
-    if (this.loading) {
-      return html`<div class="loading">Loading...</div>`;
-    }
-
-    const currentPath = window.location.pathname;
-    
-    if (!this.isAuthenticated && !['/login', '/register'].includes(currentPath)) {
+    if (!this.isAuthenticated) {
       return html`
-        <main class="main-content">
-          ${this.renderLogin()}
-        </main>
+        <div class="auth-container">
+          <div class="auth-card">
+            <div class="auth-header">
+              <h1>Monooki</h1>
+              <p>Your personal inventory management system</p>
+            </div>
+            
+            <login-form @login-success="${this.handleLogin}"></login-form>
+            
+            <div class="auth-toggle">
+              <p>Don't have an account? <button @click="${() => this.currentView = 'register'}">Sign up</button></p>
+            </div>
+          </div>
+        </div>
       `;
     }
 
     return html`
-      ${this.isAuthenticated ? html`
-        <app-navbar 
-          .currentUser="${this.currentUser}"
-          @logout="${this.handleLogout}">
-        </app-navbar>
-        
+      <div class="app-container">
+        <app-navbar @logout="${this.handleLogout}"></app-navbar>
         <main class="main-content">
           ${this.router.outlet()}
         </main>
-      ` : html`
-        <main class="main-content">
-          ${currentPath === '/register' ? this.renderRegister() : this.renderLogin()}
-        </main>
-      `}
+      </div>
     `;
   }
 }
