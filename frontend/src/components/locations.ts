@@ -98,53 +98,79 @@ export class LocationsPage extends LitElement {
       background: var(--btn-danger-bg-hover);
     }
 
-    .locations-grid {
-      display: grid;
-      gap: var(--spacing-xl);
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    .btn-small {
+      padding: 0.5rem 0.75rem;
+      font-size: 12px;
     }
 
-    .location-card {
+    .locations-table {
       background: var(--color-bg-secondary);
       border: 1px solid var(--color-border-primary);
       border-radius: var(--radius-lg);
-      padding: var(--spacing-xl);
-      transition: all var(--transition-normal);
+      overflow: hidden;
+      width: 100%;
     }
 
-    .location-card:hover {
-      border-color: var(--color-accent-primary);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
+    table {
+      width: 100%;
+      border-collapse: collapse;
     }
 
-    .location-card h3 {
-      margin: 0 0 var(--spacing-sm) 0;
-      color: var(--color-text-primary);
-      font-size: var(--font-size-lg);
+    th, td {
+      text-align: left;
+      padding: 1rem 1.5rem;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #21262d;
+      font-weight: 600;
+      color: #f0f6fc;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.75rem 1.5rem;
+      border-bottom: 1px solid #30363d;
+    }
+
+    td {
+      border-bottom: 1px solid #30363d;
+    }
+
+    tr:hover {
+      background: #0d1117;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .actions-cell {
+      text-align: right;
+      width: 150px;
+    }
+
+    .location-name {
       font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+      font-size: var(--font-size-base);
     }
 
     .location-description {
       color: var(--color-text-secondary);
-      margin-bottom: var(--spacing-lg);
       font-size: var(--font-size-sm);
-      line-height: var(--line-height-normal);
+      margin-top: var(--spacing-xs);
     }
 
-    .location-meta {
-      font-size: var(--font-size-xs);
+    .location-date {
       color: var(--color-text-secondary);
-      margin-bottom: var(--spacing-lg);
-      padding: var(--spacing-sm);
-      background: var(--color-bg-primary);
-      border-radius: var(--radius-sm);
-      border: 1px solid var(--color-border-secondary);
+      font-size: var(--font-size-sm);
     }
 
     .location-actions {
       display: flex;
-      gap: var(--spacing-sm);
+      gap: 0.5rem;
+      justify-content: flex-end;
     }
 
     .form-overlay {
@@ -384,27 +410,44 @@ export class LocationsPage extends LitElement {
           <p>No locations yet. Create your first location to get started!</p>
         </div>
       ` : html`
-        <div class="locations-grid">
-          ${this.locations.map(location => html`
-            <div class="location-card">
-              <h3>${location.name}</h3>
-              ${location.description ? html`
-                <div class="location-description">${location.description}</div>
-              ` : ''}
-              
-              <div class="location-meta">
-                Created: ${new Date(location.created_at).toLocaleDateString()}
-              </div>
-              <div class="location-actions">
-                <button class="btn btn-secondary" @click="${() => this.showEditForm(location)}">
-                  Edit
-                </button>
-                <button class="btn btn-danger" @click="${() => this.deleteLocation(location)}">
-                  Delete
-                </button>
-              </div>
-            </div>
-          `)}
+        <div class="locations-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Created</th>
+                <th class="actions-cell">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${this.locations.map(location => html`
+                <tr>
+                  <td>
+                    <div class="location-name">${location.name}</div>
+                  </td>
+                  <td>
+                    <div class="location-description">
+                      ${location.description || '—'}
+                    </div>
+                  </td>
+                  <td>
+                    <div class="location-date">${new Date(location.created_at).toLocaleDateString()}</div>
+                  </td>
+                  <td class="actions-cell">
+                    <div class="location-actions">
+                      <button class="btn btn-secondary btn-small" @click="${() => this.showEditForm(location)}">
+                        Edit
+                      </button>
+                      <button class="btn btn-danger btn-small" @click="${() => this.deleteLocation(location)}">
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              `)}
+            </tbody>
+          </table>
         </div>
       `}
 

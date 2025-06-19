@@ -227,121 +227,118 @@ export class ItemsPage extends LitElement {
       background: var(--btn-danger-bg-hover);
     }
 
-    .items-grid {
-      display: grid;
-      gap: var(--spacing-xl);
-      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    .btn-small {
+      padding: 0.5rem 0.75rem;
+      font-size: 12px;
     }
 
-    .item-card {
+    .items-table {
       background: var(--color-bg-secondary);
       border: 1px solid var(--color-border-primary);
       border-radius: var(--radius-lg);
-      padding: var(--spacing-xl);
-      transition: all var(--transition-normal);
-      display: flex;
-      flex-direction: column;
-    }
-
-    .item-card:hover {
-      border-color: var(--color-accent-primary);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-lg);
-    }
-
-    .item-photo {
+      overflow: hidden;
       width: 100%;
-      height: 200px;
-      object-fit: cover;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-      border: 1px solid #30363d;
     }
 
-    .item-content {
-      flex: 1;
+    table {
+      width: 100%;
+      border-collapse: collapse;
     }
 
-    .item-card h3 {
-      margin: 0 0 0.5rem 0;
-      color: #f0f6fc;
-      font-size: 18px;
+    th, td {
+      text-align: left;
+      padding: 1rem 1.5rem;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #21262d;
       font-weight: 600;
+      color: #f0f6fc;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.75rem 1.5rem;
+      border-bottom: 1px solid #30363d;
+    }
+
+    td {
+      border-bottom: 1px solid #30363d;
+    }
+
+    tr:hover {
+      background: #0d1117;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .actions-cell {
+      text-align: right;
+      width: 150px;
+    }
+
+    .item-name {
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+      font-size: var(--font-size-base);
     }
 
     .item-description {
-      color: #8b949e;
-      margin-bottom: 1rem;
-      font-size: 14px;
-      line-height: 1.5;
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
+      margin-top: var(--spacing-xs);
     }
 
-    .item-details {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-      margin-bottom: 1rem;
-      font-size: 13px;
+    .item-location,
+    .item-category {
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
     }
 
-    .item-detail {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.5rem;
-      background: #0d1117;
-      border-radius: 6px;
-      border: 1px solid #21262d;
+    .item-quantity {
+      color: var(--color-accent-primary);
+      font-weight: var(--font-weight-medium);
+      font-size: var(--font-size-sm);
     }
 
-    .item-detail-label {
-      font-weight: 500;
-      color: #8b949e;
+    .item-price {
+      color: var(--color-text-primary);
+      font-weight: var(--font-weight-medium);
+      font-size: var(--font-size-sm);
     }
 
-    .item-detail-value {
-      color: #f0f6fc;
-      font-weight: 500;
-    }
-
-    .custom-fields {
-      margin-bottom: 1rem;
-    }
-
-    .custom-fields h4 {
-      margin: 0 0 0.5rem 0;
-      font-size: 14px;
-      color: #f0f6fc;
-      font-weight: 600;
-    }
-
-    .custom-field {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.5rem;
-      font-size: 12px;
-      background: #0d1117;
-      border-radius: 6px;
-      border: 1px solid #21262d;
-      margin-bottom: 0.25rem;
-    }
-
-    .custom-field:last-child {
-      margin-bottom: 0;
-    }
-
-    .item-meta {
-      font-size: 12px;
-      color: #8b949e;
-      margin-bottom: 1rem;
-      padding: 0.5rem;
-      background: #0d1117;
-      border-radius: 6px;
-      border: 1px solid #21262d;
+    .item-date {
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
     }
 
     .item-actions {
       display: flex;
       gap: 0.5rem;
+      justify-content: flex-end;
+    }
+
+    .item-photo {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      object-fit: cover;
+      border: 1px solid var(--color-border-secondary);
+    }
+
+    .no-photo {
+      width: 40px;
+      height: 40px;
+      background: var(--color-bg-tertiary);
+      border: 1px solid var(--color-border-secondary);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-xs);
     }
 
     .form-overlay {
@@ -1006,8 +1003,6 @@ export class ItemsPage extends LitElement {
       return html`<div class="loading">Loading items...</div>`;
     }
 
-    const filteredItems = this.filteredAndSortedItems;
-
     return html`
       <div class="header">
         <h1>Items</h1>
@@ -1021,134 +1016,107 @@ export class ItemsPage extends LitElement {
           <label>Search</label>
           <input
             type="text"
-            placeholder="Search items..."
             .value="${this.searchTerm}"
             @input="${(e: Event) => this.searchTerm = (e.target as HTMLInputElement).value}"
+            placeholder="Search items..."
           />
         </div>
-        
         <div class="filter-group">
           <label>Category</label>
           <select .value="${this.selectedCategory}" @change="${(e: Event) => this.selectedCategory = (e.target as HTMLSelectElement).value}">
             <option value="">All Categories</option>
-            ${this.categories.map(cat => html`
-              <option value="${cat.id}">${cat.name}</option>
+            ${this.categories.map(category => html`
+              <option value="${category.id}">${category.name}</option>
             `)}
           </select>
         </div>
-        
         <div class="filter-group">
           <label>Location</label>
           <select .value="${this.selectedLocation}" @change="${(e: Event) => this.selectedLocation = (e.target as HTMLSelectElement).value}">
             <option value="">All Locations</option>
-            ${this.locations.map(loc => html`
-              <option value="${loc.id}">${loc.name}</option>
+            ${this.locations.map(location => html`
+              <option value="${location.id}">${location.name}</option>
             `)}
           </select>
         </div>
-        
         <div class="filter-group">
           <label>Sort By</label>
           <select .value="${this.sortBy}" @change="${(e: Event) => this.sortBy = (e.target as HTMLSelectElement).value}">
             <option value="name">Name</option>
-            <option value="created_at">Date Added</option>
+            <option value="created_at">Date Created</option>
             <option value="purchase_date">Purchase Date</option>
-            <option value="purchase_price">Purchase Price</option>
+            <option value="purchase_price">Price</option>
+            <option value="quantity">Quantity</option>
           </select>
         </div>
       </div>
 
-      ${filteredItems.length === 0 ? html`
+      ${this.filteredAndSortedItems.length === 0 ? html`
         <div class="empty-state">
-          <p>${this.items.length === 0 ? 'No items yet. Add your first item to get started!' : 'No items match your current filters.'}</p>
+          <p>No items found. ${this.items.length === 0 ? 'Create your first item to get started!' : 'Try adjusting your filters.'}</p>
         </div>
       ` : html`
-        <div class="items-grid">
-          ${filteredItems.map(item => html`
-            <div class="item-card">
-              ${item.first_photo ? html`
-                <img 
-                  src="/api/photos/files/${item.first_photo}" 
-                  alt="${item.name}" 
-                  class="item-photo"
-                />
-              ` : ''}
-              <div class="item-content">
-                <h3>${item.name}</h3>
-              ${item.description ? html`
-                <div class="item-description">${item.description}</div>
-              ` : ''}
-              
-              <div class="item-details">
-                ${item.location ? html`
-                  <div class="item-detail">
-                    <span class="item-detail-label">Location:</span>
-                    <span class="item-detail-value">${item.location.name}</span>
-                  </div>
-                ` : ''}
-                
-                ${item.category ? html`
-                  <div class="item-detail">
-                    <span class="item-detail-label">Category:</span>
-                    <span class="item-detail-value">${item.category.name}</span>
-                  </div>
-                ` : ''}
-                
-                ${item.quantity ? html`
-                  <div class="item-detail">
-                    <span class="item-detail-label">Quantity:</span>
-                    <span class="item-detail-value">${item.quantity}</span>
-                  </div>
-                ` : ''}
-                
-                ${item.model_number ? html`
-                  <div class="item-detail">
-                    <span class="item-detail-label">Model:</span>
-                    <span class="item-detail-value">${item.model_number}</span>
-                  </div>
-                ` : ''}
-                
-                ${item.serial_number ? html`
-                  <div class="item-detail">
-                    <span class="item-detail-label">Serial:</span>
-                    <span class="item-detail-value">${item.serial_number}</span>
-                  </div>
-                ` : ''}
-                
-                ${item.purchase_price ? html`
-                  <div class="item-detail">
-                    <span class="item-detail-label">Price:</span>
-                    <span class="item-detail-value">$${item.purchase_price}</span>
-                  </div>
-                ` : ''}
-              </div>
-              
-              ${item.custom_fields && Object.keys(item.custom_fields).length > 0 ? html`
-                <div class="custom-fields">
-                  <h4>Additional Information</h4>
-                  ${Object.entries(item.custom_fields).map(([key, value]) => html`
-                    <div class="custom-field">
-                      <span class="item-detail-label">${key}:</span>
-                      <span class="item-detail-value">${value}</span>
+        <div class="items-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Photo</th>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Location</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Created</th>
+                <th class="actions-cell">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${this.filteredAndSortedItems.map(item => html`
+                <tr>
+                  <td>
+                                         ${item.first_photo ? html`
+                       <img class="item-photo" src="/api/photos/files/${item.first_photo}" alt="${item.name}" />
+                     ` : html`
+                       <div class="no-photo">📷</div>
+                     `}
+                  </td>
+                  <td>
+                    <div class="item-name">${item.name}</div>
+                    ${item.description ? html`
+                      <div class="item-description">${item.description}</div>
+                    ` : ''}
+                  </td>
+                  <td>
+                    <div class="item-category">${item.category?.name || '—'}</div>
+                  </td>
+                  <td>
+                    <div class="item-location">${item.location?.name || '—'}</div>
+                  </td>
+                  <td>
+                    <div class="item-quantity">${item.quantity || 1}</div>
+                  </td>
+                  <td>
+                    <div class="item-price">
+                      ${item.purchase_price ? `$${item.purchase_price}` : '—'}
                     </div>
-                  `)}
-                </div>
-              ` : ''}
-              
-              <div class="item-meta">
-                Created: ${new Date(item.created_at).toLocaleDateString()}
-              </div>
-                <div class="item-actions">
-                  <button class="btn btn-secondary" @click="${() => this.showEditForm(item)}">
-                    Edit
-                  </button>
-                  <button class="btn btn-danger" @click="${() => this.deleteItem(item)}">
-                    Delete
-                  </button>
-                </div>
-              </div>
-            </div>
-          `)}
+                  </td>
+                  <td>
+                    <div class="item-date">${new Date(item.created_at).toLocaleDateString()}</div>
+                  </td>
+                  <td class="actions-cell">
+                    <div class="item-actions">
+                      <button class="btn btn-secondary btn-small" @click="${() => this.showEditForm(item)}">
+                        Edit
+                      </button>
+                      <button class="btn btn-danger btn-small" @click="${() => this.deleteItem(item)}">
+                        Delete
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              `)}
+            </tbody>
+          </table>
         </div>
       `}
 
