@@ -347,6 +347,41 @@ export class ItemView extends LitElement {
       gap: var(--spacing-md);
     }
 
+    /* Global badge styles */
+    .badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      white-space: nowrap;
+      display: inline-block;
+      text-transform: capitalize;
+    }
+
+    .badge--required {
+      background: var(--color-accent-primary);
+      color: white;
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .badge--optional {
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-secondary);
+    }
+
+    .badge--type {
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-secondary);
+    }
+
+    .badge--label {
+      background: var(--color-accent-primary);
+      color: white;
+      font-weight: var(--font-weight-semibold);
+      font-family: 'Courier New', monospace;
+      text-transform: none;
+    }
+
     @media (max-width: 768px) {
       .content {
         grid-template-columns: 1fr;
@@ -651,8 +686,8 @@ export class ItemView extends LitElement {
               ${this.item.label_id ? html`
                 <div class="info-item">
                   <span class="info-label">Label ID</span>
-                  <span class="info-value" style="font-family: 'Courier New', monospace; font-weight: var(--font-weight-semibold); color: var(--color-accent-primary);">
-                    ${this.item.label_id}
+                  <span class="info-value">
+                    <span class="badge badge--label">${this.item.label_id}</span>
                   </span>
                 </div>
               ` : ''}

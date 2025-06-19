@@ -315,15 +315,39 @@ export class ItemsPage extends LitElement {
       font-size: var(--font-size-xs);
     }
 
-    .item-label-id {
-      background: var(--color-accent-primary);
-      color: white;
+    /* Global badge styles */
+    .badge {
       padding: 0.25rem 0.5rem;
       border-radius: var(--radius-sm);
       font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      white-space: nowrap;
+      display: inline-block;
+      text-transform: capitalize;
+    }
+
+    .badge--required {
+      background: var(--color-accent-primary);
+      color: white;
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .badge--optional {
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-secondary);
+    }
+
+    .badge--type {
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-secondary);
+    }
+
+    .badge--label {
+      background: var(--color-accent-primary);
+      color: white;
       font-weight: var(--font-weight-semibold);
       font-family: 'Courier New', monospace;
-      white-space: nowrap;
+      text-transform: none;
     }
 
     .empty-label {
@@ -1179,7 +1203,7 @@ export class ItemsPage extends LitElement {
                   </td>
                   <td>
                     ${item.label_id ? html`
-                      <div class="item-label-id">${item.label_id}</div>
+                      <span class="badge badge--label">${item.label_id}</span>
                     ` : html`
                       <span class="empty-label">—</span>
                     `}
@@ -1258,7 +1282,7 @@ export class ItemsPage extends LitElement {
                   <label>Label ID</label>
                   <div class="readonly-field">
                     ${this.editingItem?.label_id ? html`
-                      <span class="item-label-id">${this.editingItem.label_id}</span>
+                      <span class="badge badge--label">${this.editingItem.label_id}</span>
                       <span class="readonly-note">(auto-generated)</span>
                     ` : html`
                       <span class="readonly-placeholder">Will be auto-generated</span>

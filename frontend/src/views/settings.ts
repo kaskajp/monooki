@@ -317,10 +317,107 @@ export class SettingsPage extends LitElement {
     }
 
     .field-options {
-      margin-top: 0.5rem;
-      color: #8b949e;
-      font-size: 12px;
-      font-style: italic;
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
+    }
+
+    /* Table styles */
+    .items-table {
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border-primary);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      width: 100%;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 1rem 1.5rem;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #21262d;
+      font-weight: 600;
+      color: #f0f6fc;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0.75rem 1.5rem;
+      border-bottom: 1px solid #30363d;
+    }
+
+    td {
+      border-bottom: 1px solid #30363d;
+    }
+
+    tbody tr:hover {
+      background: #0d1117;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .actions-cell {
+      text-align: right;
+      width: 150px;
+    }
+
+    .item-actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: flex-end;
+      position: relative;
+      z-index: 10;
+    }
+
+    .item-name {
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+      font-size: var(--font-size-base);
+    }
+
+    .item-date {
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
+    }
+
+    /* Global badge styles */
+    .badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      white-space: nowrap;
+      display: inline-block;
+      text-transform: capitalize;
+    }
+
+    .badge--required {
+      background: var(--color-accent-primary);
+      color: white;
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .badge--optional {
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-secondary);
+    }
+
+    .badge--type {
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-secondary);
+    }
+
+    .empty-label {
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
     }
   `;
 
@@ -696,31 +793,60 @@ export class SettingsPage extends LitElement {
             <p>No custom fields defined yet. Create custom fields to add additional information to your items.</p>
           </div>
         ` : html`
-          <div class="custom-fields-list">
-            ${this.customFields.map(field => html`
-              <div class="custom-field-item">
-                <div class="custom-field-info">
-                  <h3>${field.name}</h3>
-                  <div class="custom-field-meta">
-                    <span class="custom-field-type">${field.field_type}</span>
-                    ${field.required ? html`<span class="required-badge">Required</span>` : ''}
-                  </div>
-                  ${field.field_type === 'enum' && field.options ? html`
-                    <div class="field-options">
-                      <small>Options: ${field.options.join(', ')}</small>
-                    </div>
-                  ` : ''}
-                </div>
-                <div class="custom-field-actions">
-                  <app-button variant="secondary" size="sm" icon-only @button-click="${() => this.showEditForm(field)}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>16 pen 01</title><g fill="currentColor" class="nc-icon-wrapper"><line id="butt_color" data-name="butt color" x1="13" y1="7" x2="9" y2="3" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-cap="butt" data-color="color-2"></line> <polygon points="5.5 14.5 0.5 15.5 1.5 10.5 11.5 0.5 15.5 4.5 5.5 14.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-cap="butt"></polygon></g></svg>
-                  </app-button>
-                  <app-button variant="danger" size="sm" icon-only @button-click="${() => this.deleteCustomField(field)}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>16 trash can</title><g fill="currentColor" class="nc-icon-wrapper"><path d="M2.5,5.5l.865,8.649A1.5,1.5,0,0,0,4.857,15.5h6.286a1.5,1.5,0,0,0,1.492-1.351L13.5,5.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path><line data-color="color-2" x1="0.5" y1="3.5" x2="15.5" y2="3.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></line><polyline data-color="color-2" points="5.5 3.5 5.5 0.5 10.5 0.5 10.5 3.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></polyline> </g></svg>
-                  </app-button>
-                </div>
-              </div>
-            `)}
+          <div class="items-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Type</th>
+                  <th>Required</th>
+                  <th>Options</th>
+                  <th>Created</th>
+                  <th class="actions-cell">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${this.customFields.map(field => html`
+                  <tr>
+                    <td>
+                      <div class="item-name">${field.name}</div>
+                    </td>
+                    <td>
+                      <span class="badge badge--type">${field.field_type}</span>
+                    </td>
+                    <td>
+                      ${field.required ? html`
+                        <span class="badge badge--required">Required</span>
+                      ` : html`
+                        <span class="badge badge--optional">Optional</span>
+                      `}
+                    </td>
+                    <td>
+                      ${field.field_type === 'enum' && field.options ? html`
+                        <div class="field-options">
+                          ${field.options.join(', ')}
+                        </div>
+                      ` : html`
+                        <span class="empty-label">—</span>
+                      `}
+                    </td>
+                    <td>
+                      <div class="item-date">${new Date(field.created_at || Date.now()).toLocaleDateString()}</div>
+                    </td>
+                    <td class="actions-cell">
+                      <div class="item-actions">
+                        <app-button variant="secondary" size="sm" icon-only @button-click="${() => this.showEditForm(field)}">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>16 pen 01</title><g fill="currentColor" class="nc-icon-wrapper"><line id="butt_color" data-name="butt color" x1="13" y1="7" x2="9" y2="3" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-cap="butt" data-color="color-2"></line> <polygon points="5.5 14.5 0.5 15.5 1.5 10.5 11.5 0.5 15.5 4.5 5.5 14.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-cap="butt"></polygon></g></svg>
+                        </app-button>
+                        <app-button variant="danger" size="sm" icon-only @button-click="${() => this.deleteCustomField(field)}">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>16 trash can</title><g fill="currentColor" class="nc-icon-wrapper"><path d="M2.5,5.5l.865,8.649A1.5,1.5,0,0,0,4.857,15.5h6.286a1.5,1.5,0,0,0,1.492-1.351L13.5,5.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path><line data-color="color-2" x1="0.5" y1="3.5" x2="15.5" y2="3.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></line><polyline data-color="color-2" points="5.5 3.5 5.5 0.5 10.5 0.5 10.5 3.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></polyline> </g></svg>
+                        </app-button>
+                      </div>
+                    </td>
+                  </tr>
+                `)}
+              </tbody>
+            </table>
           </div>
         `}
       </div>
