@@ -112,9 +112,9 @@ export class ItemsPage extends LitElement {
   static styles = css`
     :host {
       display: block;
-      padding: 2rem;
-      background: #0d1117;
-      color: #f0f6fc;
+      padding: var(--spacing-2xl);
+      background: var(--color-bg-primary);
+      color: var(--color-text-primary);
       min-height: 100vh;
       color-scheme: dark;
     }
@@ -123,130 +123,130 @@ export class ItemsPage extends LitElement {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 2rem;
+      margin-bottom: var(--spacing-2xl);
     }
 
     .header h1 {
       margin: 0;
-      font-size: 32px;
-      font-weight: 600;
-      color: #f0f6fc;
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
     }
 
     .filters {
       display: flex;
-      gap: 1rem;
-      margin-bottom: 2rem;
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-2xl);
       flex-wrap: wrap;
-      padding: 1.5rem;
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 12px;
+      padding: var(--spacing-xl);
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border-primary);
+      border-radius: var(--radius-lg);
     }
 
     .filter-group {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      gap: var(--spacing-sm);
       min-width: 200px;
     }
 
     .filter-group label {
-      font-size: 12px;
-      font-weight: 500;
-      color: #8b949e;
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-secondary);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
     .filter-group input,
     .filter-group select {
-      padding: 0.75rem;
-      background: #0d1117;
-      border: 1px solid #30363d;
-      border-radius: 8px;
-      font-size: 14px;
-      color: #f0f6fc;
-      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      transition: all 0.2s ease;
+      padding: var(--spacing-md);
+      background: var(--form-bg);
+      border: 1px solid var(--form-border);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-sm);
+      color: var(--form-text);
+      font-family: var(--font-family-primary);
+      transition: all var(--transition-normal);
     }
 
     .filter-group input::placeholder {
-      color: #8b949e;
+      color: var(--form-placeholder);
     }
 
     .filter-group input:focus,
     .filter-group select:focus {
       outline: none;
-      border-color: #58a6ff;
-      box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+      border-color: var(--form-border-focus);
+      box-shadow: var(--shadow-focus);
     }
 
     .btn {
-      padding: 0.75rem 1rem;
+      padding: var(--spacing-md) var(--spacing-lg);
       border: none;
-      border-radius: 8px;
+      border-radius: var(--radius-md);
       cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
       text-decoration: none;
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      transition: all 0.2s ease;
-      font-family: inherit;
+      gap: var(--spacing-sm);
+      transition: all var(--transition-normal);
+      font-family: var(--font-family-primary);
     }
 
     .btn-primary {
-      background: #238636;
-      color: white;
+      background: var(--btn-primary-bg);
+      color: var(--btn-primary-text);
     }
 
     .btn-primary:hover {
-      background: #2ea043;
+      background: var(--btn-primary-bg-hover);
       transform: translateY(-1px);
     }
 
     .btn-secondary {
-      background: #21262d;
-      color: #f0f6fc;
-      border: 1px solid #30363d;
+      background: var(--btn-secondary-bg);
+      color: var(--btn-secondary-text);
+      border: 1px solid var(--btn-secondary-border);
     }
 
     .btn-secondary:hover {
-      background: #30363d;
-      border-color: #58a6ff;
+      background: var(--btn-secondary-bg-hover);
+      border-color: var(--btn-secondary-border-hover);
     }
 
     .btn-danger {
-      background: #da3633;
-      color: white;
+      background: var(--btn-danger-bg);
+      color: var(--btn-danger-text);
     }
 
     .btn-danger:hover {
-      background: #f85149;
+      background: var(--btn-danger-bg-hover);
     }
 
     .items-grid {
       display: grid;
-      gap: 1.5rem;
+      gap: var(--spacing-xl);
       grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
     }
 
     .item-card {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 12px;
-      padding: 1.5rem;
-      transition: all 0.2s ease;
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border-primary);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-xl);
+      transition: all var(--transition-normal);
       display: flex;
       flex-direction: column;
     }
 
     .item-card:hover {
-      border-color: #58a6ff;
+      border-color: var(--color-accent-primary);
       transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      box-shadow: var(--shadow-lg);
     }
 
     .item-photo {
@@ -404,15 +404,15 @@ export class ItemsPage extends LitElement {
     .form-group textarea,
     .form-group select {
       width: 100%;
-      padding: 0.75rem;
-      background: #0d1117;
-      border: 1px solid #30363d;
-      border-radius: 8px;
+      padding: var(--spacing-md);
+      background: var(--form-bg);
+      border: 1px solid var(--form-border);
+      border-radius: var(--radius-md);
       box-sizing: border-box;
-      color: #f0f6fc;
-      font-size: 14px;
-      transition: all 0.2s ease;
-      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: var(--form-text);
+      font-size: var(--font-size-sm);
+      transition: all var(--transition-normal);
+      font-family: var(--font-family-primary);
     }
 
     .form-group input::placeholder,

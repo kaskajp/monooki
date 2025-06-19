@@ -39,9 +39,9 @@ export class SettingsPage extends LitElement {
   static styles = css`
     :host {
       display: block;
-      padding: 2rem;
-      background: #0d1117;
-      color: #f0f6fc;
+      padding: var(--spacing-2xl);
+      background: var(--color-bg-primary);
+      color: var(--color-text-primary);
       min-height: 100vh;
       color-scheme: dark;
     }
@@ -50,65 +50,65 @@ export class SettingsPage extends LitElement {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 2rem;
+      margin-bottom: var(--spacing-2xl);
     }
 
     .header h1 {
       margin: 0;
-      font-size: 32px;
-      font-weight: 600;
-      color: #f0f6fc;
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
     }
 
     .btn {
-      padding: 0.75rem 1rem;
+      padding: var(--spacing-md) var(--spacing-lg);
       border: none;
-      border-radius: 8px;
+      border-radius: var(--radius-md);
       cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
       text-decoration: none;
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      transition: all 0.2s ease;
-      font-family: inherit;
+      gap: var(--spacing-sm);
+      transition: all var(--transition-normal);
+      font-family: var(--font-family-primary);
     }
 
     .btn-primary {
-      background: #238636;
-      color: white;
+      background: var(--btn-primary-bg);
+      color: var(--btn-primary-text);
     }
 
     .btn-primary:hover {
-      background: #2ea043;
+      background: var(--btn-primary-bg-hover);
       transform: translateY(-1px);
     }
 
     .btn-secondary {
-      background: #21262d;
-      color: #f0f6fc;
-      border: 1px solid #30363d;
+      background: var(--btn-secondary-bg);
+      color: var(--btn-secondary-text);
+      border: 1px solid var(--btn-secondary-border);
     }
 
     .btn-secondary:hover {
-      background: #30363d;
-      border-color: #58a6ff;
+      background: var(--btn-secondary-bg-hover);
+      border-color: var(--btn-secondary-border-hover);
     }
 
     .btn-danger {
-      background: #da3633;
-      color: white;
+      background: var(--btn-danger-bg);
+      color: var(--btn-danger-text);
     }
 
     .btn-danger:hover {
-      background: #f85149;
+      background: var(--btn-danger-bg-hover);
     }
 
     .custom-fields-list {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 12px;
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border-primary);
+      border-radius: var(--radius-lg);
       overflow: hidden;
     }
 
@@ -116,13 +116,13 @@ export class SettingsPage extends LitElement {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1.5rem;
-      border-bottom: 1px solid #30363d;
-      transition: background 0.2s ease;
+      padding: var(--spacing-xl);
+      border-bottom: 1px solid var(--color-border-primary);
+      transition: background var(--transition-normal);
     }
 
     .custom-field-item:hover {
-      background: #0d1117;
+      background: var(--color-bg-primary);
     }
 
     .custom-field-item:last-child {
@@ -130,38 +130,38 @@ export class SettingsPage extends LitElement {
     }
 
     .custom-field-info h3 {
-      margin: 0 0 0.5rem 0;
-      color: #f0f6fc;
-      font-size: 16px;
-      font-weight: 600;
+      margin: 0 0 var(--spacing-sm) 0;
+      color: var(--color-text-primary);
+      font-size: var(--font-size-base);
+      font-weight: var(--font-weight-semibold);
     }
 
     .custom-field-meta {
-      font-size: 12px;
-      color: #8b949e;
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: var(--spacing-sm);
     }
 
     .custom-field-type {
-      background: #21262d;
-      color: #58a6ff;
-      padding: 0.25rem 0.5rem;
-      border-radius: 6px;
+      background: var(--color-bg-tertiary);
+      color: var(--color-accent-primary);
+      padding: var(--spacing-xs) var(--spacing-sm);
+      border-radius: var(--radius-sm);
       font-size: 11px;
       text-transform: uppercase;
-      font-weight: 500;
-      border: 1px solid #30363d;
+      font-weight: var(--font-weight-medium);
+      border: 1px solid var(--color-border-primary);
     }
 
     .required-badge {
-      background: #f85149;
+      background: var(--color-danger);
       color: white;
-      padding: 0.25rem 0.5rem;
-      border-radius: 6px;
+      padding: var(--spacing-xs) var(--spacing-sm);
+      border-radius: var(--radius-sm);
       font-size: 10px;
-      font-weight: 500;
+      font-weight: var(--font-weight-medium);
     }
 
     .custom-field-actions {
@@ -175,7 +175,7 @@ export class SettingsPage extends LitElement {
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0, 0, 0, 0.8);
+      background: var(--color-bg-overlay);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -184,58 +184,58 @@ export class SettingsPage extends LitElement {
     }
 
     .form-container {
-      background: #161b22;
-      border: 1px solid #30363d;
-      padding: 2rem;
-      border-radius: 12px;
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border-primary);
+      padding: var(--spacing-2xl);
+      border-radius: var(--radius-lg);
       width: 90%;
       max-width: 500px;
       color-scheme: dark;
-      box-shadow: 0 16px 70px rgba(0, 0, 0, 0.5);
+      box-shadow: var(--shadow-lg);
     }
 
     .form-container h2 {
-      margin: 0 0 1.5rem 0;
-      font-size: 24px;
-      font-weight: 600;
-      color: #f0f6fc;
+      margin: 0 0 var(--spacing-xl) 0;
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
     }
 
     .form-group {
-      margin-bottom: 1.5rem;
+      margin-bottom: var(--spacing-xl);
     }
 
     .form-group label {
       display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-      color: #f0f6fc;
-      font-size: 14px;
+      margin-bottom: var(--spacing-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
+      font-size: var(--font-size-sm);
     }
 
     .form-group input,
     .form-group select {
       width: 100%;
-      padding: 0.75rem;
-      background: #0d1117;
-      border: 1px solid #30363d;
-      border-radius: 8px;
+      padding: var(--spacing-md);
+      background: var(--form-bg);
+      border: 1px solid var(--form-border);
+      border-radius: var(--radius-md);
       box-sizing: border-box;
-      color: #f0f6fc;
-      font-size: 14px;
-      transition: all 0.2s ease;
-      font-family: inherit;
+      color: var(--form-text);
+      font-size: var(--font-size-sm);
+      transition: all var(--transition-normal);
+      font-family: var(--font-family-primary);
     }
 
     .form-group input::placeholder {
-      color: #8b949e;
+      color: var(--form-placeholder);
     }
 
     .form-group input:focus,
     .form-group select:focus {
       outline: none;
-      border-color: #58a6ff;
-      box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+      border-color: var(--form-border-focus);
+      box-shadow: var(--shadow-focus);
     }
 
     .checkbox-group {
@@ -300,37 +300,37 @@ export class SettingsPage extends LitElement {
     }
 
     .options-section {
-      border: 1px solid #30363d;
-      border-radius: 8px;
-      padding: 1rem;
-      background: #0d1117;
-      margin-top: 1rem;
+      border: 1px solid var(--color-border-primary);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-lg);
+      background: var(--color-bg-primary);
+      margin-top: var(--spacing-lg);
     }
 
     .options-section h4 {
-      margin: 0 0 1rem 0;
-      color: #f0f6fc;
-      font-size: 14px;
-      font-weight: 600;
+      margin: 0 0 var(--spacing-lg) 0;
+      color: var(--color-text-primary);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
     }
 
     .option-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.75rem 0;
-      border-bottom: 1px solid #30363d;
+      padding: var(--spacing-md) 0;
+      border-bottom: 1px solid var(--color-border-primary);
     }
 
     .option-item:last-of-type {
       border-bottom: none;
-      margin-bottom: 1rem;
+      margin-bottom: var(--spacing-lg);
     }
 
     .option-text {
       flex: 1;
-      font-size: 14px;
-      color: #f0f6fc;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-primary);
     }
 
     .add-option {

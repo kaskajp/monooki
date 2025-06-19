@@ -34,57 +34,57 @@ export class LoginForm extends LitElement {
 
     .form-group input {
       width: 100%;
-      padding: 0.75rem 1rem;
-      background: #0d1117;
-      border: 1px solid #30363d;
-      border-radius: 8px;
-      font-size: 14px;
-      color: #f0f6fc;
-      transition: all 0.2s ease;
-      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      padding: var(--spacing-md) var(--spacing-lg);
+      background: var(--form-bg);
+      border: 1px solid var(--form-border);
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-sm);
+      color: var(--form-text);
+      transition: all var(--transition-normal);
+      font-family: var(--font-family-primary);
       box-sizing: border-box;
     }
 
     .form-group input::placeholder {
-      color: #8b949e;
+      color: var(--form-placeholder);
     }
 
     .form-group input:focus {
       outline: none;
-      border-color: #58a6ff;
-      box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+      border-color: var(--form-border-focus);
+      box-shadow: var(--shadow-focus);
     }
 
     .form-group input:hover {
-      border-color: #58a6ff;
+      border-color: var(--color-accent-primary);
     }
 
     .submit-btn {
       width: 100%;
-      padding: 0.75rem 1rem;
-      background: #238636;
-      color: white;
+      padding: var(--spacing-md) var(--spacing-lg);
+      background: var(--btn-primary-bg);
+      color: var(--btn-primary-text);
       border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 500;
+      border-radius: var(--radius-md);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
       cursor: pointer;
-      transition: all 0.2s ease;
-      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      transition: all var(--transition-normal);
+      font-family: var(--font-family-primary);
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
+      gap: var(--spacing-sm);
     }
 
     .submit-btn:hover:not(:disabled) {
-      background: #2ea043;
+      background: var(--btn-primary-bg-hover);
       transform: translateY(-1px);
     }
 
     .submit-btn:disabled {
-      background: #30363d;
-      color: #8b949e;
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-secondary);
       cursor: not-allowed;
       transform: none;
     }

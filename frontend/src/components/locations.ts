@@ -32,9 +32,9 @@ export class LocationsPage extends LitElement {
   static styles = css`
     :host {
       display: block;
-      padding: 2rem;
-      background: #0d1117;
-      color: #f0f6fc;
+      padding: var(--spacing-2xl);
+      background: var(--color-bg-primary);
+      color: var(--color-text-primary);
       min-height: 100vh;
       color-scheme: dark;
     }
@@ -43,108 +43,108 @@ export class LocationsPage extends LitElement {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 2rem;
+      margin-bottom: var(--spacing-2xl);
     }
 
     .header h1 {
       margin: 0;
-      font-size: 32px;
-      font-weight: 600;
-      color: #f0f6fc;
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
     }
 
     .btn {
-      padding: 0.75rem 1rem;
+      padding: var(--spacing-md) var(--spacing-lg);
       border: none;
-      border-radius: 8px;
+      border-radius: var(--radius-md);
       cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
       text-decoration: none;
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      transition: all 0.2s ease;
-      font-family: inherit;
+      gap: var(--spacing-sm);
+      transition: all var(--transition-normal);
+      font-family: var(--font-family-primary);
     }
 
     .btn-primary {
-      background: #238636;
-      color: white;
+      background: var(--btn-primary-bg);
+      color: var(--btn-primary-text);
     }
 
     .btn-primary:hover {
-      background: #2ea043;
+      background: var(--btn-primary-bg-hover);
       transform: translateY(-1px);
     }
 
     .btn-secondary {
-      background: #21262d;
-      color: #f0f6fc;
-      border: 1px solid #30363d;
+      background: var(--btn-secondary-bg);
+      color: var(--btn-secondary-text);
+      border: 1px solid var(--btn-secondary-border);
     }
 
     .btn-secondary:hover {
-      background: #30363d;
-      border-color: #58a6ff;
+      background: var(--btn-secondary-bg-hover);
+      border-color: var(--btn-secondary-border-hover);
     }
 
     .btn-danger {
-      background: #da3633;
-      color: white;
+      background: var(--btn-danger-bg);
+      color: var(--btn-danger-text);
     }
 
     .btn-danger:hover {
-      background: #f85149;
+      background: var(--btn-danger-bg-hover);
     }
 
     .locations-grid {
       display: grid;
-      gap: 1.5rem;
+      gap: var(--spacing-xl);
       grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     }
 
     .location-card {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 12px;
-      padding: 1.5rem;
-      transition: all 0.2s ease;
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border-primary);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-xl);
+      transition: all var(--transition-normal);
     }
 
     .location-card:hover {
-      border-color: #58a6ff;
+      border-color: var(--color-accent-primary);
       transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      box-shadow: var(--shadow-lg);
     }
 
     .location-card h3 {
-      margin: 0 0 0.5rem 0;
-      color: #f0f6fc;
-      font-size: 18px;
-      font-weight: 600;
+      margin: 0 0 var(--spacing-sm) 0;
+      color: var(--color-text-primary);
+      font-size: var(--font-size-lg);
+      font-weight: var(--font-weight-semibold);
     }
 
     .location-description {
-      color: #8b949e;
-      margin-bottom: 1rem;
-      font-size: 14px;
-      line-height: 1.5;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--spacing-lg);
+      font-size: var(--font-size-sm);
+      line-height: var(--line-height-normal);
     }
 
     .location-meta {
-      font-size: 12px;
-      color: #8b949e;
-      margin-bottom: 1rem;
-      padding: 0.5rem;
-      background: #0d1117;
-      border-radius: 6px;
-      border: 1px solid #21262d;
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--spacing-lg);
+      padding: var(--spacing-sm);
+      background: var(--color-bg-primary);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--color-border-secondary);
     }
 
     .location-actions {
       display: flex;
-      gap: 0.5rem;
+      gap: var(--spacing-sm);
     }
 
     .form-overlay {
@@ -153,7 +153,7 @@ export class LocationsPage extends LitElement {
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0, 0, 0, 0.8);
+      background: var(--color-bg-overlay);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -162,59 +162,59 @@ export class LocationsPage extends LitElement {
     }
 
     .form-container {
-      background: #161b22;
-      border: 1px solid #30363d;
-      padding: 2rem;
-      border-radius: 12px;
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border-primary);
+      padding: var(--spacing-2xl);
+      border-radius: var(--radius-lg);
       width: 90%;
       max-width: 500px;
       color-scheme: dark;
-      box-shadow: 0 16px 70px rgba(0, 0, 0, 0.5);
+      box-shadow: var(--shadow-lg);
     }
 
     .form-container h2 {
-      margin: 0 0 1.5rem 0;
-      font-size: 24px;
-      font-weight: 600;
-      color: #f0f6fc;
+      margin: 0 0 var(--spacing-xl) 0;
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
     }
 
     .form-group {
-      margin-bottom: 1.5rem;
+      margin-bottom: var(--spacing-xl);
     }
 
     .form-group label {
       display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-      color: #f0f6fc;
-      font-size: 14px;
+      margin-bottom: var(--spacing-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
+      font-size: var(--font-size-sm);
     }
 
     .form-group input,
     .form-group textarea {
       width: 100%;
-      padding: 0.75rem;
-      background: #0d1117;
-      border: 1px solid #30363d;
-      border-radius: 8px;
+      padding: var(--spacing-md);
+      background: var(--form-bg);
+      border: 1px solid var(--form-border);
+      border-radius: var(--radius-md);
       box-sizing: border-box;
-      color: #f0f6fc;
-      font-size: 14px;
-      transition: all 0.2s ease;
-      font-family: inherit;
+      color: var(--form-text);
+      font-size: var(--font-size-sm);
+      transition: all var(--transition-normal);
+      font-family: var(--font-family-primary);
     }
 
     .form-group input::placeholder,
     .form-group textarea::placeholder {
-      color: #8b949e;
+      color: var(--form-placeholder);
     }
 
     .form-group input:focus,
     .form-group textarea:focus {
       outline: none;
-      border-color: #58a6ff;
-      box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+      border-color: var(--form-border-focus);
+      box-shadow: var(--shadow-focus);
     }
 
     .form-group textarea {
@@ -224,28 +224,28 @@ export class LocationsPage extends LitElement {
 
     .form-actions {
       display: flex;
-      gap: 0.75rem;
+      gap: var(--spacing-md);
       justify-content: flex-end;
-      margin-top: 1.5rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid #30363d;
+      margin-top: var(--spacing-xl);
+      padding-top: var(--spacing-xl);
+      border-top: 1px solid var(--color-border-primary);
     }
 
     .loading {
       text-align: center;
-      padding: 3rem;
-      color: #8b949e;
-      font-size: 16px;
+      padding: var(--spacing-3xl);
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-base);
     }
 
     .empty-state {
       text-align: center;
-      padding: 3rem;
-      color: #8b949e;
+      padding: var(--spacing-3xl);
+      color: var(--color-text-secondary);
     }
 
     .empty-state p {
-      font-size: 16px;
+      font-size: var(--font-size-base);
       margin: 0;
     }
   `;

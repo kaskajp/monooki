@@ -29,11 +29,11 @@ export class MonookiApp extends LitElement {
     :host {
       display: block;
       min-height: 100vh;
-      background: #0d1117;
-      color: #f0f6fc;
-      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
-      font-size: 14px;
-      line-height: 1.5;
+      background: var(--color-bg-primary);
+      color: var(--color-text-primary);
+      font-family: var(--font-family-primary);
+      font-size: var(--font-size-sm);
+      line-height: var(--line-height-normal);
       color-scheme: dark;
     }
 
@@ -48,7 +48,7 @@ export class MonookiApp extends LitElement {
 
     .main-content {
       flex: 1;
-      background: #0d1117;
+      background: var(--color-bg-primary);
       overflow-y: auto;
       color-scheme: dark;
     }
@@ -58,18 +58,18 @@ export class MonookiApp extends LitElement {
       align-items: center;
       justify-content: center;
       min-height: 100vh;
-      background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
-      padding: 2rem;
+      background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 100%);
+      padding: var(--spacing-2xl);
     }
 
     .auth-card {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 12px;
-      padding: 2rem;
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border-primary);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-2xl);
       width: 100%;
       max-width: 400px;
-      box-shadow: 0 16px 70px rgba(0, 0, 0, 0.5);
+      box-shadow: var(--shadow-lg);
     }
 
     .auth-header {

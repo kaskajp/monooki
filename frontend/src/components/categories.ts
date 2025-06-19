@@ -29,9 +29,9 @@ export class CategoriesPage extends LitElement {
   static styles = css`
     :host {
       display: block;
-      padding: 2rem;
-      background: #0d1117;
-      color: #f0f6fc;
+      padding: var(--spacing-2xl);
+      background: var(--color-bg-primary);
+      color: var(--color-text-primary);
       min-height: 100vh;
       color-scheme: dark;
     }
@@ -40,81 +40,81 @@ export class CategoriesPage extends LitElement {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 2rem;
+      margin-bottom: var(--spacing-2xl);
     }
 
     .header h1 {
       margin: 0;
-      font-size: 32px;
-      font-weight: 600;
-      color: #f0f6fc;
+      font-size: var(--font-size-3xl);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
     }
 
     .btn {
-      padding: 0.75rem 1rem;
+      padding: var(--spacing-md) var(--spacing-lg);
       border: none;
-      border-radius: 8px;
+      border-radius: var(--radius-md);
       cursor: pointer;
-      font-size: 14px;
-      font-weight: 500;
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
       text-decoration: none;
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      transition: all 0.2s ease;
-      font-family: inherit;
+      gap: var(--spacing-sm);
+      transition: all var(--transition-normal);
+      font-family: var(--font-family-primary);
     }
 
     .btn-primary {
-      background: #238636;
-      color: white;
+      background: var(--btn-primary-bg);
+      color: var(--btn-primary-text);
     }
 
     .btn-primary:hover {
-      background: #2ea043;
+      background: var(--btn-primary-bg-hover);
       transform: translateY(-1px);
     }
 
     .btn-secondary {
-      background: #21262d;
-      color: #f0f6fc;
-      border: 1px solid #30363d;
+      background: var(--btn-secondary-bg);
+      color: var(--btn-secondary-text);
+      border: 1px solid var(--btn-secondary-border);
     }
 
     .btn-secondary:hover {
-      background: #30363d;
-      border-color: #58a6ff;
+      background: var(--btn-secondary-bg-hover);
+      border-color: var(--btn-secondary-border-hover);
     }
 
     .btn-danger {
-      background: #da3633;
-      color: white;
+      background: var(--btn-danger-bg);
+      color: var(--btn-danger-text);
     }
 
     .btn-danger:hover {
-      background: #f85149;
+      background: var(--btn-danger-bg-hover);
     }
 
     .categories-table {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 12px;
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border-primary);
+      border-radius: var(--radius-lg);
       overflow: hidden;
       width: 100%;
     }
 
     .table-header {
-      background: #21262d;
-      border-bottom: 1px solid #30363d;
+      background: var(--color-bg-tertiary);
+      border-bottom: 1px solid var(--color-border-primary);
     }
 
     .table-row {
-      border-bottom: 1px solid #30363d;
-      transition: background 0.2s ease;
+      border-bottom: 1px solid var(--color-border-primary);
+      transition: background var(--transition-normal);
     }
 
     .table-row:hover {
-      background: #0d1117;
+      background: var(--color-bg-primary);
     }
 
     .table-row:last-child {
@@ -122,34 +122,34 @@ export class CategoriesPage extends LitElement {
     }
 
     .table-cell {
-      padding: 1rem 1.5rem;
+      padding: var(--spacing-lg) var(--spacing-xl);
       vertical-align: middle;
     }
 
     .table-header .table-cell {
-      font-weight: 600;
-      color: #f0f6fc;
-      font-size: 14px;
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+      font-size: var(--font-size-sm);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      padding: 0.75rem 1.5rem;
+      padding: var(--spacing-md) var(--spacing-xl);
     }
 
     .category-name {
-      font-weight: 600;
-      color: #f0f6fc;
-      font-size: 16px;
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
+      font-size: var(--font-size-base);
     }
 
     .category-date {
-      color: #8b949e;
-      font-size: 14px;
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
     }
 
     .category-count {
-      color: #58a6ff;
-      font-weight: 500;
-      font-size: 14px;
+      color: var(--color-accent-primary);
+      font-weight: var(--font-weight-medium);
+      font-size: var(--font-size-sm);
     }
 
     .category-actions {
@@ -208,7 +208,7 @@ export class CategoriesPage extends LitElement {
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(0, 0, 0, 0.8);
+      background: var(--color-bg-overlay);
       display: flex;
       justify-content: center;
       align-items: center;
@@ -217,93 +217,93 @@ export class CategoriesPage extends LitElement {
     }
 
     .form-container {
-      background: #161b22;
-      border: 1px solid #30363d;
-      padding: 2rem;
-      border-radius: 12px;
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border-primary);
+      padding: var(--spacing-2xl);
+      border-radius: var(--radius-lg);
       width: 90%;
       max-width: 400px;
       color-scheme: dark;
-      box-shadow: 0 16px 70px rgba(0, 0, 0, 0.5);
+      box-shadow: var(--shadow-lg);
     }
 
     .form-container h2 {
-      margin: 0 0 1.5rem 0;
-      font-size: 24px;
-      font-weight: 600;
-      color: #f0f6fc;
+      margin: 0 0 var(--spacing-xl) 0;
+      font-size: var(--font-size-2xl);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
     }
 
     .form-group {
-      margin-bottom: 1.5rem;
+      margin-bottom: var(--spacing-xl);
     }
 
     .form-group label {
       display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-      color: #f0f6fc;
-      font-size: 14px;
+      margin-bottom: var(--spacing-sm);
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
+      font-size: var(--font-size-sm);
     }
 
     .form-group input {
       width: 100%;
-      padding: 0.75rem;
-      background: #0d1117;
-      border: 1px solid #30363d;
-      border-radius: 8px;
+      padding: var(--spacing-md);
+      background: var(--form-bg);
+      border: 1px solid var(--form-border);
+      border-radius: var(--radius-md);
       box-sizing: border-box;
-      color: #f0f6fc;
-      font-size: 14px;
-      transition: all 0.2s ease;
-      font-family: inherit;
+      color: var(--form-text);
+      font-size: var(--font-size-sm);
+      transition: all var(--transition-normal);
+      font-family: var(--font-family-primary);
     }
 
     .form-group input::placeholder {
-      color: #8b949e;
+      color: var(--form-placeholder);
     }
 
     .form-group input:focus {
       outline: none;
-      border-color: #58a6ff;
-      box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+      border-color: var(--form-border-focus);
+      box-shadow: var(--shadow-focus);
     }
 
     .form-actions {
       display: flex;
-      gap: 0.75rem;
+      gap: var(--spacing-md);
       justify-content: flex-end;
-      margin-top: 1.5rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid #30363d;
+      margin-top: var(--spacing-xl);
+      padding-top: var(--spacing-xl);
+      border-top: 1px solid var(--color-border-primary);
     }
 
     .loading {
       text-align: center;
-      padding: 3rem;
-      color: #8b949e;
-      font-size: 16px;
+      padding: var(--spacing-3xl);
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-base);
     }
 
     .empty-state {
       text-align: center;
-      padding: 3rem;
-      color: #8b949e;
+      padding: var(--spacing-3xl);
+      color: var(--color-text-secondary);
     }
 
     .empty-state p {
-      font-size: 16px;
+      font-size: var(--font-size-base);
       margin: 0;
     }
 
     .error {
-      color: #f85149;
-      margin-bottom: 1rem;
-      padding: 0.75rem;
-      background: rgba(248, 81, 73, 0.1);
-      border: 1px solid rgba(248, 81, 73, 0.2);
-      border-radius: 6px;
-      border-left: 3px solid #f85149;
+      color: var(--color-danger);
+      margin-bottom: var(--spacing-lg);
+      padding: var(--spacing-md);
+      background: var(--color-danger-light);
+      border: 1px solid var(--color-border-danger);
+      border-radius: var(--radius-sm);
+      border-left: 3px solid var(--color-danger);
     }
   `;
 
