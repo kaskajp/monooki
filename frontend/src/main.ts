@@ -15,7 +15,7 @@ export class MonookiApp extends LitElement {
   private isAuthenticated = false;
 
   @state()
-  private currentView = 'dashboard';
+  private authView = 'login'; // 'login' or 'register'
 
   private router = new Router(this, [
     { path: '/', render: () => this.renderDashboard() },
@@ -253,6 +253,11 @@ export class MonookiApp extends LitElement {
     this.router.goto('/');
   }
 
+  private handleRegister() {
+    this.isAuthenticated = true;
+    this.router.goto('/');
+  }
+
   private handleLogout() {
     localStorage.removeItem('token');
     this.isAuthenticated = false;
@@ -324,10 +329,16 @@ export class MonookiApp extends LitElement {
               <p>Your personal inventory management system</p>
             </div>
             
-            <login-form @login-success="${this.handleLogin}"></login-form>
+${this.authView === 'login' 
+              ? html`<login-form @login-success="${this.handleLogin}"></login-form>`
+              : html`<register-form @register-success="${this.handleRegister}"></register-form>`
+            }
             
             <div class="auth-toggle">
-              <p>Don't have an account? <button @click="${() => this.currentView = 'register'}">Sign up</button></p>
+              <p>${this.authView === 'login' 
+                ? html`Don't have an account? <button @click="${() => this.authView = 'register'}">Sign up</button>`
+                : html`Already have an account? <button @click="${() => this.authView = 'login'}">Sign in</button>`
+              }</p>
             </div>
           </div>
         </div>

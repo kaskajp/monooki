@@ -19,87 +19,103 @@ export class RegisterForm extends LitElement {
   private error = '';
 
   static styles = css`
-    .register-container {
-      max-width: 400px;
-      margin: 2rem auto;
-      padding: 2rem;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-
-    .form-title {
-      text-align: center;
-      margin-bottom: 2rem;
-      color: #333;
+    .register-form {
+      width: 100%;
     }
 
     .form-group {
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
     }
 
-    label {
+    .form-group label {
       display: block;
       margin-bottom: 0.5rem;
+      color: #f0f6fc;
+      font-size: 14px;
       font-weight: 500;
     }
 
-    input {
+    .form-group input {
       width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 1rem;
+      padding: 0.75rem 1rem;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #f0f6fc;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      box-sizing: border-box;
     }
 
-    input:focus {
+    .form-group input::placeholder {
+      color: #8b949e;
+    }
+
+    .form-group input:focus {
       outline: none;
-      border-color: #007bff;
-      box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+      border-color: #58a6ff;
+      box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
     }
 
-    .btn-primary {
+    .form-group input:hover {
+      border-color: #58a6ff;
+    }
+
+    .submit-btn {
       width: 100%;
-      padding: 0.75rem;
-      background: #007bff;
+      padding: 0.75rem 1rem;
+      background: #238636;
       color: white;
       border: none;
-      border-radius: 4px;
-      font-size: 1rem;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
       cursor: pointer;
-      margin-top: 1rem;
+      transition: all 0.2s ease;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
 
-    .btn-primary:hover {
-      background: #0056b3;
+    .submit-btn:hover:not(:disabled) {
+      background: #2ea043;
+      transform: translateY(-1px);
     }
 
-    .btn-primary:disabled {
-      background: #6c757d;
+    .submit-btn:disabled {
+      background: #30363d;
+      color: #8b949e;
       cursor: not-allowed;
+      transform: none;
     }
 
-    .error {
-      color: #dc3545;
+    .error-message {
+      color: #f85149;
+      font-size: 12px;
       margin-bottom: 1rem;
       padding: 0.75rem;
-      background: #f8d7da;
-      border: 1px solid #f5c6cb;
-      border-radius: 4px;
+      background: rgba(248, 81, 73, 0.1);
+      border: 1px solid rgba(248, 81, 73, 0.2);
+      border-radius: 6px;
+      border-left: 3px solid #f85149;
     }
 
-    .login-link {
-      text-align: center;
-      margin-top: 1rem;
+    .loading-spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid transparent;
+      border-top: 2px solid currentColor;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
     }
 
-    .login-link a {
-      color: #007bff;
-      text-decoration: none;
-    }
-
-    .login-link a:hover {
-      text-decoration: underline;
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
     }
   `;
 
@@ -139,62 +155,59 @@ export class RegisterForm extends LitElement {
 
   render() {
     return html`
-      <div class="register-container">
-        <h2 class="form-title">Create Your Account</h2>
-        
+      <form class="register-form" @submit="${this.handleSubmit}">
         ${this.error ? html`
-          <div class="error">${this.error}</div>
+          <div class="error-message">${this.error}</div>
         ` : ''}
         
-        <form @submit="${this.handleSubmit}">
-          <div class="form-group">
-            <label for="email">Email</label>
-            <input
-              type="email"
-              id="email"
-              .value="${this.email}"
-              @input="${(e: InputEvent) => this.email = (e.target as HTMLInputElement).value}"
-              required
-            />
-          </div>
-          
-          <div class="form-group">
-            <label for="password">Password</label>
-            <input
-              type="password"
-              id="password"
-              .value="${this.password}"
-              @input="${(e: InputEvent) => this.password = (e.target as HTMLInputElement).value}"
-              required
-              minlength="8"
-            />
-          </div>
-          
-          <div class="form-group">
-            <label for="workspaceName">Workspace Name</label>
-            <input
-              type="text"
-              id="workspaceName"
-              .value="${this.workspaceName}"
-              @input="${(e: InputEvent) => this.workspaceName = (e.target as HTMLInputElement).value}"
-              required
-              placeholder="e.g., Smith Family"
-            />
-          </div>
-          
-          <button
-            type="submit"
-            class="btn-primary"
-            ?disabled="${this.loading}"
-          >
-            ${this.loading ? 'Creating Account...' : 'Create Account'}
-          </button>
-        </form>
-        
-        <div class="login-link">
-          <p>Already have an account? <a href="/login">Login here</a></p>
+        <div class="form-group">
+          <label for="email">Email address</label>
+          <input
+            type="email"
+            id="email"
+            placeholder="Enter your email"
+            .value="${this.email}"
+            @input="${(e: InputEvent) => this.email = (e.target as HTMLInputElement).value}"
+            required
+          />
         </div>
-      </div>
+        
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            placeholder="Enter your password"
+            .value="${this.password}"
+            @input="${(e: InputEvent) => this.password = (e.target as HTMLInputElement).value}"
+            required
+            minlength="8"
+          />
+        </div>
+        
+        <div class="form-group">
+          <label for="workspaceName">Workspace name</label>
+          <input
+            type="text"
+            id="workspaceName"
+            placeholder="e.g., Smith Family"
+            .value="${this.workspaceName}"
+            @input="${(e: InputEvent) => this.workspaceName = (e.target as HTMLInputElement).value}"
+            required
+          />
+        </div>
+        
+        <button
+          type="submit"
+          class="submit-btn"
+          ?disabled="${this.loading}"
+        >
+          ${this.loading ? html`
+            <div class="loading-spinner"></div>
+            Creating account...
+          ` : 'Create account'}
+        </button>
+      </form>
     `;
   }
 } 

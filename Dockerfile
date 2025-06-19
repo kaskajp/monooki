@@ -8,9 +8,9 @@ WORKDIR /app
 COPY package*.json ./
 COPY frontend/package*.json ./frontend/
 
-# Install dependencies
-RUN npm ci --only=production
-RUN cd frontend && npm ci --only=production
+# Install dependencies (including devDependencies for build)
+RUN npm ci
+RUN cd frontend && npm ci
 
 # Copy source code
 COPY . .
@@ -30,14 +30,21 @@ RUN adduser -S nodejs -u 1001
 
 WORKDIR /app
 
+# Copy package files for production install
+COPY package*.json ./
+
+# Install only production dependencies  
+RUN npm ci --only=production && npm cache clean --force
+
 # Copy built application
-COPY --from=build --chown=nodejs:nodejs /app/dist ./dist
-COPY --from=build --chown=nodejs:nodejs /app/frontend/dist ./frontend/dist
-COPY --from=build --chown=nodejs:nodejs /app/node_modules ./node_modules
-COPY --from=build --chown=nodejs:nodejs /app/package*.json ./
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/frontend/dist ./frontend/dist
 
 # Create directories for data and uploads
-RUN mkdir -p data uploads && chown -R nodejs:nodejs data uploads
+RUN mkdir -p data uploads
+
+# Change ownership to nodejs user
+RUN chown -R nodejs:nodejs /app
 
 # Switch to nodejs user
 USER nodejs
