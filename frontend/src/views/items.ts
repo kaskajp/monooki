@@ -832,6 +832,11 @@ export class ItemsPage extends LitElement {
     }
   }
 
+  // Public method to open create modal (called from command center)
+  public openCreateModal() {
+    this.showAddForm();
+  }
+
   private async handleSubmit(e: Event) {
     e.preventDefault();
     console.log('Form submitted:', this.formData);
@@ -893,6 +898,13 @@ export class ItemsPage extends LitElement {
           await this.uploadPhotos(savedItem.id);
         }
         
+        // If creating a new item, navigate to its view page
+        if (!this.editingItem) {
+          window.location.href = `/items/${savedItem.id}`;
+          return;
+        }
+        
+        // If editing, reload items and close form
         await this.loadItems();
         this.hideForm();
       } else {

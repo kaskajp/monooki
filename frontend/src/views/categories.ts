@@ -338,10 +338,27 @@ export class CategoriesPage extends LitElement {
     this.formData = { name: '' };
   }
 
+  // Public method to open create modal (called from command center)
+  public openCreateModal() {
+    this.showAddForm();
+  }
+
   private async handleSubmit(e: Event) {
     e.preventDefault();
     
+    // Handle both native form events and custom button-click events
+    if (e.type === 'button-click') {
+      // For button-click events, we need to prevent the default form submission
+      // since we're handling it manually
+      const form = this.shadowRoot?.querySelector('form');
+      if (form) {
+        // Prevent any potential form submission
+        form.addEventListener('submit', (formEvent) => formEvent.preventDefault(), { once: true });
+      }
+    }
+    
     if (!this.formData.name.trim()) {
+      alert('Please enter a category name');
       return;
     }
 
@@ -484,7 +501,7 @@ export class CategoriesPage extends LitElement {
                 <app-button type="button" variant="secondary" @button-click="${this.hideForm}">
                   Cancel
                 </app-button>
-                <app-button type="submit" variant="primary" ?loading="${this.loading}">
+                <app-button type="submit" variant="primary" ?loading="${this.loading}" @button-click="${this.handleSubmit}">
                   ${this.editingCategory ? 'Update' : 'Create'}
                 </app-button>
               </div>

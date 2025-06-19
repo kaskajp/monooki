@@ -300,9 +300,21 @@ export class MonookiApp extends LitElement {
     // If it's a create action, trigger the create modal
     if (action === 'create') {
       setTimeout(() => {
-        const pageComponent = this.shadowRoot?.querySelector('main')?.querySelector(':not([style*="display: none"])');
-        if (pageComponent && 'openCreateModal' in pageComponent) {
-          (pageComponent as any).openCreateModal();
+        // Find the specific component based on the URL
+        let componentSelector = '';
+        if (url === '/items') {
+          componentSelector = 'items-page';
+        } else if (url === '/locations') {
+          componentSelector = 'locations-page';
+        } else if (url === '/categories') {
+          componentSelector = 'categories-page';
+        }
+        
+        if (componentSelector) {
+          const pageComponent = this.shadowRoot?.querySelector(componentSelector);
+          if (pageComponent && 'openCreateModal' in pageComponent) {
+            (pageComponent as any).openCreateModal();
+          }
         }
       }, 100);
     }
