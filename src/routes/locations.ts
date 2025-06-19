@@ -18,8 +18,7 @@ router.use(authMiddleware);
 
 const locationSchema = Joi.object({
   name: Joi.string().min(1).required(),
-  description: Joi.string().allow(''),
-  custom_fields: Joi.object()
+  description: Joi.string().allow('')
 });
 
 const updateLocationSchema = locationSchema.keys({
@@ -37,12 +36,7 @@ router.get('/', async (req: any, res: any) => {
       [workspace_id]
     );
 
-    const processedLocations = locations.map(location => ({
-      ...location,
-      custom_fields: location.custom_fields ? JSON.parse(location.custom_fields) : {}
-    }));
-
-    res.json(processedLocations);
+    res.json(locations);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -64,7 +58,6 @@ router.get('/:id', async (req: any, res: any) => {
       return res.status(404).json({ error: 'Location not found' });
     }
 
-    location.custom_fields = location.custom_fields ? JSON.parse(location.custom_fields) : {};
     res.json(location);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
@@ -83,15 +76,13 @@ router.post('/', async (req: any, res: any) => {
     const db = getDatabase();
     
     const id = uuidv4();
-    const custom_fields_json = value.custom_fields ? JSON.stringify(value.custom_fields) : null;
 
     await db.run(
-      'INSERT INTO locations (id, name, description, custom_fields, workspace_id) VALUES (?, ?, ?, ?, ?)',
-      [id, value.name, value.description, custom_fields_json, workspace_id]
+      'INSERT INTO locations (id, name, description, workspace_id) VALUES (?, ?, ?, ?)',
+      [id, value.name, value.description, workspace_id]
     );
 
     const createdLocation = await db.get('SELECT * FROM locations WHERE id = ?', [id]);
-    createdLocation.custom_fields = createdLocation.custom_fields ? JSON.parse(createdLocation.custom_fields) : {};
 
     res.status(201).json(createdLocation);
   } catch (error: any) {
@@ -119,19 +110,15 @@ router.put('/:id', async (req: any, res: any) => {
       return res.status(404).json({ error: 'Location not found' });
     }
 
-    const custom_fields_json = value.custom_fields ? JSON.stringify(value.custom_fields) : null;
-
     await db.run(`
       UPDATE locations SET 
         name = COALESCE(?, name),
         description = COALESCE(?, description),
-        custom_fields = ?,
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ? AND workspace_id = ?
-    `, [value.name, value.description, custom_fields_json, id, workspace_id]);
+    `, [value.name, value.description, id, workspace_id]);
 
     const updatedLocation = await db.get('SELECT * FROM locations WHERE id = ?', [id]);
-    updatedLocation.custom_fields = updatedLocation.custom_fields ? JSON.parse(updatedLocation.custom_fields) : {};
 
     res.json(updatedLocation);
   } catch (error: any) {

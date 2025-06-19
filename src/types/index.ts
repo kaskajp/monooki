@@ -38,7 +38,6 @@ export interface Location {
   id: string;
   name: string;
   description?: string;
-  custom_fields?: Record<string, any>;
   workspace_id: string;
   created_at: string;
   updated_at: string;
