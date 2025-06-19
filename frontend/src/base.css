@@ -48,7 +48,7 @@
   --btn-primary-text: #ffffff;
   
   --btn-secondary-bg: var(--color-bg-tertiary);
-  --btn-secondary-bg-hover: var(--color-bg-secondary);
+  --btn-secondary-bg-hover: #292f39;
   --btn-secondary-text: var(--color-text-primary);
   --btn-secondary-border: var(--color-border-primary);
   --btn-secondary-border-hover: var(--color-accent-primary);
@@ -167,7 +167,7 @@ button {
 
 .btn-secondary:hover:not(:disabled) {
   background: var(--btn-secondary-bg-hover);
-  border-color: var(--btn-secondary-border-hover);
+  border-color: var(--btn-secondary-bg-hover);
 }
 
 .btn-danger {

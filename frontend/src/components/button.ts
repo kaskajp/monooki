@@ -98,7 +98,7 @@ export class AppButton extends LitElement {
 
     .btn--secondary:hover:not(:disabled) {
       background: var(--btn-secondary-bg-hover);
-      border-color: var(--btn-secondary-border-hover);
+      border-color: var(--btn-secondary-bg-hover);
     }
 
     .btn--danger {

@@ -4,11 +4,11 @@ import { Router } from '@lit-labs/router';
 import './components/auth/login-form.js';
 import './components/auth/register-form.js';
 import './components/navbar.js';
-import './components/categories.js';
-import './components/locations.js';
-import './components/items.js';
-import './components/settings.js';
-import './components/profile.js';
+import './views/categories.js';
+import './views/locations.js';
+import './views/items.js';
+import './views/settings.js';
+import './views/profile.js';
 import './components/button.js';
 
 @customElement('monooki-app')

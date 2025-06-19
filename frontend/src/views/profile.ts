@@ -1,6 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import './button.js';
+import '../components/button.js';
 
 @customElement('profile-page')
 export class ProfilePage extends LitElement {
