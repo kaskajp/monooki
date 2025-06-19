@@ -111,6 +111,16 @@ export class ItemsPage extends LitElement {
   @state()
   uploadingPhotos = false;
 
+  // Add simple caching to prevent redundant API calls
+  private static cachedData: {
+    categories?: Category[];
+    locations?: Location[];
+    customFields?: CustomField[];
+    cacheTime?: number;
+  } = {};
+
+  private static CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
   static styles = css`
     :host {
       display: block;
@@ -220,7 +230,12 @@ export class ItemsPage extends LitElement {
       border-bottom: 1px solid #30363d;
     }
 
-    tr:hover {
+    tbody tr {
+      cursor: pointer;
+      transition: background-color var(--transition-normal);
+    }
+
+    tbody tr:hover {
       background: #0d1117;
     }
 
@@ -233,15 +248,9 @@ export class ItemsPage extends LitElement {
       width: 150px;
     }
 
-    .item-name-link {
-      text-decoration: none;
-      color: inherit;
-      display: block;
-      transition: opacity var(--transition-normal);
-    }
-
-    .item-name-link:hover {
-      opacity: 0.8;
+    .item-actions {
+      position: relative;
+      z-index: 10;
     }
 
     .item-name {
@@ -315,6 +324,33 @@ export class ItemsPage extends LitElement {
       font-weight: var(--font-weight-semibold);
       font-family: 'Courier New', monospace;
       white-space: nowrap;
+    }
+
+    .empty-label {
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
+    }
+
+    .readonly-field {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      padding: var(--spacing-md);
+      background: var(--color-bg-tertiary);
+      border: 1px solid var(--color-border-secondary);
+      border-radius: var(--radius-md);
+    }
+
+    .readonly-note {
+      color: var(--color-text-tertiary);
+      font-size: var(--font-size-xs);
+      font-style: italic;
+    }
+
+    .readonly-placeholder {
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
+      font-style: italic;
     }
 
     .form-overlay {
@@ -547,12 +583,14 @@ export class ItemsPage extends LitElement {
 
   async connectedCallback() {
     super.connectedCallback();
-    await Promise.all([
-      this.loadItems(),
-      this.loadCategories(),
-      this.loadLocations(),
-      this.loadCustomFields()
-    ]);
+    
+    // Load cached data first (synchronous)
+    await this.loadCategories();
+    await this.loadLocations(); 
+    await this.loadCustomFields();
+    
+    // Then load items (which isn't cached and is component-specific)
+    await this.loadItems();
   }
 
   private async loadItems() {
@@ -578,6 +616,15 @@ export class ItemsPage extends LitElement {
   }
 
   private async loadCategories() {
+    // Check cache first
+    const cache = ItemsPage.cachedData;
+    const now = Date.now();
+    
+    if (cache.categories && cache.cacheTime && (now - cache.cacheTime) < ItemsPage.CACHE_DURATION) {
+      this.categories = cache.categories;
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('/api/categories', {
@@ -588,6 +635,9 @@ export class ItemsPage extends LitElement {
 
       if (response.ok) {
         this.categories = await response.json();
+        // Update cache
+        cache.categories = this.categories;
+        cache.cacheTime = now;
       }
     } catch (error) {
       console.error('Error loading categories:', error);
@@ -595,6 +645,15 @@ export class ItemsPage extends LitElement {
   }
 
   private async loadLocations() {
+    // Check cache first
+    const cache = ItemsPage.cachedData;
+    const now = Date.now();
+    
+    if (cache.locations && cache.cacheTime && (now - cache.cacheTime) < ItemsPage.CACHE_DURATION) {
+      this.locations = cache.locations;
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('/api/locations', {
@@ -605,6 +664,9 @@ export class ItemsPage extends LitElement {
 
       if (response.ok) {
         this.locations = await response.json();
+        // Update cache
+        cache.locations = this.locations;
+        cache.cacheTime = now;
       }
     } catch (error) {
       console.error('Error loading locations:', error);
@@ -612,6 +674,15 @@ export class ItemsPage extends LitElement {
   }
 
   private async loadCustomFields() {
+    // Check cache first
+    const cache = ItemsPage.cachedData;
+    const now = Date.now();
+    
+    if (cache.customFields && cache.cacheTime && (now - cache.cacheTime) < ItemsPage.CACHE_DURATION) {
+      this.customFieldDefs = cache.customFields;
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('/api/custom-fields', {
@@ -622,10 +693,25 @@ export class ItemsPage extends LitElement {
 
       if (response.ok) {
         this.customFieldDefs = await response.json();
+        // Update cache
+        cache.customFields = this.customFieldDefs;
+        cache.cacheTime = now;
       }
     } catch (error) {
       console.error('Error loading custom fields:', error);
     }
+  }
+
+  // Static method to get cached custom fields for other components
+  static getCachedCustomFields(): CustomField[] | null {
+    const cache = ItemsPage.cachedData;
+    const now = Date.now();
+    
+    if (cache.customFields && cache.cacheTime && (now - cache.cacheTime) < ItemsPage.CACHE_DURATION) {
+      return cache.customFields;
+    }
+    
+    return null;
   }
 
   private get filteredAndSortedItems() {
@@ -724,8 +810,21 @@ export class ItemsPage extends LitElement {
 
   private async handleSubmit(e: Event) {
     e.preventDefault();
+    console.log('Form submitted:', this.formData);
+    
+    // Handle both native form events and custom button-click events
+    if (e.type === 'button-click') {
+      // For button-click events, we need to prevent the default form submission
+      // since we're handling it manually
+      const form = this.shadowRoot?.querySelector('form');
+      if (form) {
+        // Prevent any potential form submission
+        form.addEventListener('submit', (formEvent) => formEvent.preventDefault(), { once: true });
+      }
+    }
     
     if (!this.formData.name.trim()) {
+      alert('Please enter an item name');
       return;
     }
 
@@ -773,10 +872,13 @@ export class ItemsPage extends LitElement {
         await this.loadItems();
         this.hideForm();
       } else {
-        console.error('Failed to save item');
+        const errorData = await response.text();
+        console.error('Failed to save item:', response.status, errorData);
+        alert(`Failed to save item: ${response.status} ${response.statusText}`);
       }
     } catch (error) {
       console.error('Error saving item:', error);
+      alert('Error saving item. Please check your connection and try again.');
     } finally {
       this.loading = false;
     }
@@ -816,6 +918,16 @@ export class ItemsPage extends LitElement {
 
   private handleCustomFieldChange(fieldName: string, value: any) {
     this.customFieldValues = { ...this.customFieldValues, [fieldName]: value };
+  }
+
+  private handleRowClick(item: Item, event: Event) {
+    // Don't navigate if clicking on action buttons
+    if ((event.target as HTMLElement).closest('.item-actions')) {
+      return;
+    }
+    
+    // Navigate to item view
+    window.location.href = `/items/${item.id}`;
   }
 
   private handleFileSelect(e: Event) {
@@ -1045,6 +1157,7 @@ export class ItemsPage extends LitElement {
             <thead>
               <tr>
                 <th>Photo</th>
+                <th>Label</th>
                 <th>Name</th>
                 <th>Category</th>
                 <th>Location</th>
@@ -1056,26 +1169,26 @@ export class ItemsPage extends LitElement {
             </thead>
             <tbody>
               ${this.filteredAndSortedItems.map(item => html`
-                <tr>
+                <tr @click="${(e: Event) => this.handleRowClick(item, e)}">
                   <td>
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                      ${item.first_photo ? html`
-                        <img class="item-photo" src="/api/photos/files/${item.first_photo}" alt="${item.name}" />
-                      ` : html`
-                        <div class="no-photo">📷</div>
-                      `}
-                      ${item.label_id ? html`
-                        <div class="item-label-id">${item.label_id}</div>
-                      ` : ''}
-                    </div>
+                    ${item.first_photo ? html`
+                      <img class="item-photo" src="/api/photos/files/${item.first_photo}" alt="${item.name}" />
+                    ` : html`
+                      <div class="no-photo"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>no-photo</title><g fill="#FFFFFF" stroke-miterlimit="10"><path fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" d="M5.525,10.475 C4.892,9.842,4.5,8.967,4.5,8c0-1.933,1.567-3.5,3.5-3.5c0.966,0,1.841,0.392,2.475,1.025"></path> <path fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" d="M11.355,7 C11.449,7.317,11.5,7.652,11.5,8c0,1.933-1.567,3.5-3.5,3.5c-0.348,0-0.683-0.051-1-0.145"></path> <path fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" d="M5.5,13.5h9 c0.552,0,1-0.448,1-1v-9"></path> <path fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" d="M13.5,2.5h-2l-1-2h-5 l-1,2h-3c-0.552,0-1,0.448-1,1v9c0,0.552,0.448,1,1,1h1"></path> <line fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" x1="0.5" y1="15.5" x2="15.5" y2="0.5"></line></g></svg></div>
+                    `}
                   </td>
                   <td>
-                    <a href="/items/${item.id}" class="item-name-link">
-                      <div class="item-name">${item.name}</div>
-                      ${item.description ? html`
-                        <div class="item-description">${item.description}</div>
-                      ` : ''}
-                    </a>
+                    ${item.label_id ? html`
+                      <div class="item-label-id">${item.label_id}</div>
+                    ` : html`
+                      <span class="empty-label">—</span>
+                    `}
+                  </td>
+                  <td>
+                    <div class="item-name">${item.name}</div>
+                    ${item.description ? html`
+                      <div class="item-description">${item.description}</div>
+                    ` : ''}
                   </td>
                   <td>
                     <div class="item-category">${item.category?.name || '—'}</div>
@@ -1139,6 +1252,19 @@ export class ItemsPage extends LitElement {
                     @input="${this.handleInputChange}"
                     placeholder="Item description"
                   ></textarea>
+                </div>
+                
+                <div class="form-group">
+                  <label>Label ID</label>
+                  <div class="readonly-field">
+                    ${this.editingItem?.label_id ? html`
+                      <span class="item-label-id">${this.editingItem.label_id}</span>
+                      <span class="readonly-note">(auto-generated)</span>
+                    ` : html`
+                      <span class="readonly-placeholder">Will be auto-generated</span>
+                      <span class="readonly-note">(assigned after creation)</span>
+                    `}
+                  </div>
                 </div>
                 
                 <div class="form-group">
@@ -1317,7 +1443,12 @@ export class ItemsPage extends LitElement {
                 <app-button type="button" variant="secondary" @button-click="${this.hideForm}">
                   Cancel
                 </app-button>
-                <app-button type="submit" variant="primary" ?loading="${this.loading}">
+                <app-button 
+                  type="submit" 
+                  variant="primary" 
+                  ?loading="${this.loading}"
+                  @button-click="${this.handleSubmit}"
+                >
                   ${this.editingItem ? 'Update' : 'Create'}
                 </app-button>
               </div>

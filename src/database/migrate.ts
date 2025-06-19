@@ -51,7 +51,6 @@ const createTables = async () => {
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
         description TEXT,
-        custom_fields TEXT, -- JSON string
         workspace_id TEXT NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,

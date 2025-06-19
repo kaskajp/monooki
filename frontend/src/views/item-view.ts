@@ -374,8 +374,12 @@ export class ItemView extends LitElement {
 
   updated(changedProperties: Map<string, any>) {
     if (changedProperties.has('itemId') && this.itemId) {
-      this.loadItem();
-      this.loadCustomFields();
+      // Only reload if itemId actually changed to a different value
+      const oldItemId = changedProperties.get('itemId');
+      if (oldItemId !== this.itemId) {
+        this.loadItem();
+        this.loadCustomFields();
+      }
     }
   }
 
@@ -407,6 +411,21 @@ export class ItemView extends LitElement {
   }
 
   private async loadCustomFields() {
+    // First try to get cached data from ItemsPage
+    try {
+      // Import ItemsPage class to access cached data
+      const { ItemsPage } = await import('./items.js');
+      const cachedFields = ItemsPage.getCachedCustomFields();
+      
+      if (cachedFields) {
+        this.customFieldDefs = cachedFields;
+        return;
+      }
+    } catch (error) {
+      console.log('Could not access cached custom fields, loading fresh data');
+    }
+
+    // Fallback to API call if no cache available
     try {
       const token = localStorage.getItem('token');
       if (!token) return;
