@@ -9,6 +9,9 @@ export class AppNavbar extends LitElement {
   @state()
   private currentPath = window.location.pathname;
 
+  @state()
+  private userProfile: any = null;
+
   static styles = css`
     :host {
       display: block;
@@ -18,6 +21,7 @@ export class AppNavbar extends LitElement {
       border-right: 1px solid var(--color-border-primary);
       overflow-y: auto;
       color-scheme: dark;
+      position: fixed;
     }
 
     .sidebar {
@@ -119,8 +123,27 @@ export class AppNavbar extends LitElement {
     }
 
     .user-info {
-      padding: 0 var(--spacing-xl);
+      padding: var(--spacing-md) var(--spacing-xl);
       margin-bottom: var(--spacing-lg);
+      cursor: pointer;
+      transition: all var(--transition-normal);
+      border-left: 3px solid transparent;
+      border-radius: 0;
+    }
+
+    .user-info:hover {
+      background: var(--color-bg-tertiary);
+    }
+
+    .user-info.active {
+      background: var(--color-bg-primary);
+      color: var(--color-accent-primary);
+      border-left-color: var(--color-accent-primary);
+    }
+
+    .user-info.active .user-email,
+    .user-info.active .user-workspace {
+      color: var(--color-accent-primary);
     }
 
     .user-email {
@@ -194,13 +217,20 @@ export class AppNavbar extends LitElement {
     // Listen for popstate events (back/forward navigation)
     window.addEventListener('popstate', this.handlePopState);
     
+    // Listen for workspace updates
+    window.addEventListener('workspace-updated', this.handleWorkspaceUpdate);
+    
     // Start checking for path changes periodically
     this.startPathMonitoring();
+    
+    // Load user profile
+    this.loadUserProfile();
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     window.removeEventListener('popstate', this.handlePopState);
+    window.removeEventListener('workspace-updated', this.handleWorkspaceUpdate);
     this.stopPathMonitoring();
   }
 
@@ -240,6 +270,40 @@ export class AppNavbar extends LitElement {
 
   private handleLogout() {
     this.dispatchEvent(new CustomEvent('logout'));
+  }
+
+  private handleProfileClick() {
+    window.history.pushState({}, '', '/profile');
+    window.dispatchEvent(new PopStateEvent('popstate'));
+  }
+
+  private async loadUserProfile() {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await fetch('/api/user/profile', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        this.userProfile = await response.json();
+      }
+    } catch (error) {
+      console.error('Error loading user profile:', error);
+    }
+  }
+
+  private handleWorkspaceUpdate = (event: any) => {
+    if (this.userProfile) {
+      this.userProfile = {
+        ...this.userProfile,
+        workspaceName: event.detail.workspaceName
+      };
+      this.requestUpdate();
+    }
   }
 
   render() {
@@ -325,9 +389,9 @@ export class AppNavbar extends LitElement {
         </div>
 
         <div class="user-section">
-          <div class="user-info">
-            <div class="user-email">user@monooki.app</div>
-            <div class="user-workspace">Personal Workspace</div>
+          <div class="user-info ${this.isActive('/profile') ? 'active' : ''}" @click="${this.handleProfileClick}">
+            <div class="user-email">${this.userProfile?.email || 'user@monooki.app'}</div>
+            <div class="user-workspace">${this.userProfile?.workspaceName || 'Personal Workspace'}</div>
           </div>
           <button class="logout-btn" @click="${this.handleLogout}">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>16 log out</title><g fill="#FFFFFF" class="nc-icon-wrapper"><path d="M6.5,4.5V2A1.5,1.5,0,0,1,8,.5h6A1.5,1.5,0,0,1,15.5,2V14A1.5,1.5,0,0,1,14,15.5H8A1.5,1.5,0,0,1,6.5,14V11.5" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round"></path><line data-color="color-2" x1="11.5" y1="8" x2="0.5" y2="8" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round"></line><polyline data-color="color-2" points="3.5 5 0.5 8 3.5 11" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round"></polyline></g></svg>

@@ -7,6 +7,7 @@ import path from 'path';
 
 // Import routes
 import authRoutes from './routes/auth';
+import userRoutes from './routes/user';
 import itemRoutes from './routes/items';
 import locationRoutes from './routes/locations';
 import categoryRoutes from './routes/categories';
@@ -45,6 +46,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // API routes
 app.use('/api', authRoutes);
+app.use('/api/user', userRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api/locations', locationRoutes);
 app.use('/api/categories', categoryRoutes);

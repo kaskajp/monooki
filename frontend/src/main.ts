@@ -8,6 +8,7 @@ import './components/categories.js';
 import './components/locations.js';
 import './components/items.js';
 import './components/settings.js';
+import './components/profile.js';
 
 @customElement('monooki-app')
 export class MonookiApp extends LitElement {
@@ -23,6 +24,7 @@ export class MonookiApp extends LitElement {
     { path: '/locations', render: () => html`<locations-page></locations-page>` },
     { path: '/categories', render: () => html`<categories-page></categories-page>` },
     { path: '/settings', render: () => html`<settings-page></settings-page>` },
+    { path: '/profile', render: () => html`<profile-page></profile-page>` },
   ]);
 
   static styles = css`
@@ -48,6 +50,7 @@ export class MonookiApp extends LitElement {
 
     .main-content {
       flex: 1;
+      margin-left: 240px;
       background: var(--color-bg-primary);
       overflow-y: auto;
       color-scheme: dark;
