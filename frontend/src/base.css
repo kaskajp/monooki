@@ -43,8 +43,8 @@
   --color-warning-light: rgba(210, 153, 34, 0.1);
 
   /* Buttons */
-  --btn-primary-bg: var(--color-success);
-  --btn-primary-bg-hover: var(--color-success-hover);
+  --btn-primary-bg: #4E52B9;
+  --btn-primary-bg-hover: #5A5DCC;
   --btn-primary-text: #ffffff;
   
   --btn-secondary-bg: var(--color-bg-tertiary);

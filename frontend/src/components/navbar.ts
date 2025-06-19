@@ -1,18 +1,21 @@
 import { LitElement, html, css } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 
 @customElement('app-navbar')
 export class AppNavbar extends LitElement {
   @property({ type: Object })
   currentUser: any = null;
 
+  @state()
+  private currentPath = window.location.pathname;
+
   static styles = css`
     :host {
       display: block;
       width: 240px;
       height: 100vh;
-      background: #161b22;
-      border-right: 1px solid #30363d;
+      background: var(--color-bg-secondary);
+      border-right: 1px solid var(--color-border-primary);
       overflow-y: auto;
       color-scheme: dark;
     }
@@ -21,47 +24,47 @@ export class AppNavbar extends LitElement {
       display: flex;
       flex-direction: column;
       height: 100%;
-      padding: 1rem 0 0 0;
+      padding: var(--spacing-lg) 0 0 0;
       box-sizing: border-box;
     }
 
     .nav-brand {
-      padding: 0 1.5rem;
-      margin-bottom: 2rem;
+      padding: 0 var(--spacing-xl);
+      margin-bottom: var(--spacing-2xl);
     }
 
     .nav-brand h1 {
       margin: 0;
-      font-size: 20px;
-      font-weight: 600;
-      color: #f0f6fc;
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-semibold);
+      color: var(--color-text-primary);
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: var(--spacing-sm);
     }
 
     .nav-brand .logo {
       width: 24px;
       height: 24px;
-      background: linear-gradient(135deg, #58a6ff 0%, #79c0ff 100%);
-      border-radius: 6px;
+      background: linear-gradient(135deg, var(--color-accent-primary) 0%, var(--color-accent-secondary) 100%);
+      border-radius: var(--radius-sm);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 12px;
+      font-size: var(--font-size-xs);
     }
 
     .nav-section {
-      margin-bottom: 1.5rem;
+      margin-bottom: var(--spacing-xl);
     }
 
     .nav-section-title {
-      padding: 0 1.5rem;
-      margin-bottom: 0.5rem;
+      padding: 0 var(--spacing-xl);
+      margin-bottom: var(--spacing-sm);
       font-size: 11px;
-      font-weight: 600;
+      font-weight: var(--font-weight-semibold);
       text-transform: uppercase;
-      color: #8b949e;
+      color: var(--color-text-secondary);
       letter-spacing: 0.5px;
     }
 
@@ -74,25 +77,25 @@ export class AppNavbar extends LitElement {
     .nav-link {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      color: #e6edf3;
+      gap: var(--spacing-md);
+      color: var(--color-text-primary);
       text-decoration: none;
-      padding: 0.5rem 1.5rem;
-      font-size: 14px;
-      font-weight: 500;
-      transition: all 0.2s ease;
+      padding: var(--spacing-sm) var(--spacing-xl);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      transition: all var(--transition-normal);
       border-left: 3px solid transparent;
     }
 
     .nav-link:hover {
-      background: #21262d;
-      color: #f0f6fc;
+      background: var(--color-bg-tertiary);
+      color: var(--color-text-primary);
     }
 
     .nav-link.active {
-      background: #1c2128;
-      color: #58a6ff;
-      border-left-color: #58a6ff;
+      background: var(--color-bg-primary);
+      color: var(--color-accent-primary);
+      border-left-color: var(--color-accent-primary);
     }
 
     .nav-link .icon {
@@ -111,46 +114,47 @@ export class AppNavbar extends LitElement {
 
     .user-section {
       margin-top: auto;
-      padding: 1rem 0;
-      border-top: 1px solid #30363d;
+      padding: var(--spacing-lg) 0;
+      border-top: 1px solid var(--color-border-primary);
     }
 
     .user-info {
-      padding: 0 1.5rem;
-      margin-bottom: 1rem;
+      padding: 0 var(--spacing-xl);
+      margin-bottom: var(--spacing-lg);
     }
 
     .user-email {
-      font-size: 12px;
-      color: #8b949e;
-      margin-bottom: 0.25rem;
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--spacing-xs);
     }
 
     .user-workspace {
-      font-size: 14px;
-      color: #f0f6fc;
-      font-weight: 500;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-primary);
+      font-weight: var(--font-weight-medium);
     }
 
     .logout-btn {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
+      gap: var(--spacing-md);
       background: none;
       border: none;
-      color: #e6edf3;
-      padding: 0.5rem 1.5rem;
-      font-size: 14px;
-      font-weight: 500;
+      color: var(--color-text-primary);
+      padding: var(--spacing-sm) var(--spacing-xl);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
       cursor: pointer;
       width: 100%;
       text-align: left;
-      transition: all 0.2s ease;
+      transition: all var(--transition-normal);
+      font-family: var(--font-family-primary);
     }
 
     .logout-btn:hover {
-      background: #21262d;
-      color: #f85149;
+      background: var(--color-bg-tertiary);
+      color: var(--color-danger);
     }
 
     .logout-btn .icon {
@@ -181,8 +185,52 @@ export class AppNavbar extends LitElement {
     }
   `;
 
+  private pathCheckInterval?: number;
+
+  connectedCallback() {
+    super.connectedCallback();
+    this.updateCurrentPath();
+    
+    // Listen for popstate events (back/forward navigation)
+    window.addEventListener('popstate', this.handlePopState);
+    
+    // Start checking for path changes periodically
+    this.startPathMonitoring();
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    window.removeEventListener('popstate', this.handlePopState);
+    this.stopPathMonitoring();
+  }
+
+  private startPathMonitoring() {
+    // Check for path changes every 100ms
+    this.pathCheckInterval = window.setInterval(() => {
+      const newPath = window.location.pathname;
+      if (newPath !== this.currentPath) {
+        this.updateCurrentPath();
+      }
+    }, 100);
+  }
+
+  private stopPathMonitoring() {
+    if (this.pathCheckInterval) {
+      clearInterval(this.pathCheckInterval);
+      this.pathCheckInterval = undefined;
+    }
+  }
+
+  private handlePopState = () => {
+    this.updateCurrentPath();
+  }
+
+  private updateCurrentPath() {
+    this.currentPath = window.location.pathname;
+  }
+
   private getCurrentPath() {
-    return window.location.pathname;
+    return this.currentPath;
   }
 
   private isActive(path: string) {
