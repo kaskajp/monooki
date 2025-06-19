@@ -463,10 +463,10 @@ export class CategoriesPage extends LitElement {
                   <td class="actions-cell">
                     <div class="category-actions">
                       <button class="btn btn-secondary btn-small" @click="${() => this.showEditForm(category)}">
-                        Edit
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>16 pen 01</title><g fill="#FFFFFF" class="nc-icon-wrapper"><line id="butt_color" data-name="butt color" x1="13" y1="7" x2="9" y2="3" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" data-cap="butt" data-color="color-2"></line> <polygon points="5.5 14.5 0.5 15.5 1.5 10.5 11.5 0.5 15.5 4.5 5.5 14.5" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" data-cap="butt"></polygon></g></svg>
                       </button>
                       <button class="btn btn-danger btn-small" @click="${() => this.deleteCategory(category)}">
-                        Delete
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>16 trash can</title><g fill="#FFFFFF" class="nc-icon-wrapper"><path d="M2.5,5.5l.865,8.649A1.5,1.5,0,0,0,4.857,15.5h6.286a1.5,1.5,0,0,0,1.492-1.351L13.5,5.5" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round"></path><line data-color="color-2" x1="0.5" y1="3.5" x2="15.5" y2="3.5" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round"></line><polyline data-color="color-2" points="5.5 3.5 5.5 0.5 10.5 0.5 10.5 3.5" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round"></polyline> </g></svg>
                       </button>
                     </div>
                   </td>

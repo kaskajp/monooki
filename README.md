@@ -58,11 +58,11 @@ A self-hosted web application for managing your home inventory with support for 
    npm run dev
    ```
 
-   This starts both backend (port 3000) and frontend (port 5173) servers.
+   This starts both backend (port 3000) and frontend (port 5175) servers.
 
 6. **Open your browser**
    
-   Navigate to http://localhost:5173
+   Navigate to http://localhost:5175
 
 ### Production Deployment with Docker
 
