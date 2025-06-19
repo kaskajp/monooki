@@ -15,7 +15,7 @@ import customFieldRoutes from './routes/custom-fields';
 import photoRoutes from './routes/photos';
 
 // Initialize database
-import createTables from './database/migrate';
+import migrate from './database/migrate';
 
 const app = express();
 const PORT = process.env.PORT || 3010;
@@ -85,7 +85,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 const startServer = async () => {
   try {
     console.log('Initializing database...');
-    await createTables();
+    await migrate();
     
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);

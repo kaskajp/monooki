@@ -7,9 +7,11 @@ import './components/navbar.js';
 import './views/categories.js';
 import './views/locations.js';
 import './views/items.js';
+import './views/item-view.js';
 import './views/settings.js';
 import './views/profile.js';
 import './components/button.js';
+import './components/command-center.js';
 
 @customElement('monooki-app')
 export class MonookiApp extends LitElement {
@@ -31,6 +33,7 @@ export class MonookiApp extends LitElement {
   private router = new Router(this, [
     { path: '/', render: () => this.renderDashboard() },
     { path: '/items', render: () => html`<items-page></items-page>` },
+    { path: '/items/:id', render: (params) => html`<item-view .itemId="${params.id || ''}" @edit-item="${this.handleEditItem}" @item-deleted="${this.handleItemDeleted}"></item-view>` },
     { path: '/locations', render: () => html`<locations-page></locations-page>` },
     { path: '/categories', render: () => html`<categories-page></categories-page>` },
     { path: '/settings', render: () => html`<settings-page></settings-page>` },
@@ -290,6 +293,38 @@ export class MonookiApp extends LitElement {
     this.requestUpdate();
   }
 
+  private handleCommandCenterNavigation(e: CustomEvent) {
+    const { url, action } = e.detail;
+    this.router.goto(url);
+    
+    // If it's a create action, trigger the create modal
+    if (action === 'create') {
+      setTimeout(() => {
+        const pageComponent = this.shadowRoot?.querySelector('main')?.querySelector(':not([style*="display: none"])');
+        if (pageComponent && 'openCreateModal' in pageComponent) {
+          (pageComponent as any).openCreateModal();
+        }
+      }, 100);
+    }
+  }
+
+  private handleEditItem(e: CustomEvent) {
+    const { itemId } = e.detail;
+    // Navigate to items page and trigger edit modal
+    this.router.goto('/items');
+    setTimeout(() => {
+      const itemsPage = this.shadowRoot?.querySelector('items-page');
+      if (itemsPage && 'editItemById' in itemsPage) {
+        (itemsPage as any).editItemById(itemId);
+      }
+    }, 100);
+  }
+
+  private handleItemDeleted(e: CustomEvent) {
+    // Navigate back to items list after deletion
+    this.router.goto('/items');
+  }
+
   private renderDashboard() {
     return html`
       <div class="dashboard">
@@ -379,6 +414,7 @@ ${this.authView === 'login'
         <main class="main-content">
           ${this.router.outlet()}
         </main>
+        <command-center @navigate="${this.handleCommandCenterNavigation}"></command-center>
       </div>
     `;
   }

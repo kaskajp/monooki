@@ -9,6 +9,10 @@ const createTables = async () => {
       CREATE TABLE IF NOT EXISTS workspaces (
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
+        label_format TEXT DEFAULT '{number}',
+        label_padding INTEGER DEFAULT 1,
+        label_separator TEXT DEFAULT '',
+        label_next_number INTEGER DEFAULT 1,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
       )
@@ -47,6 +51,7 @@ const createTables = async () => {
         id TEXT PRIMARY KEY,
         name TEXT NOT NULL,
         description TEXT,
+        custom_fields TEXT, -- JSON string
         workspace_id TEXT NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -59,6 +64,7 @@ const createTables = async () => {
     await db.run(`
       CREATE TABLE IF NOT EXISTS items (
         id TEXT PRIMARY KEY,
+        label_id TEXT,
         name TEXT NOT NULL,
         description TEXT,
         location_id TEXT,
@@ -138,6 +144,7 @@ const createTables = async () => {
     await db.run('CREATE INDEX IF NOT EXISTS idx_items_location ON items(location_id)');
     await db.run('CREATE INDEX IF NOT EXISTS idx_items_category ON items(category_id)');
     await db.run('CREATE INDEX IF NOT EXISTS idx_items_name ON items(name)');
+    await db.run('CREATE INDEX IF NOT EXISTS idx_items_label_id ON items(label_id)');
     await db.run('CREATE INDEX IF NOT EXISTS idx_categories_workspace ON categories(workspace_id)');
     await db.run('CREATE INDEX IF NOT EXISTS idx_locations_workspace ON locations(workspace_id)');
     await db.run('CREATE INDEX IF NOT EXISTS idx_photos_item ON photos(item_id)');
@@ -152,17 +159,65 @@ const createTables = async () => {
   }
 };
 
-// Run migration if called directly
-if (require.main === module) {
-  createTables()
-    .then(() => {
-      console.log('Migration completed successfully');
-      process.exit(0);
-    })
-    .catch((error) => {
-      console.error('Migration failed:', error);
-      process.exit(1);
-    });
-}
+const addLabelFields = async () => {
+  const db = getDatabase();
+  
+  try {
+    // Check if workspaces table exists first
+    const tables = await db.all("SELECT name FROM sqlite_master WHERE type='table' AND name='workspaces'");
+    if (tables.length === 0) {
+      console.log('Workspaces table does not exist yet, skipping label fields migration...');
+      return;
+    }
 
-export default createTables; 
+    // Check if label fields exist in workspaces table
+    const workspaceColumns = await db.all("PRAGMA table_info(workspaces)");
+    const hasLabelFormat = workspaceColumns.some((col: any) => col.name === 'label_format');
+    
+    if (!hasLabelFormat) {
+      console.log('Adding label configuration fields to workspaces table...');
+      await db.run('ALTER TABLE workspaces ADD COLUMN label_format TEXT DEFAULT \'{number}\'');
+      await db.run('ALTER TABLE workspaces ADD COLUMN label_padding INTEGER DEFAULT 1');
+      await db.run('ALTER TABLE workspaces ADD COLUMN label_separator TEXT DEFAULT \'\'');
+      await db.run('ALTER TABLE workspaces ADD COLUMN label_next_number INTEGER DEFAULT 1');
+    }
+    
+    // Check if items table exists first
+    const itemsTables = await db.all("SELECT name FROM sqlite_master WHERE type='table' AND name='items'");
+    if (itemsTables.length === 0) {
+      console.log('Items table does not exist yet, skipping label_id field migration...');
+      return;
+    }
+
+    // Check if label_id field exists in items table
+    const itemColumns = await db.all("PRAGMA table_info(items)");
+    const hasLabelId = itemColumns.some((col: any) => col.name === 'label_id');
+    
+    if (!hasLabelId) {
+      console.log('Adding label_id field to items table...');
+      await db.run('ALTER TABLE items ADD COLUMN label_id TEXT');
+      await db.run('CREATE INDEX IF NOT EXISTS idx_items_label_id ON items(label_id)');
+    }
+    
+    console.log('Label fields migration completed successfully');
+  } catch (error) {
+    console.error('Error adding label fields:', error);
+    throw error;
+  }
+};
+
+export { createTables, addLabelFields };
+
+// Auto-run migrations
+const migrate = async () => {
+  try {
+    await createTables();
+    // Run label fields migration after tables are created
+    await addLabelFields();
+  } catch (error) {
+    console.error('Migration failed:', error);
+    throw error;
+  }
+};
+
+export default migrate; 

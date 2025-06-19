@@ -37,6 +37,20 @@ export class SettingsPage extends LitElement {
   @state()
   newOption = '';
 
+  @state()
+  labelSettings = {
+    labelFormat: '{number}',
+    labelPadding: 1,
+    labelSeparator: '',
+    labelNextNumber: 1
+  };
+
+  @state()
+  previewLabel = '';
+
+  @state()
+  labelSettingsLoading = false;
+
   static styles = css`
     :host {
       display: block;
@@ -310,9 +324,67 @@ export class SettingsPage extends LitElement {
     }
   `;
 
+  private async loadLabelSettings() {
+    this.labelSettingsLoading = true;
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/user/label-settings', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const settings = await response.json();
+        this.labelSettings = {
+          labelFormat: settings.labelFormat,
+          labelPadding: settings.labelPadding,
+          labelSeparator: settings.labelSeparator,
+          labelNextNumber: settings.labelNextNumber
+        };
+        await this.updatePreview();
+      } else {
+        console.error('Failed to load label settings');
+      }
+    } catch (error) {
+      console.error('Error loading label settings:', error);
+    } finally {
+      this.labelSettingsLoading = false;
+    }
+  }
+
+  private async updatePreview() {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/user/preview-label', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          labelFormat: this.labelSettings.labelFormat,
+          labelPadding: this.labelSettings.labelPadding,
+          labelSeparator: this.labelSettings.labelSeparator,
+          sampleNumber: this.labelSettings.labelNextNumber
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        this.previewLabel = data.preview;
+      }
+    } catch (error) {
+      console.error('Error updating preview:', error);
+    }
+  }
+
   async connectedCallback() {
     super.connectedCallback();
-    await this.loadCustomFields();
+    await Promise.all([
+      this.loadCustomFields(),
+      this.loadLabelSettings()
+    ]);
   }
 
   private async loadCustomFields() {
@@ -478,6 +550,47 @@ export class SettingsPage extends LitElement {
     }
   }
 
+  private async handleLabelSettingsChange(e: Event) {
+    const target = e.target as HTMLInputElement | HTMLSelectElement;
+    const value = target.type === 'number' ? parseInt(target.value) : target.value;
+    
+    this.labelSettings = { 
+      ...this.labelSettings, 
+      [target.name]: value 
+    };
+    
+    // Update preview when settings change
+    await this.updatePreview();
+  }
+
+  private async saveLabelSettings() {
+    this.labelSettingsLoading = true;
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/user/label-settings', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(this.labelSettings)
+      });
+
+      if (response.ok) {
+        // Optional: Show success message
+        console.log('Label settings saved successfully');
+      } else {
+        console.error('Failed to save label settings');
+        alert('Failed to save label settings');
+      }
+    } catch (error) {
+      console.error('Error saving label settings:', error);
+      alert('Error saving label settings');
+    } finally {
+      this.labelSettingsLoading = false;
+    }
+  }
+
   render() {
     if (this.loading && !this.customFields.length) {
       return html`<div class="loading">Loading settings...</div>`;
@@ -485,6 +598,90 @@ export class SettingsPage extends LitElement {
 
     return html`
       <h1>Settings</h1>
+
+      <div class="section">
+        <div class="header">
+          <h2 class="section-title">Label Settings</h2>
+          <app-button variant="primary" @button-click="${this.saveLabelSettings}" ?loading="${this.labelSettingsLoading}">
+            Save Label Settings
+          </app-button>
+        </div>
+
+        <div class="label-settings-form">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+            <div class="form-group">
+              <label for="labelFormat">Label Format</label>
+              <input
+                type="text"
+                id="labelFormat"
+                name="labelFormat"
+                .value="${this.labelSettings.labelFormat}"
+                @input="${this.handleLabelSettingsChange}"
+                placeholder="e.g., {number}, ITEM-{number}, {number}{separator}001"
+              />
+              <small style="color: var(--color-text-secondary); font-size: var(--font-size-xs); margin-top: 0.25rem; display: block;">
+                Use {number} for the sequential number and {separator} for the separator
+              </small>
+            </div>
+            
+            <div class="form-group">
+              <label for="labelPadding">Number Padding</label>
+              <input
+                type="number"
+                id="labelPadding"
+                name="labelPadding"
+                .value="${this.labelSettings.labelPadding.toString()}"
+                @input="${this.handleLabelSettingsChange}"
+                min="1"
+                max="10"
+              />
+              <small style="color: var(--color-text-secondary); font-size: var(--font-size-xs); margin-top: 0.25rem; display: block;">
+                Number of digits (1 = 1, 3 = 001, 5 = 00001)
+              </small>
+            </div>
+            
+            <div class="form-group">
+              <label for="labelSeparator">Separator</label>
+              <input
+                type="text"
+                id="labelSeparator"
+                name="labelSeparator"
+                .value="${this.labelSettings.labelSeparator}"
+                @input="${this.handleLabelSettingsChange}"
+                placeholder="e.g., -, _, (leave empty for none)"
+                maxlength="5"
+              />
+              <small style="color: var(--color-text-secondary); font-size: var(--font-size-xs); margin-top: 0.25rem; display: block;">
+                Characters to use as separator (optional)
+              </small>
+            </div>
+            
+            <div class="form-group">
+              <label for="labelNextNumber">Next Number</label>
+              <input
+                type="number"
+                id="labelNextNumber"
+                name="labelNextNumber"
+                .value="${this.labelSettings.labelNextNumber.toString()}"
+                @input="${this.handleLabelSettingsChange}"
+                min="1"
+              />
+              <small style="color: var(--color-text-secondary); font-size: var(--font-size-xs); margin-top: 0.25rem; display: block;">
+                Next number to assign to new items
+              </small>
+            </div>
+          </div>
+          
+          ${this.previewLabel ? html`
+            <div style="background: var(--color-bg-secondary); border: 1px solid var(--color-border-primary); border-radius: var(--radius-md); padding: 1rem; margin-bottom: 1rem;">
+              <strong>Preview:</strong> 
+              <span style="background: var(--color-accent-primary); color: white; padding: 0.25rem 0.5rem; border-radius: var(--radius-sm); font-family: 'Courier New', monospace; margin-left: 0.5rem;">
+                ${this.previewLabel}
+              </span>
+            </div>
+          ` : ''}
+        </div>
+      </div>
 
       <div class="section">
         <div class="header">

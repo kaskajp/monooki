@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import Joi from 'joi';
 import { authMiddleware } from '../utils/auth';
 import getDatabase from '../database/connection';
+import { generateAndAssignLabelId } from '../utils/labels';
 
 interface AuthenticatedRequest extends Request {
   user?: {
@@ -186,16 +187,17 @@ router.post('/', async (req: any, res: any) => {
     }
 
     const id = uuidv4();
+    const labelId = await generateAndAssignLabelId(workspace_id);
     const custom_fields_json = processedValue.custom_fields ? JSON.stringify(processedValue.custom_fields) : null;
 
     await db.run(`
       INSERT INTO items (
-        id, name, description, location_id, category_id, quantity,
+        id, label_id, name, description, location_id, category_id, quantity,
         model_number, serial_number, purchase_date, purchase_price,
         purchase_location, warranty, custom_fields, workspace_id
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
-      id, processedValue.name, processedValue.description, processedValue.location_id, processedValue.category_id,
+      id, labelId, processedValue.name, processedValue.description, processedValue.location_id, processedValue.category_id,
       processedValue.quantity, processedValue.model_number, processedValue.serial_number, processedValue.purchase_date,
       processedValue.purchase_price, processedValue.purchase_location, processedValue.warranty,
       custom_fields_json, workspace_id

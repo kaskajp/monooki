@@ -11,12 +11,17 @@ export interface User {
 export interface Workspace {
   id: string;
   name: string;
+  label_format: string;
+  label_padding: number;
+  label_separator: string;
+  label_next_number: number;
   created_at: string;
   updated_at: string;
 }
 
 export interface Item {
   id: string;
+  label_id?: string;
   name: string;
   description?: string;
   location_id?: string;

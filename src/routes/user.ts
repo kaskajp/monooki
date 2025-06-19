@@ -3,6 +3,7 @@ import Joi from 'joi';
 import { hashPassword, comparePassword } from '../utils/auth';
 import { authMiddleware } from '../utils/auth';
 import getDatabase from '../database/connection';
+import { updateWorkspaceLabelConfig, getWorkspaceLabelConfig, previewLabelFormat } from '../utils/labels';
 
 const router = Router();
 
@@ -14,6 +15,13 @@ const updateWorkspaceSchema = Joi.object({
 const updatePasswordSchema = Joi.object({
   currentPassword: Joi.string().required(),
   newPassword: Joi.string().min(8).required()
+});
+
+const updateLabelSettingsSchema = Joi.object({
+  labelFormat: Joi.string().required(),
+  labelPadding: Joi.number().integer().min(1).max(10).required(),
+  labelSeparator: Joi.string().allow('').max(5).required(),
+  labelNextNumber: Joi.number().integer().min(1).optional()
 });
 
 // Apply auth middleware to all routes
@@ -135,6 +143,84 @@ router.get('/profile', async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Get profile error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/user/label-settings - Get workspace label settings
+router.get('/label-settings', async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const config = await getWorkspaceLabelConfig(user.workspace_id);
+    
+    res.json({
+      labelFormat: config.format,
+      labelPadding: config.padding,
+      labelSeparator: config.separator,
+      labelNextNumber: config.nextNumber
+    });
+  } catch (error) {
+    console.error('Get label settings error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PUT /api/user/label-settings - Update workspace label settings
+router.put('/label-settings', async (req: Request, res: Response) => {
+  try {
+    const { error, value } = updateLabelSettingsSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+
+    const { labelFormat, labelPadding, labelSeparator, labelNextNumber } = value;
+    const user = (req as any).user;
+
+    await updateWorkspaceLabelConfig(user.workspace_id, {
+      format: labelFormat,
+      padding: labelPadding,
+      separator: labelSeparator,
+      ...(labelNextNumber !== undefined && { nextNumber: labelNextNumber })
+    });
+
+    res.json({
+      message: 'Label settings updated successfully',
+      labelFormat,
+      labelPadding,
+      labelSeparator,
+      labelNextNumber
+    });
+  } catch (error) {
+    console.error('Update label settings error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /api/user/preview-label - Preview label format
+router.post('/preview-label', async (req: Request, res: Response) => {
+  try {
+    const { labelFormat, labelPadding, labelSeparator, sampleNumber } = req.body;
+    
+    // Provide defaults for missing parameters
+    const safeFormat = labelFormat || '{number}';
+    const safePadding = labelPadding !== undefined ? Number(labelPadding) : 1;
+    const safeSeparator = labelSeparator !== undefined ? labelSeparator : '';
+    const safeSampleNumber = sampleNumber !== undefined ? Number(sampleNumber) : 1;
+    
+    // Validate numeric values
+    if (isNaN(safePadding) || safePadding < 1 || safePadding > 10) {
+      return res.status(400).json({ error: 'Invalid padding value' });
+    }
+    
+    if (isNaN(safeSampleNumber) || safeSampleNumber < 1) {
+      return res.status(400).json({ error: 'Invalid sample number' });
+    }
+    
+    const preview = previewLabelFormat(safeFormat, safePadding, safeSeparator, safeSampleNumber);
+    
+    res.json({ preview });
+  } catch (error) {
+    console.error('Preview label error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

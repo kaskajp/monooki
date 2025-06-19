@@ -4,6 +4,7 @@ import '../components/button.js';
 
 interface Item {
   id: string;
+  label_id?: string;
   name: string;
   description?: string;
   location_id?: string;
@@ -232,6 +233,17 @@ export class ItemsPage extends LitElement {
       width: 150px;
     }
 
+    .item-name-link {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      transition: opacity var(--transition-normal);
+    }
+
+    .item-name-link:hover {
+      opacity: 0.8;
+    }
+
     .item-name {
       font-weight: var(--font-weight-semibold);
       color: var(--color-text-primary);
@@ -292,6 +304,17 @@ export class ItemsPage extends LitElement {
       justify-content: center;
       color: var(--color-text-secondary);
       font-size: var(--font-size-xs);
+    }
+
+    .item-label-id {
+      background: var(--color-accent-primary);
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--radius-sm);
+      font-size: var(--font-size-xs);
+      font-weight: var(--font-weight-semibold);
+      font-family: 'Courier New', monospace;
+      white-space: nowrap;
     }
 
     .form-overlay {
@@ -691,6 +714,14 @@ export class ItemsPage extends LitElement {
     this.selectedFiles = [];
   }
 
+  // Public method to edit an item by ID (called from item view)
+  public async editItemById(itemId: string) {
+    const item = this.items.find(i => i.id === itemId);
+    if (item) {
+      await this.showEditForm(item);
+    }
+  }
+
   private async handleSubmit(e: Event) {
     e.preventDefault();
     
@@ -1027,17 +1058,24 @@ export class ItemsPage extends LitElement {
               ${this.filteredAndSortedItems.map(item => html`
                 <tr>
                   <td>
-                                         ${item.first_photo ? html`
-                       <img class="item-photo" src="/api/photos/files/${item.first_photo}" alt="${item.name}" />
-                     ` : html`
-                       <div class="no-photo">📷</div>
-                     `}
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                      ${item.first_photo ? html`
+                        <img class="item-photo" src="/api/photos/files/${item.first_photo}" alt="${item.name}" />
+                      ` : html`
+                        <div class="no-photo">📷</div>
+                      `}
+                      ${item.label_id ? html`
+                        <div class="item-label-id">${item.label_id}</div>
+                      ` : ''}
+                    </div>
                   </td>
                   <td>
-                    <div class="item-name">${item.name}</div>
-                    ${item.description ? html`
-                      <div class="item-description">${item.description}</div>
-                    ` : ''}
+                    <a href="/items/${item.id}" class="item-name-link">
+                      <div class="item-name">${item.name}</div>
+                      ${item.description ? html`
+                        <div class="item-description">${item.description}</div>
+                      ` : ''}
+                    </a>
                   </td>
                   <td>
                     <div class="item-category">${item.category?.name || '—'}</div>
