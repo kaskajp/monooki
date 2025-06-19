@@ -44,7 +44,7 @@ export class RegisterForm extends LitElement {
       font-size: 14px;
       color: #f0f6fc;
       transition: all 0.2s ease;
-      font-family: inherit;
+      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       box-sizing: border-box;
     }
 
@@ -73,7 +73,7 @@ export class RegisterForm extends LitElement {
       font-weight: 500;
       cursor: pointer;
       transition: all 0.2s ease;
-      font-family: inherit;
+      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       display: flex;
       align-items: center;
       justify-content: center;

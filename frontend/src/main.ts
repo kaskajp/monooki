@@ -31,7 +31,7 @@ export class MonookiApp extends LitElement {
       min-height: 100vh;
       background: #0d1117;
       color: #f0f6fc;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
       font-size: 14px;
       line-height: 1.5;
       color-scheme: dark;

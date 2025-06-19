@@ -167,6 +167,7 @@ export class ItemsPage extends LitElement {
       border-radius: 8px;
       font-size: 14px;
       color: #f0f6fc;
+      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       transition: all 0.2s ease;
     }
 
@@ -411,7 +412,7 @@ export class ItemsPage extends LitElement {
       color: #f0f6fc;
       font-size: 14px;
       transition: all 0.2s ease;
-      font-family: inherit;
+      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
 
     .form-group input::placeholder,
@@ -483,6 +484,7 @@ export class ItemsPage extends LitElement {
       border-radius: 6px;
       color: #f0f6fc;
       font-size: 14px;
+      font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
 
     .photo-preview {
