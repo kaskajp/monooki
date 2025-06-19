@@ -157,7 +157,6 @@ button {
 
 .btn-primary:hover:not(:disabled) {
   background: var(--btn-primary-bg-hover);
-  transform: translateY(-1px);
 }
 
 .btn-secondary {

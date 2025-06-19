@@ -72,7 +72,6 @@ export class CategoriesPage extends LitElement {
 
     .btn-primary:hover {
       background: var(--btn-primary-bg-hover);
-      transform: translateY(-1px);
     }
 
     .btn-secondary {
@@ -83,7 +82,6 @@ export class CategoriesPage extends LitElement {
 
     .btn-secondary:hover {
       background: var(--btn-secondary-bg-hover);
-      border-color: var(--btn-secondary-border-hover);
     }
 
     .btn-danger {

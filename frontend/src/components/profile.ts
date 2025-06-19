@@ -133,7 +133,6 @@ export class ProfilePage extends LitElement {
 
     .btn-primary:hover {
       background: var(--btn-primary-bg-hover);
-      transform: translateY(-1px);
     }
 
     .btn-primary:disabled {
@@ -150,7 +149,6 @@ export class ProfilePage extends LitElement {
 
     .btn-secondary:hover {
       background: var(--btn-secondary-bg-hover);
-      border-color: var(--btn-secondary-border-hover);
     }
 
     .user-info-display {
