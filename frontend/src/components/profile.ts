@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import './button.js';
 
 @customElement('profile-page')
 export class ProfilePage extends LitElement {
@@ -111,45 +112,7 @@ export class ProfilePage extends LitElement {
       border-top: 1px solid var(--color-border-primary);
     }
 
-    .btn {
-      padding: var(--spacing-md) var(--spacing-lg);
-      border: none;
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      font-size: var(--font-size-sm);
-      font-weight: var(--font-weight-medium);
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: var(--spacing-sm);
-      transition: all var(--transition-normal);
-      font-family: var(--font-family-primary);
-    }
 
-    .btn-primary {
-      background: var(--btn-primary-bg);
-      color: var(--btn-primary-text);
-    }
-
-    .btn-primary:hover {
-      background: var(--btn-primary-bg-hover);
-    }
-
-    .btn-primary:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    .btn-secondary {
-      background: var(--btn-secondary-bg);
-      color: var(--btn-secondary-text);
-      border: 1px solid var(--btn-secondary-border);
-    }
-
-    .btn-secondary:hover {
-      background: var(--btn-secondary-bg-hover);
-    }
 
     .user-info-display {
       display: flex;
@@ -416,9 +379,9 @@ export class ProfilePage extends LitElement {
             </div>
             
             <div class="form-actions">
-              <button type="submit" class="btn btn-primary" ?disabled="${this.loading}">
-                ${this.loading ? 'Updating...' : 'Update Workspace'}
-              </button>
+              <app-button type="submit" variant="primary" ?loading="${this.loading}">
+                Update Workspace
+              </app-button>
             </div>
           </form>
         </div>
@@ -483,9 +446,9 @@ export class ProfilePage extends LitElement {
             </div>
             
             <div class="form-actions">
-              <button type="submit" class="btn btn-primary" ?disabled="${this.loading}">
-                ${this.loading ? 'Updating...' : 'Update Password'}
-              </button>
+              <app-button type="submit" variant="primary" ?loading="${this.loading}">
+                Update Password
+              </app-button>
             </div>
           </form>
         </div>

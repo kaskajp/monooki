@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import '../button.js';
 
 @customElement('login-form')
 export class LoginForm extends LitElement {
@@ -61,32 +62,6 @@ export class LoginForm extends LitElement {
 
     .submit-btn {
       width: 100%;
-      padding: var(--spacing-md) var(--spacing-lg);
-      background: var(--btn-primary-bg);
-      color: var(--btn-primary-text);
-      border: none;
-      border-radius: var(--radius-md);
-      font-size: var(--font-size-sm);
-      font-weight: var(--font-weight-medium);
-      cursor: pointer;
-      transition: all var(--transition-normal);
-      font-family: var(--font-family-primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--spacing-sm);
-    }
-
-    .submit-btn:hover:not(:disabled) {
-      background: var(--btn-primary-bg-hover);
-      transform: translateY(-1px);
-    }
-
-    .submit-btn:disabled {
-      background: var(--color-bg-tertiary);
-      color: var(--color-text-secondary);
-      cursor: not-allowed;
-      transform: none;
     }
 
     .error-message {
@@ -98,21 +73,6 @@ export class LoginForm extends LitElement {
       border: 1px solid rgba(248, 81, 73, 0.2);
       border-radius: 6px;
       border-left: 3px solid #f85149;
-    }
-
-    .loading-spinner {
-      width: 16px;
-      height: 16px;
-      border: 2px solid transparent;
-      border-top: 2px solid currentColor;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-
-    @keyframes spin {
-      to {
-        transform: rotate(360deg);
-      }
     }
   `;
 
@@ -181,16 +141,14 @@ export class LoginForm extends LitElement {
           />
         </div>
         
-        <button
+        <app-button
           type="submit"
+          variant="primary"
           class="submit-btn"
-          ?disabled="${this.loading}"
+          ?loading="${this.loading}"
         >
-          ${this.loading ? html`
-            <div class="loading-spinner"></div>
-            Signing in...
-          ` : 'Sign in'}
-        </button>
+          Sign in
+        </app-button>
       </form>
     `;
   }

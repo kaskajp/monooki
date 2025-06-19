@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import './button.js';
 
 interface CustomField {
   id: string;
@@ -60,48 +61,7 @@ export class SettingsPage extends LitElement {
       color: var(--color-text-primary);
     }
 
-    .btn {
-      padding: var(--spacing-md) var(--spacing-lg);
-      border: none;
-      border-radius: var(--radius-md);
-      cursor: pointer;
-      font-size: var(--font-size-sm);
-      font-weight: var(--font-weight-medium);
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: var(--spacing-sm);
-      transition: all var(--transition-normal);
-      font-family: var(--font-family-primary);
-    }
 
-    .btn-primary {
-      background: var(--btn-primary-bg);
-      color: var(--btn-primary-text);
-    }
-
-    .btn-primary:hover {
-      background: var(--btn-primary-bg-hover);
-    }
-
-    .btn-secondary {
-      background: var(--btn-secondary-bg);
-      color: var(--btn-secondary-text);
-      border: 1px solid var(--btn-secondary-border);
-    }
-
-    .btn-secondary:hover {
-      background: var(--btn-secondary-bg-hover);
-    }
-
-    .btn-danger {
-      background: var(--btn-danger-bg);
-      color: var(--btn-danger-text);
-    }
-
-    .btn-danger:hover {
-      background: var(--btn-danger-bg-hover);
-    }
 
     .custom-fields-list {
       background: var(--color-bg-secondary);
@@ -529,9 +489,9 @@ export class SettingsPage extends LitElement {
       <div class="section">
         <div class="header">
           <h2 class="section-title">Custom Fields for Items</h2>
-          <button class="btn btn-primary" @click="${this.showAddForm}">
+          <app-button variant="primary" @button-click="${this.showAddForm}">
             Add Custom Field
-          </button>
+          </app-button>
         </div>
 
         ${this.customFields.length === 0 ? html`
@@ -555,12 +515,12 @@ export class SettingsPage extends LitElement {
                   ` : ''}
                 </div>
                 <div class="custom-field-actions">
-                  <button class="btn btn-secondary" @click="${() => this.showEditForm(field)}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>16 pen 01</title><g fill="#FFFFFF" class="nc-icon-wrapper"><line id="butt_color" data-name="butt color" x1="13" y1="7" x2="9" y2="3" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" data-cap="butt" data-color="color-2"></line> <polygon points="5.5 14.5 0.5 15.5 1.5 10.5 11.5 0.5 15.5 4.5 5.5 14.5" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" data-cap="butt"></polygon></g></svg>
-                  </button>
-                  <button class="btn btn-danger" @click="${() => this.deleteCustomField(field)}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>16 trash can</title><g fill="#FFFFFF" class="nc-icon-wrapper"><path d="M2.5,5.5l.865,8.649A1.5,1.5,0,0,0,4.857,15.5h6.286a1.5,1.5,0,0,0,1.492-1.351L13.5,5.5" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round"></path><line data-color="color-2" x1="0.5" y1="3.5" x2="15.5" y2="3.5" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round"></line><polyline data-color="color-2" points="5.5 3.5 5.5 0.5 10.5 0.5 10.5 3.5" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round"></polyline> </g></svg>
-                  </button>
+                  <app-button variant="secondary" size="sm" icon-only @button-click="${() => this.showEditForm(field)}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>16 pen 01</title><g fill="currentColor" class="nc-icon-wrapper"><line id="butt_color" data-name="butt color" x1="13" y1="7" x2="9" y2="3" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-cap="butt" data-color="color-2"></line> <polygon points="5.5 14.5 0.5 15.5 1.5 10.5 11.5 0.5 15.5 4.5 5.5 14.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-cap="butt"></polygon></g></svg>
+                  </app-button>
+                  <app-button variant="danger" size="sm" icon-only @button-click="${() => this.deleteCustomField(field)}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>16 trash can</title><g fill="currentColor" class="nc-icon-wrapper"><path d="M2.5,5.5l.865,8.649A1.5,1.5,0,0,0,4.857,15.5h6.286a1.5,1.5,0,0,0,1.492-1.351L13.5,5.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path><line data-color="color-2" x1="0.5" y1="3.5" x2="15.5" y2="3.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></line><polyline data-color="color-2" points="5.5 3.5 5.5 0.5 10.5 0.5 10.5 3.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></polyline> </g></svg>
+                  </app-button>
                 </div>
               </div>
             `)}
@@ -623,9 +583,9 @@ export class SettingsPage extends LitElement {
                     ${this.formData.options.map((option, index) => html`
                       <div class="option-item">
                         <span class="option-text">${option}</span>
-                        <button type="button" class="btn btn-danger btn-small" @click="${() => this.removeOption(index)}">
+                        <app-button type="button" variant="danger" size="sm" @button-click="${() => this.removeOption(index)}">
                           Remove
-                        </button>
+                        </app-button>
                       </div>
                     `)}
                     <div class="add-option">
@@ -636,21 +596,21 @@ export class SettingsPage extends LitElement {
                         @input="${(e: Event) => this.newOption = (e.target as HTMLInputElement).value}"
                         @keydown="${this.handleNewOptionKeyDown}"
                       />
-                      <button type="button" class="btn btn-secondary btn-small" @click="${this.addOption}">
+                      <app-button type="button" variant="secondary" size="sm" @button-click="${this.addOption}">
                         Add
-                      </button>
+                      </app-button>
                     </div>
                   </div>
                 </div>
               ` : ''}
 
               <div class="form-actions">
-                <button type="button" class="btn btn-secondary" @click="${this.hideForm}">
+                <app-button type="button" variant="secondary" @button-click="${this.hideForm}">
                   Cancel
-                </button>
-                <button type="submit" class="btn btn-primary" ?disabled="${this.loading}">
-                  ${this.loading ? 'Saving...' : (this.editingField ? 'Update' : 'Create')}
-                </button>
+                </app-button>
+                <app-button type="submit" variant="primary" ?loading="${this.loading}">
+                  ${this.editingField ? 'Update' : 'Create'}
+                </app-button>
               </div>
             </form>
           </div>

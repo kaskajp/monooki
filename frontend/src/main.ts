@@ -9,6 +9,7 @@ import './components/locations.js';
 import './components/items.js';
 import './components/settings.js';
 import './components/profile.js';
+import './components/button.js';
 
 @customElement('monooki-app')
 export class MonookiApp extends LitElement {
@@ -17,6 +18,15 @@ export class MonookiApp extends LitElement {
 
   @state()
   private authView = 'login'; // 'login' or 'register'
+
+  @state()
+  private dashboardStats = {
+    totalItems: 0,
+    totalLocations: 0,
+    totalCategories: 0,
+    recentActivity: 0,
+    isLoading: true
+  };
 
   private router = new Router(this, [
     { path: '/', render: () => this.renderDashboard() },
@@ -149,13 +159,7 @@ export class MonookiApp extends LitElement {
       border: 1px solid #30363d;
       border-radius: 12px;
       padding: 1.5rem;
-      transition: all 0.2s ease;
-    }
-
-    .dashboard-card:hover {
-      border-color: #58a6ff;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+      position: relative;
     }
 
     .dashboard-card h3 {
@@ -177,54 +181,13 @@ export class MonookiApp extends LitElement {
       color: #58a6ff;
     }
 
-    .quick-actions {
-      margin-top: 2rem;
+    .card-nav-btn {
+      position: absolute;
+      bottom: 1rem;
+      right: 1rem;
     }
 
-    .quick-actions h2 {
-      margin: 0 0 1rem 0;
-      font-size: 20px;
-      font-weight: 600;
-      color: #f0f6fc;
-    }
 
-    .action-buttons {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-
-    .action-btn {
-      background: #238636;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 0.75rem 1.5rem;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .action-btn:hover {
-      background: #2ea043;
-      transform: translateY(-1px);
-    }
-
-    .action-btn.secondary {
-      background: #21262d;
-      color: #f0f6fc;
-      border: 1px solid #30363d;
-    }
-
-    .action-btn.secondary:hover {
-      background: #30363d;
-      border-color: #58a6ff;
-    }
 
     @media (max-width: 768px) {
       .dashboard {
@@ -249,21 +212,81 @@ export class MonookiApp extends LitElement {
   private checkAuthStatus() {
     const token = localStorage.getItem('token');
     this.isAuthenticated = !!token;
+    if (this.isAuthenticated) {
+      this.loadDashboardStats();
+    }
+  }
+
+  private async loadDashboardStats() {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const headers = {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      };
+
+      // Fetch all data in parallel
+      const [itemsResponse, locationsResponse, categoriesResponse] = await Promise.all([
+        fetch('/api/items', { headers }),
+        fetch('/api/locations', { headers }),
+        fetch('/api/categories', { headers })
+      ]);
+
+      if (itemsResponse.ok && locationsResponse.ok && categoriesResponse.ok) {
+        const [items, locations, categories] = await Promise.all([
+          itemsResponse.json(),
+          locationsResponse.json(),
+          categoriesResponse.json()
+        ]);
+
+        // Calculate recent activity (items added in last 7 days)
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const recentItems = items.filter((item: any) => 
+          new Date(item.created_at) > sevenDaysAgo
+        );
+
+        this.dashboardStats = {
+          totalItems: items.length,
+          totalLocations: locations.length,
+          totalCategories: categories.length,
+          recentActivity: recentItems.length,
+          isLoading: false
+        };
+      }
+    } catch (error) {
+      console.error('Failed to load dashboard stats:', error);
+      this.dashboardStats = {
+        ...this.dashboardStats,
+        isLoading: false
+      };
+    }
   }
 
   private handleLogin() {
     this.isAuthenticated = true;
+    this.loadDashboardStats();
     this.router.goto('/');
   }
 
   private handleRegister() {
     this.isAuthenticated = true;
+    this.loadDashboardStats();
     this.router.goto('/');
   }
 
   private handleLogout() {
     localStorage.removeItem('token');
     this.isAuthenticated = false;
+    this.dashboardStats = {
+      totalItems: 0,
+      totalLocations: 0,
+      totalCategories: 0,
+      recentActivity: 0,
+      isLoading: true
+    };
     this.requestUpdate();
   }
 
@@ -279,43 +302,45 @@ export class MonookiApp extends LitElement {
           <div class="dashboard-card">
             <h3>Items</h3>
             <p>Total items in your inventory</p>
-            <div class="metric">-</div>
+            <div class="metric">
+              ${this.dashboardStats.isLoading ? '-' : this.dashboardStats.totalItems}
+            </div>
+            <app-button class="card-nav-btn" variant="secondary" size="sm" href="/items">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>16 file copies</title><g stroke-miterlimit="10" fill="#FFFFFF" class="nc-icon-wrapper"><rect x="2.5" y="4.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" width="9" height="11"></rect> <polyline fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" points="4.5,2.5 13.5,2.5 13.5,13.5 " data-color="color-2"></polyline> <polyline fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" points="7.5,0.5 15.5,0.5 15.5,10.5 " data-color="color-2"></polyline></g></svg>
+              View Items
+            </app-button>
           </div>
 
           <div class="dashboard-card">
             <h3>Locations</h3>
             <p>Organized storage locations</p>
-            <div class="metric">-</div>
+            <div class="metric">
+              ${this.dashboardStats.isLoading ? '-' : this.dashboardStats.totalLocations}
+            </div>
+            <app-button class="card-nav-btn" variant="secondary" size="sm" href="/locations">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>16 position marker</title><g fill="currentColor" class="nc-icon-wrapper"><line x1="8.5" y1="12.5" x2="8.5" y2="8.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></line> <circle cx="8.5" cy="4.5" r="4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></circle> <path d="M11,11.681c2.066.316,3.5,1.012,3.5,1.819,0,1.105-2.686,2-6,2s-6-.895-6-2c0-.807,1.434-1.5,3.5-1.819" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" data-color="color-2"></path></g></svg>
+              View Locations
+            </app-button>
           </div>
 
           <div class="dashboard-card">
             <h3>Categories</h3>
             <p>Item categories for organization</p>
-            <div class="metric">-</div>
+            <div class="metric">
+              ${this.dashboardStats.isLoading ? '-' : this.dashboardStats.totalCategories}
+            </div>
+            <app-button class="card-nav-btn" variant="secondary" size="sm" href="/categories">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>16 tag cut</title><g stroke-miterlimit="10" fill="currentColor" class="nc-icon-wrapper"><polygon fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" points="3.5,0.5 8.5,1.5 15.5,8.5 8.5,15.5 1.5,8.5 0.5,3.5 " data-cap="butt"></polygon> <circle fill="currentColor" cx="5" cy="5" r="1" data-color="color-2" data-stroke="none"></circle></g></svg>
+              View Categories
+            </app-button>
           </div>
 
           <div class="dashboard-card">
             <h3>Recent Activity</h3>
-            <p>Latest inventory updates</p>
-            <div class="metric">-</div>
-          </div>
-        </div>
-
-        <div class="quick-actions">
-          <h2>Quick Actions</h2>
-          <div class="action-buttons">
-            <a href="/items" class="action-btn">
-              <span>📦</span> Add Item
-            </a>
-            <a href="/locations" class="action-btn secondary">
-              <span>📍</span> Manage Locations
-            </a>
-            <a href="/categories" class="action-btn secondary">
-              <span>🏷️</span> Manage Categories
-            </a>
-            <a href="/settings" class="action-btn secondary">
-              <span>⚙️</span> Settings
-            </a>
+            <p>Items added in the last 7 days</p>
+            <div class="metric">
+              ${this.dashboardStats.isLoading ? '-' : this.dashboardStats.recentActivity}
+            </div>
           </div>
         </div>
       </div>
