@@ -314,8 +314,8 @@ router.put('/:id', async (req: any, res: any) => {
       UPDATE items SET 
         name = COALESCE(?, name),
         description = COALESCE(?, description),
-        location_id = ?,
-        category_id = ?,
+        location_id = COALESCE(?, location_id),
+        category_id = COALESCE(?, category_id),
         quantity = COALESCE(?, quantity),
         model_number = COALESCE(?, model_number),
         serial_number = COALESCE(?, serial_number),
@@ -324,7 +324,7 @@ router.put('/:id', async (req: any, res: any) => {
         purchase_location = COALESCE(?, purchase_location),
         warranty = COALESCE(?, warranty),
         expiration_date = COALESCE(?, expiration_date),
-        custom_fields = ?,
+        custom_fields = COALESCE(?, custom_fields),
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ? AND workspace_id = ?
     `, [

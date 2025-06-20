@@ -453,7 +453,17 @@ export class ItemView extends LitElement {
         throw new Error('Failed to load item');
       }
 
-      this.item = await response.json();
+      const rawItem = await response.json();
+      // Transform the API response to match our Item interface
+      this.item = {
+        ...rawItem,
+        location: rawItem.location_id && rawItem.location_name ? 
+          { id: rawItem.location_id, name: rawItem.location_name } : 
+          undefined,
+        category: rawItem.category_id && rawItem.category_name ? 
+          { id: rawItem.category_id, name: rawItem.category_name } : 
+          undefined
+      };
     } catch (error) {
       console.error('Failed to load item:', error);
     } finally {

@@ -680,7 +680,17 @@ export class ItemsPage extends LitElement {
       });
 
       if (response.ok) {
-        this.items = await response.json();
+        const rawItems = await response.json();
+        // Transform the API response to match our Item interface
+        this.items = rawItems.map((item: any) => ({
+          ...item,
+          location: item.location_id && item.location_name ? 
+            { id: item.location_id, name: item.location_name } : 
+            undefined,
+          category: item.category_id && item.category_name ? 
+            { id: item.category_id, name: item.category_name } : 
+            undefined
+        }));
       } else {
         console.error('Failed to load items');
       }
@@ -1389,12 +1399,11 @@ export class ItemsPage extends LitElement {
                   <select
                     id="location_id"
                     name="location_id"
-                    .value="${this.formData.location_id}"
                     @change="${this.handleInputChange}"
                   >
-                    <option value="">Select location</option>
+                    <option value="" ?selected="${!this.formData.location_id}">Select location</option>
                     ${this.locations.map(loc => html`
-                      <option value="${loc.id}">${loc.name}</option>
+                      <option value="${loc.id}" ?selected="${this.formData.location_id === loc.id}">${loc.name}</option>
                     `)}
                   </select>
                 </div>
@@ -1404,12 +1413,11 @@ export class ItemsPage extends LitElement {
                   <select
                     id="category_id"
                     name="category_id"
-                    .value="${this.formData.category_id}"
                     @change="${this.handleInputChange}"
                   >
-                    <option value="">Select category</option>
+                    <option value="" ?selected="${!this.formData.category_id}">Select category</option>
                     ${this.categories.map(cat => html`
-                      <option value="${cat.id}">${cat.name}</option>
+                      <option value="${cat.id}" ?selected="${this.formData.category_id === cat.id}">${cat.name}</option>
                     `)}
                   </select>
                 </div>
