@@ -351,7 +351,7 @@ export class MonookiApp extends LitElement {
     }, 100);
   }
 
-  private handleItemDeleted(e: CustomEvent) {
+  private handleItemDeleted(_e: CustomEvent) {
     // Navigate back to items list after deletion
     this.router.goto('/items');
   }

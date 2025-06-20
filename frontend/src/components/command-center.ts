@@ -243,9 +243,6 @@ export class CommandCenter extends LitElement {
   }
 
   private executeSelected() {
-    const allItems = this.getAllSelectableItems();
-    const selectedItem = allItems[this.selectedIndex];
-    
     if (this.selectedIndex < 3) {
       // Quick actions
       const actions = ['items', 'locations', 'categories'];
