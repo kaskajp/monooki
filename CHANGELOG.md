@@ -1,3 +1,10 @@
+# [1.0.0-beta.4](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.3...v1.0.0-beta.4) (2025-06-20)
+
+
+### Bug Fixes
+
+* **frontend:** Responsive tables and fixed button clicks ([3e4797f](https://github.com/kaskajp/monooki/commit/3e4797fe655c5861c3566cad6c02f024c88c67b1))
+
 # [1.0.0-beta.3](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.2...v1.0.0-beta.3) (2025-06-20)
 
 
