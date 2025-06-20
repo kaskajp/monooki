@@ -125,6 +125,22 @@ export class ItemsPage extends LitElement {
   @state()
   userCurrency = 'USD';
 
+  @state()
+  visibleColumns = {
+    photo: true,
+    label: true,
+    name: true,
+    category: true,
+    location: true,
+    quantity: true,
+    price: true,
+    expiration: true,
+    created: true
+  };
+
+  @state()
+  showColumnSelector = false;
+
   // Add simple caching to prevent redundant API calls
   private static cachedData: {
     categories?: Category[];
@@ -271,6 +287,7 @@ export class ItemsPage extends LitElement {
       font-weight: var(--font-weight-semibold);
       color: var(--color-text-primary);
       font-size: var(--font-size-base);
+      min-width: 200px;
     }
 
     .item-description {
@@ -692,6 +709,71 @@ export class ItemsPage extends LitElement {
       font-size: 16px;
       margin: 0;
     }
+
+    .column-selector {
+      position: relative;
+      display: inline-block;
+    }
+
+    .column-selector-button {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .column-selector-dropdown {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border-primary);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-lg);
+      min-width: 250px;
+      z-index: 1000;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      margin-top: 0.5rem;
+      display: block;
+    }
+
+    .column-selector-dropdown h4 {
+      margin: 0 0 var(--spacing-lg) 0;
+      color: var(--color-text-primary);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .column-option {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+      padding: var(--spacing-sm) 0;
+      cursor: pointer;
+    }
+
+    .column-option input[type="checkbox"] {
+      margin: 0;
+      width: auto;
+    }
+
+    .column-option label {
+      margin: 0;
+      font-size: var(--font-size-sm);
+      color: var(--color-text-primary);
+      cursor: pointer;
+      flex: 1;
+    }
+
+    .column-option:hover {
+      background: var(--color-bg-primary);
+      border-radius: var(--radius-sm);
+      margin: 0 calc(var(--spacing-sm) * -1);
+      padding: var(--spacing-sm);
+    }
+
+    .name-column {
+      min-width: 200px;
+    }
   `;
 
   async connectedCallback() {
@@ -708,6 +790,21 @@ export class ItemsPage extends LitElement {
     
     // Then load items (which isn't cached and is component-specific)
     await this.loadItems();
+
+    // Add click listener to close column selector when clicking outside
+    document.addEventListener('click', this.handleDocumentClick.bind(this));
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    document.removeEventListener('click', this.handleDocumentClick.bind(this));
+  }
+
+  private handleDocumentClick(event: Event) {
+    const target = event.target as Element;
+    if (this.showColumnSelector && !target.closest('.column-selector')) {
+      this.showColumnSelector = false;
+    }
   }
 
   private async loadUserCurrency() {
@@ -1222,6 +1319,24 @@ export class ItemsPage extends LitElement {
     return '';
   }
 
+  private toggleColumnSelector(e?: Event) {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    this.showColumnSelector = !this.showColumnSelector;
+  }
+
+  private toggleColumn(column: keyof typeof this.visibleColumns) {
+    // Don't allow hiding the name column (it's essential)
+    if (column === 'name') return;
+    
+    this.visibleColumns = {
+      ...this.visibleColumns,
+      [column]: !this.visibleColumns[column]
+    };
+  }
+
   private formatCurrency(amount: number): string {
     if (!amount) return '';
     
@@ -1449,9 +1564,120 @@ export class ItemsPage extends LitElement {
     return html`
       <div class="header">
         <h1>Items</h1>
-        <app-button variant="primary" @button-click="${this.showAddForm}">
-          Add Item
-        </app-button>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+          <div class="column-selector">
+            <button 
+              class="column-selector-btn" 
+              @click="${(e: Event) => this.toggleColumnSelector(e)}"
+              style="
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                padding: var(--spacing-md);
+                background: var(--color-bg-secondary);
+                border: 1px solid var(--color-border-primary);
+                border-radius: var(--radius-md);
+                color: var(--color-text-primary);
+                font-size: var(--font-size-sm);
+                cursor: pointer;
+                transition: all var(--transition-normal);
+              "
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>columns</title><g fill="currentColor"><rect x="1" y="3" width="3" height="10" rx="0.5" ry="0.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></rect><rect x="6" y="3" width="3" height="10" rx="0.5" ry="0.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></rect><rect x="11" y="3" width="3" height="10" rx="0.5" ry="0.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></rect></g></svg>
+              Columns
+            </button>
+            ${this.showColumnSelector ? html`
+              <div class="column-selector-dropdown" @click="${(e: Event) => e.stopPropagation()}">
+                <h4>Show/Hide Columns</h4>
+                <div class="column-option">
+                  <input
+                    type="checkbox"
+                    id="col-photo"
+                    .checked="${this.visibleColumns.photo}"
+                    @change="${() => this.toggleColumn('photo')}"
+                  />
+                  <label for="col-photo">Photo</label>
+                </div>
+                <div class="column-option">
+                  <input
+                    type="checkbox"
+                    id="col-label"
+                    .checked="${this.visibleColumns.label}"
+                    @change="${() => this.toggleColumn('label')}"
+                  />
+                  <label for="col-label">Label</label>
+                </div>
+                <div class="column-option">
+                  <input
+                    type="checkbox"
+                    id="col-name"
+                    .checked="${this.visibleColumns.name}"
+                    disabled
+                    title="Name column cannot be hidden"
+                  />
+                  <label for="col-name">Name (required)</label>
+                </div>
+                <div class="column-option">
+                  <input
+                    type="checkbox"
+                    id="col-category"
+                    .checked="${this.visibleColumns.category}"
+                    @change="${() => this.toggleColumn('category')}"
+                  />
+                  <label for="col-category">Category</label>
+                </div>
+                <div class="column-option">
+                  <input
+                    type="checkbox"
+                    id="col-location"
+                    .checked="${this.visibleColumns.location}"
+                    @change="${() => this.toggleColumn('location')}"
+                  />
+                  <label for="col-location">Location</label>
+                </div>
+                <div class="column-option">
+                  <input
+                    type="checkbox"
+                    id="col-quantity"
+                    .checked="${this.visibleColumns.quantity}"
+                    @change="${() => this.toggleColumn('quantity')}"
+                  />
+                  <label for="col-quantity">Quantity</label>
+                </div>
+                <div class="column-option">
+                  <input
+                    type="checkbox"
+                    id="col-price"
+                    .checked="${this.visibleColumns.price}"
+                    @change="${() => this.toggleColumn('price')}"
+                  />
+                  <label for="col-price">Price</label>
+                </div>
+                <div class="column-option">
+                  <input
+                    type="checkbox"
+                    id="col-expiration"
+                    .checked="${this.visibleColumns.expiration}"
+                    @change="${() => this.toggleColumn('expiration')}"
+                  />
+                  <label for="col-expiration">Expiration</label>
+                </div>
+                <div class="column-option">
+                  <input
+                    type="checkbox"
+                    id="col-created"
+                    .checked="${this.visibleColumns.created}"
+                    @change="${() => this.toggleColumn('created')}"
+                  />
+                  <label for="col-created">Created</label>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+          <app-button variant="primary" @button-click="${this.showAddForm}">
+            Add Item
+          </app-button>
+        </div>
       </div>
 
       <div class="filters">
@@ -1504,60 +1730,78 @@ export class ItemsPage extends LitElement {
           <table>
             <thead>
               <tr>
-                <th>Photo</th>
-                <th>Label</th>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Location</th>
-                <th>Quantity</th>
-                <th>Price</th>
-                <th>Expiration</th>
-                <th>Created</th>
+                ${this.visibleColumns.photo ? html`<th>Photo</th>` : ''}
+                ${this.visibleColumns.label ? html`<th>Label</th>` : ''}
+                ${this.visibleColumns.name ? html`<th class="name-column">Name</th>` : ''}
+                ${this.visibleColumns.category ? html`<th>Category</th>` : ''}
+                ${this.visibleColumns.location ? html`<th>Location</th>` : ''}
+                ${this.visibleColumns.quantity ? html`<th>Quantity</th>` : ''}
+                ${this.visibleColumns.price ? html`<th>Price</th>` : ''}
+                ${this.visibleColumns.expiration ? html`<th>Expiration</th>` : ''}
+                ${this.visibleColumns.created ? html`<th>Created</th>` : ''}
                 <th class="actions-cell">Actions</th>
               </tr>
             </thead>
             <tbody>
               ${this.filteredAndSortedItems.map(item => html`
                 <tr @click="${(e: Event) => this.handleRowClick(item, e)}">
-                  <td>
-                    ${item.first_photo ? html`
-                      <img class="item-photo" src="/api/photos/files/${item.first_photo}" alt="${item.name}" />
-                    ` : html`
-                      <div class="no-photo"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>no-photo</title><g fill="#FFFFFF" stroke-miterlimit="10"><path fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" d="M5.525,10.475 C4.892,9.842,4.5,8.967,4.5,8c0-1.933,1.567-3.5,3.5-3.5c0.966,0,1.841,0.392,2.475,1.025"></path> <path fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" d="M11.355,7 C11.449,7.317,11.5,7.652,11.5,8c0,1.933-1.567,3.5-3.5,3.5c-0.348,0-0.683-0.051-1-0.145"></path> <path fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" d="M5.5,13.5h9 c0.552,0,1-0.448,1-1v-9"></path> <path fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" d="M13.5,2.5h-2l-1-2h-5 l-1,2h-3c-0.552,0-1,0.448-1,1v9c0,0.552,0.448,1,1,1h1"></path> <line fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" x1="0.5" y1="15.5" x2="15.5" y2="0.5"></line></g></svg></div>
-                    `}
-                  </td>
-                  <td>
-                    ${item.label_id ? html`
-                      <span class="badge badge--label">${item.label_id}</span>
-                    ` : html`
-                      <span class="empty-label">—</span>
-                    `}
-                  </td>
-                  <td>
-                    <div class="item-name">${item.name}</div>
-                  </td>
-                  <td>
-                    <div class="item-category">${item.category?.name || '—'}</div>
-                  </td>
-                  <td>
-                    <div class="item-location">${item.location?.name || '—'}</div>
-                  </td>
-                  <td>
-                    <div class="item-quantity">${item.quantity || 1}</div>
-                  </td>
-                  <td>
-                    <div class="item-price">
-                      ${item.purchase_price ? this.formatCurrency(item.purchase_price) : '—'}
-                    </div>
-                  </td>
-                  <td>
-                    <div class="item-expiration ${item.expiration_date ? this.getExpirationClass(item.expiration_date) : ''}">
-                      ${item.expiration_date ? new Date(item.expiration_date).toLocaleDateString() : '—'}
-                    </div>
-                  </td>
-                  <td>
-                    <div class="item-date">${new Date(item.created_at).toLocaleDateString()}</div>
-                  </td>
+                  ${this.visibleColumns.photo ? html`
+                    <td>
+                      ${item.first_photo ? html`
+                        <img class="item-photo" src="/api/photos/files/${item.first_photo}" alt="${item.name}" />
+                      ` : html`
+                        <div class="no-photo"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>no-photo</title><g fill="#FFFFFF" stroke-miterlimit="10"><path fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" d="M5.525,10.475 C4.892,9.842,4.5,8.967,4.5,8c0-1.933,1.567-3.5,3.5-3.5c0.966,0,1.841,0.392,2.475,1.025"></path> <path fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" d="M11.355,7 C11.449,7.317,11.5,7.652,11.5,8c0,1.933-1.567,3.5-3.5,3.5c-0.348,0-0.683-0.051-1-0.145"></path> <path fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" d="M5.5,13.5h9 c0.552,0,1-0.448,1-1v-9"></path> <path fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" d="M13.5,2.5h-2l-1-2h-5 l-1,2h-3c-0.552,0-1,0.448-1,1v9c0,0.552,0.448,1,1,1h1"></path> <line fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" x1="0.5" y1="15.5" x2="15.5" y2="0.5"></line></g></svg></div>
+                      `}
+                    </td>
+                  ` : ''}
+                  ${this.visibleColumns.label ? html`
+                    <td>
+                      ${item.label_id ? html`
+                        <span class="badge badge--label">${item.label_id}</span>
+                      ` : html`
+                        <span class="empty-label">—</span>
+                      `}
+                    </td>
+                  ` : ''}
+                  ${this.visibleColumns.name ? html`
+                    <td class="name-column">
+                      <div class="item-name">${item.name}</div>
+                    </td>
+                  ` : ''}
+                  ${this.visibleColumns.category ? html`
+                    <td>
+                      <div class="item-category">${item.category?.name || '—'}</div>
+                    </td>
+                  ` : ''}
+                  ${this.visibleColumns.location ? html`
+                    <td>
+                      <div class="item-location">${item.location?.name || '—'}</div>
+                    </td>
+                  ` : ''}
+                  ${this.visibleColumns.quantity ? html`
+                    <td>
+                      <div class="item-quantity">${item.quantity || 1}</div>
+                    </td>
+                  ` : ''}
+                  ${this.visibleColumns.price ? html`
+                    <td>
+                      <div class="item-price">
+                        ${item.purchase_price ? this.formatCurrency(item.purchase_price) : '—'}
+                      </div>
+                    </td>
+                  ` : ''}
+                  ${this.visibleColumns.expiration ? html`
+                    <td>
+                      <div class="item-expiration ${item.expiration_date ? this.getExpirationClass(item.expiration_date) : ''}">
+                        ${item.expiration_date ? new Date(item.expiration_date).toLocaleDateString() : '—'}
+                      </div>
+                    </td>
+                  ` : ''}
+                  ${this.visibleColumns.created ? html`
+                    <td>
+                      <div class="item-date">${new Date(item.created_at).toLocaleDateString()}</div>
+                    </td>
+                  ` : ''}
                   <td class="actions-cell">
                     <div class="item-actions">
                       <app-button variant="secondary" size="sm" icon-only @button-click="${() => this.showEditForm(item)}">
