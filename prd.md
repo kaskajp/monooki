@@ -23,6 +23,10 @@ Build a self-hosted RESTful web service to help users store, organize, and manag
 - Items have: ID (required, auto-generated), Name (required), Description, Location (room), Category, Quantity, Photos, Model Number, Serial Number, Purchase Date, Purchase Price, Purchase Location, Warranty, Attachments, Custom Fields.
 - Store photos securely in local storage, not cloud storage.
 - Photos are associated with an item.
+- Items can have an expiration date.
+- Show number of items that are expiring soon (within 30 days) on the dashboard.
+- Show expiration date on the item page and list pages.
+- Sort by expiration date.
 
 ### Location Management
 - CRUD for Locations (e.g., “Kitchen”, “Garage”, “Bedroom”).
@@ -35,6 +39,12 @@ Build a self-hosted RESTful web service to help users store, organize, and manag
 ### Search & Filter
 - Search items by name, category, or location.
 - Sort by id, name, purchase date, purchase price, or any other field/custom field.
+
+### Command Center
+- CMD+K to open the command center
+- Search for items, locations, categories
+- View all items, locations, categories
+- Create new item, location, category
 
 ## API Endpoints
 
@@ -89,6 +99,14 @@ DELETE | /api/categories/{id} | Delete category by id
 - Database: SQLite
 - Authentication: JWT
 - Deployment: Docker Compose
+
+## Design
+- Take inspiration from Linear's design (https://linear.app/homepage)
+- Use Space Grotesk font family
+- Centralized design system with CSS custom properties
+- Consistent dark theme with carefully chosen color palette
+- Modern, clean interface with smooth animations and transitions
+- Custom SVG icons for buttons and other UI elements (Nucleo Icons)
 
 ## Documentation
 - README.md
