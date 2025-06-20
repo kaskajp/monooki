@@ -1,3 +1,10 @@
+# [1.0.0-beta.3](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.2...v1.0.0-beta.3) (2025-06-20)
+
+
+### Features
+
+* Currency settings ([7f16de0](https://github.com/kaskajp/monooki/commit/7f16de0ef32cf858e7d3fb913fbc86cc1954bd6a))
+
 # [1.0.0-beta.2](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2025-06-20)
 
 
