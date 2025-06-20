@@ -1,3 +1,10 @@
+# [1.0.0-beta.5](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.4...v1.0.0-beta.5) (2025-06-20)
+
+
+### Features
+
+* **frontend:** Column chooser for items view ([d1dc775](https://github.com/kaskajp/monooki/commit/d1dc7754afb1895f3a4507522beeb4bbf8abdbd0))
+
 # [1.0.0-beta.4](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.3...v1.0.0-beta.4) (2025-06-20)
 
 
