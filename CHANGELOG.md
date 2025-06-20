@@ -1,3 +1,10 @@
+# [1.0.0-beta.2](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.1...v1.0.0-beta.2) (2025-06-20)
+
+
+### Features
+
+* **frontend:** added favicon ([d74a78d](https://github.com/kaskajp/monooki/commit/d74a78d48cfa2d7052c55c7664c8af6e774df344))
+
 # 1.0.0-beta.1 (2025-06-20)
 
 
