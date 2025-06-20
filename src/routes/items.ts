@@ -32,6 +32,7 @@ const itemSchema = Joi.object({
   purchase_price: Joi.alternatives().try(Joi.number().min(0), Joi.string().allow(''), Joi.allow(null)),
   purchase_location: Joi.string().allow(''),
   warranty: Joi.string().allow(''),
+  expiration_date: Joi.string().allow(''),
   custom_fields: Joi.object().allow(null)
 });
 
@@ -83,7 +84,7 @@ router.get('/', async (req: any, res: any) => {
     }
 
     // Add sorting
-    const validSortFields = ['id', 'name', 'purchase_date', 'purchase_price', 'created_at'];
+    const validSortFields = ['id', 'name', 'purchase_date', 'purchase_price', 'expiration_date', 'created_at'];
     const sortField = validSortFields.includes(sort) ? sort : 'name';
     const sortOrder = order.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
     query += ` ORDER BY i.${sortField} ${sortOrder}`;
@@ -104,6 +105,46 @@ router.get('/', async (req: any, res: any) => {
     res.json(processedItems);
   } catch (error) {
     console.error('Get items error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/items/expiring - Get items expiring within specified days (default 30)
+router.get('/expiring', async (req: any, res: any) => {
+  try {
+    const { days = 30 } = req.query;
+    const workspace_id = req.user.workspace_id;
+    const db = getDatabase();
+
+    // Calculate the target date
+    const targetDate = new Date();
+    targetDate.setDate(targetDate.getDate() + parseInt(days));
+    const targetDateStr = targetDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+
+    const expiringItems = await db.all(`
+      SELECT i.*,
+             c.name as category_name, 
+             l.name as location_name
+      FROM items i
+      LEFT JOIN categories c ON i.category_id = c.id
+      LEFT JOIN locations l ON i.location_id = l.id
+      WHERE i.workspace_id = ? 
+        AND i.expiration_date IS NOT NULL 
+        AND i.expiration_date != ''
+        AND date(i.expiration_date) <= date(?)
+        AND date(i.expiration_date) >= date('now')
+      ORDER BY date(i.expiration_date) ASC
+    `, [workspace_id, targetDateStr]);
+
+    // Parse custom_fields JSON
+    const processedItems = expiringItems.map(item => ({
+      ...item,
+      custom_fields: item.custom_fields ? JSON.parse(item.custom_fields) : {}
+    }));
+
+    res.json(processedItems);
+  } catch (error) {
+    console.error('Get expiring items error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -194,12 +235,12 @@ router.post('/', async (req: any, res: any) => {
       INSERT INTO items (
         id, label_id, name, description, location_id, category_id, quantity,
         model_number, serial_number, purchase_date, purchase_price,
-        purchase_location, warranty, custom_fields, workspace_id
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        purchase_location, warranty, expiration_date, custom_fields, workspace_id
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `, [
       id, labelId, processedValue.name, processedValue.description, processedValue.location_id, processedValue.category_id,
       processedValue.quantity, processedValue.model_number, processedValue.serial_number, processedValue.purchase_date,
-      processedValue.purchase_price, processedValue.purchase_location, processedValue.warranty,
+      processedValue.purchase_price, processedValue.purchase_location, processedValue.warranty, processedValue.expiration_date,
       custom_fields_json, workspace_id
     ]);
 
@@ -282,13 +323,14 @@ router.put('/:id', async (req: any, res: any) => {
         purchase_price = COALESCE(?, purchase_price),
         purchase_location = COALESCE(?, purchase_location),
         warranty = COALESCE(?, warranty),
+        expiration_date = COALESCE(?, expiration_date),
         custom_fields = ?,
         updated_at = CURRENT_TIMESTAMP
       WHERE id = ? AND workspace_id = ?
     `, [
       processedValue.name, processedValue.description, processedValue.location_id, processedValue.category_id,
       processedValue.quantity, processedValue.model_number, processedValue.serial_number, processedValue.purchase_date,
-      processedValue.purchase_price, processedValue.purchase_location, processedValue.warranty,
+      processedValue.purchase_price, processedValue.purchase_location, processedValue.warranty, processedValue.expiration_date,
       custom_fields_json, id, workspace_id
     ]);
 

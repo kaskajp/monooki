@@ -205,7 +205,35 @@ const addLabelFields = async () => {
   }
 };
 
-export { createTables, addLabelFields };
+const addExpirationField = async () => {
+  const db = getDatabase();
+  
+  try {
+    // Check if items table exists first
+    const itemsTables = await db.all("SELECT name FROM sqlite_master WHERE type='table' AND name='items'");
+    if (itemsTables.length === 0) {
+      console.log('Items table does not exist yet, skipping expiration_date field migration...');
+      return;
+    }
+
+    // Check if expiration_date field exists in items table
+    const itemColumns = await db.all("PRAGMA table_info(items)");
+    const hasExpirationDate = itemColumns.some((col: any) => col.name === 'expiration_date');
+    
+    if (!hasExpirationDate) {
+      console.log('Adding expiration_date field to items table...');
+      await db.run('ALTER TABLE items ADD COLUMN expiration_date DATE');
+      await db.run('CREATE INDEX IF NOT EXISTS idx_items_expiration_date ON items(expiration_date)');
+    }
+    
+    console.log('Expiration date field migration completed successfully');
+  } catch (error) {
+    console.error('Error adding expiration_date field:', error);
+    throw error;
+  }
+};
+
+export { createTables, addLabelFields, addExpirationField };
 
 // Auto-run migrations
 const migrate = async () => {
@@ -213,6 +241,8 @@ const migrate = async () => {
     await createTables();
     // Run label fields migration after tables are created
     await addLabelFields();
+    // Run expiration field migration
+    await addExpirationField();
   } catch (error) {
     console.error('Migration failed:', error);
     throw error;

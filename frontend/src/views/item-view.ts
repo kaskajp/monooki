@@ -18,6 +18,7 @@ interface Item {
   purchase_price?: number;
   purchase_location?: string;
   warranty?: string;
+  expiration_date?: string;
   custom_fields?: Record<string, any>;
   first_photo?: string;
   photos?: Photo[];
@@ -382,6 +383,21 @@ export class ItemView extends LitElement {
       text-transform: none;
     }
 
+    .expired {
+      color: #ff6b6b !important;
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .expiring-soon {
+      color: #ffa500 !important;
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .expiring-warning {
+      color: #ffeb3b !important;
+      font-weight: var(--font-weight-medium);
+    }
+
     @media (max-width: 768px) {
       .content {
         grid-template-columns: 1fr;
@@ -552,6 +568,29 @@ export class ItemView extends LitElement {
       style: 'currency',
       currency: 'USD'
     }).format(amount);
+  }
+
+  private getExpirationClass(expirationDate: string): string {
+    const today = new Date();
+    const expDate = new Date(expirationDate);
+    const diffTime = expDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 0) {
+      return 'expired';
+    } else if (diffDays <= 7) {
+      return 'expiring-soon';
+    } else if (diffDays <= 30) {
+      return 'expiring-warning';
+    }
+    return '';
+  }
+
+  private getDaysUntilExpiration(expirationDate: string): number {
+    const today = new Date();
+    const expDate = new Date(expirationDate);
+    const diffTime = expDate.getTime() - today.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
 
   private renderCustomFields() {
@@ -763,6 +802,28 @@ export class ItemView extends LitElement {
               </div>
             </div>
           </div>
+
+          ${this.item.expiration_date ? html`
+            <div class="info-card">
+              <div class="info-card-header">
+                <h3>Expiration Information</h3>
+              </div>
+              <div class="info-card-content">
+                <div class="info-item">
+                  <span class="info-label">Expiration Date</span>
+                  <span class="info-value ${this.getExpirationClass(this.item.expiration_date)}">
+                    ${this.formatDate(this.item.expiration_date)}
+                  </span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Days Until Expiration</span>
+                  <span class="info-value ${this.getExpirationClass(this.item.expiration_date)}">
+                    ${this.getDaysUntilExpiration(this.item.expiration_date)} days
+                  </span>
+                </div>
+              </div>
+            </div>
+          ` : ''}
 
           ${this.renderCustomFields()}
 

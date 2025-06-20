@@ -33,6 +33,7 @@ export interface Item {
   purchase_price?: number;
   purchase_location?: string;
   warranty?: string;
+  expiration_date?: string;
   custom_fields?: Record<string, any>;
   workspace_id: string;
   created_at: string;

@@ -18,6 +18,7 @@ interface Item {
   purchase_price?: number;
   purchase_location?: string;
   warranty?: string;
+  expiration_date?: string;
   custom_fields?: Record<string, any>;
   first_photo?: string;
   photos?: Photo[];
@@ -99,7 +100,8 @@ export class ItemsPage extends LitElement {
     purchase_date: '',
     purchase_price: '',
     purchase_location: '',
-    warranty: ''
+    warranty: '',
+    expiration_date: ''
   };
 
   @state()
@@ -286,6 +288,25 @@ export class ItemsPage extends LitElement {
     .item-date {
       color: var(--color-text-secondary);
       font-size: var(--font-size-sm);
+    }
+
+    .item-expiration {
+      font-size: var(--font-size-sm);
+    }
+
+    .item-expiration.expired {
+      color: #ff6b6b;
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .item-expiration.expiring-soon {
+      color: #ffa500;
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .item-expiration.expiring-warning {
+      color: #ffeb3b;
+      font-weight: var(--font-weight-medium);
     }
 
     .item-actions {
@@ -762,6 +783,11 @@ export class ItemsPage extends LitElement {
           if (!a.purchase_date) return 1;
           if (!b.purchase_date) return -1;
           return new Date(b.purchase_date).getTime() - new Date(a.purchase_date).getTime();
+        case 'expiration_date':
+          if (!a.expiration_date && !b.expiration_date) return 0;
+          if (!a.expiration_date) return 1;
+          if (!b.expiration_date) return -1;
+          return new Date(a.expiration_date).getTime() - new Date(b.expiration_date).getTime();
         case 'purchase_price':
           return (b.purchase_price || 0) - (a.purchase_price || 0);
         case 'created_at':
@@ -779,7 +805,7 @@ export class ItemsPage extends LitElement {
     this.formData = {
       name: '', description: '', location_id: '', category_id: '',
       quantity: '', model_number: '', serial_number: '', purchase_date: '',
-      purchase_price: '', purchase_location: '', warranty: ''
+      purchase_price: '', purchase_location: '', warranty: '', expiration_date: ''
     };
     // Initialize custom field values
     this.customFieldValues = {};
@@ -802,7 +828,8 @@ export class ItemsPage extends LitElement {
       purchase_date: item.purchase_date || '',
       purchase_price: item.purchase_price?.toString() || '',
       purchase_location: item.purchase_location || '',
-      warranty: item.warranty || ''
+      warranty: item.warranty || '',
+      expiration_date: item.expiration_date || ''
     };
     
     // Initialize custom field values from item
@@ -971,6 +998,22 @@ export class ItemsPage extends LitElement {
     if (input.files) {
       this.selectedFiles = Array.from(input.files);
     }
+  }
+
+  private getExpirationClass(expirationDate: string): string {
+    const today = new Date();
+    const expDate = new Date(expirationDate);
+    const diffTime = expDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 0) {
+      return 'expired';
+    } else if (diffDays <= 7) {
+      return 'expiring-soon';
+    } else if (diffDays <= 30) {
+      return 'expiring-warning';
+    }
+    return '';
   }
 
   private async uploadPhotos(itemId: string) {
@@ -1177,6 +1220,7 @@ export class ItemsPage extends LitElement {
             <option value="name">Name</option>
             <option value="created_at">Date Created</option>
             <option value="purchase_date">Purchase Date</option>
+            <option value="expiration_date">Expiration Date</option>
             <option value="purchase_price">Price</option>
             <option value="quantity">Quantity</option>
           </select>
@@ -1199,6 +1243,7 @@ export class ItemsPage extends LitElement {
                 <th>Location</th>
                 <th>Quantity</th>
                 <th>Price</th>
+                <th>Expiration</th>
                 <th>Created</th>
                 <th class="actions-cell">Actions</th>
               </tr>
@@ -1238,6 +1283,11 @@ export class ItemsPage extends LitElement {
                   <td>
                     <div class="item-price">
                       ${item.purchase_price ? `$${item.purchase_price}` : '—'}
+                    </div>
+                  </td>
+                  <td>
+                    <div class="item-expiration ${item.expiration_date ? this.getExpirationClass(item.expiration_date) : ''}">
+                      ${item.expiration_date ? new Date(item.expiration_date).toLocaleDateString() : '—'}
                     </div>
                   </td>
                   <td>
@@ -1404,6 +1454,17 @@ export class ItemsPage extends LitElement {
                     .value="${this.formData.purchase_location}"
                     @input="${this.handleInputChange}"
                     placeholder="Store or website"
+                  />
+                </div>
+                
+                <div class="form-group">
+                  <label for="expiration_date">Expiration Date</label>
+                  <input
+                    type="date"
+                    id="expiration_date"
+                    name="expiration_date"
+                    .value="${this.formData.expiration_date}"
+                    @input="${this.handleInputChange}"
                   />
                 </div>
                 

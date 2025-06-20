@@ -27,6 +27,7 @@ export class MonookiApp extends LitElement {
     totalLocations: 0,
     totalCategories: 0,
     recentActivity: 0,
+    expiringItems: 0,
     isLoading: true
   };
 
@@ -190,6 +191,20 @@ export class MonookiApp extends LitElement {
       right: 1rem;
     }
 
+    .alert-metric {
+      color: #ffa500 !important;
+    }
+
+    .expiring-items-card .metric.alert-metric {
+      color: #ffa500 !important;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
 
 
     @media (max-width: 768px) {
@@ -231,17 +246,19 @@ export class MonookiApp extends LitElement {
       };
 
       // Fetch all data in parallel
-      const [itemsResponse, locationsResponse, categoriesResponse] = await Promise.all([
+      const [itemsResponse, locationsResponse, categoriesResponse, expiringResponse] = await Promise.all([
         fetch('/api/items', { headers }),
         fetch('/api/locations', { headers }),
-        fetch('/api/categories', { headers })
+        fetch('/api/categories', { headers }),
+        fetch('/api/items/expiring?days=30', { headers })
       ]);
 
-      if (itemsResponse.ok && locationsResponse.ok && categoriesResponse.ok) {
-        const [items, locations, categories] = await Promise.all([
+      if (itemsResponse.ok && locationsResponse.ok && categoriesResponse.ok && expiringResponse.ok) {
+        const [items, locations, categories, expiringItems] = await Promise.all([
           itemsResponse.json(),
           locationsResponse.json(),
-          categoriesResponse.json()
+          categoriesResponse.json(),
+          expiringResponse.json()
         ]);
 
         // Calculate recent activity (items added in last 7 days)
@@ -256,6 +273,7 @@ export class MonookiApp extends LitElement {
           totalLocations: locations.length,
           totalCategories: categories.length,
           recentActivity: recentItems.length,
+          expiringItems: expiringItems.length,
           isLoading: false
         };
       }
@@ -283,13 +301,14 @@ export class MonookiApp extends LitElement {
   private handleLogout() {
     localStorage.removeItem('token');
     this.isAuthenticated = false;
-    this.dashboardStats = {
-      totalItems: 0,
-      totalLocations: 0,
-      totalCategories: 0,
-      recentActivity: 0,
-      isLoading: true
-    };
+          this.dashboardStats = {
+        totalItems: 0,
+        totalLocations: 0,
+        totalCategories: 0,
+        recentActivity: 0,
+        expiringItems: 0,
+        isLoading: true
+      };
     this.requestUpdate();
   }
 
@@ -382,12 +401,21 @@ export class MonookiApp extends LitElement {
             </app-button>
           </div>
 
-          <div class="dashboard-card">
-            <h3>Recent Activity</h3>
-            <p>Items added in the last 7 days</p>
-            <div class="metric">
-              ${this.dashboardStats.isLoading ? '-' : this.dashboardStats.recentActivity}
+          <div class="dashboard-card expiring-items-card">
+            <h3>Expiring Soon</h3>
+            <p>Items expiring within 30 days</p>
+            <div class="metric ${this.dashboardStats.expiringItems > 0 ? 'alert-metric' : ''}">
+              ${this.dashboardStats.isLoading ? '-' : this.dashboardStats.expiringItems}
             </div>
+            ${this.dashboardStats.expiringItems > 0 ? html`
+              <app-button class="card-nav-btn" variant="secondary" size="sm" href="/items?sort=expiration_date">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                  <path d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5z"/>
+                </svg>
+                View Expiring
+              </app-button>
+            ` : ''}
           </div>
         </div>
       </div>
