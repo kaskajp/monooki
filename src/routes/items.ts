@@ -4,6 +4,7 @@ import Joi from 'joi';
 import { authMiddleware } from '../utils/auth';
 import getDatabase from '../database/connection';
 import { generateAndAssignLabelId } from '../utils/labels';
+import { AmazonScraper } from '../utils/amazon-scraper';
 
 interface AuthenticatedRequest extends Request {
   user?: {
@@ -18,6 +19,11 @@ const router = Router();
 
 // Apply auth middleware to all routes
 router.use(authMiddleware);
+
+// Validation schema for Amazon URL parsing
+const amazonUrlSchema = Joi.object({
+  url: Joi.string().uri().required()
+});
 
 // Validation schema for item
 const itemSchema = Joi.object({
@@ -38,6 +44,52 @@ const itemSchema = Joi.object({
 
 const updateItemSchema = itemSchema.keys({
   name: Joi.string().min(1) // Make name optional for updates
+});
+
+// POST /api/items/parse-amazon-url - Parse Amazon URL and extract product data
+router.post('/parse-amazon-url', async (req: any, res: any) => {
+  try {
+    const { error, value } = amazonUrlSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+
+    const { url } = value;
+    const workspace_id = req.user.workspace_id;
+    
+    // Clean the Amazon URL to remove tracking parameters
+    const cleanUrl = AmazonScraper.cleanAmazonUrl(url);
+    
+    // Scrape the product data
+    const productData = await AmazonScraper.scrapeProduct(cleanUrl);
+    
+    // Download and save images
+    let downloadedImages: Array<{filename: string, original_name: string, mime_type: string, size: number}> = [];
+    if (productData.imageUrls && productData.imageUrls.length > 0) {
+      try {
+        downloadedImages = await AmazonScraper.downloadImages(productData.imageUrls, workspace_id);
+      } catch (imageError) {
+        console.error('Error downloading images:', imageError);
+        // Continue without images if download fails
+      }
+    }
+    
+    res.json({
+      success: true,
+      data: {
+        ...productData,
+        downloadedImages
+      }
+    });
+    
+  } catch (error) {
+    console.error('Amazon URL parsing error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Failed to parse Amazon URL';
+    res.status(500).json({ 
+      success: false, 
+      error: errorMessage 
+    });
+  }
 });
 
 // GET /api/items - Get all items with optional search/filter
@@ -261,6 +313,52 @@ router.post('/', async (req: any, res: any) => {
   } catch (error) {
     console.error('Create item error:', error);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /api/items/:itemId/add-downloaded-photos - Add downloaded photos to an item
+router.post('/:itemId/add-downloaded-photos', async (req: any, res: any) => {
+  try {
+    const { itemId } = req.params;
+    const { photos } = req.body;
+    const workspace_id = req.user.workspace_id;
+    const db = getDatabase();
+
+    // Verify item exists and belongs to workspace
+    const item = await db.get('SELECT id FROM items WHERE id = ? AND workspace_id = ?', [itemId, workspace_id]);
+    if (!item) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+
+    if (!photos || !Array.isArray(photos)) {
+      return res.status(400).json({ error: 'No photos provided' });
+    }
+
+    const savedPhotos = [];
+    const now = new Date().toISOString();
+
+    for (const photo of photos) {
+      const photoId = uuidv4();
+      
+      await db.run(`
+        INSERT INTO photos (id, filename, original_name, mime_type, size, item_id, workspace_id, created_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `, [photoId, photo.filename, photo.original_name, photo.mime_type, photo.size, itemId, workspace_id, now]);
+
+      savedPhotos.push({
+        id: photoId,
+        filename: photo.filename,
+        original_name: photo.original_name,
+        mime_type: photo.mime_type,
+        size: photo.size,
+        created_at: now
+      });
+    }
+
+    res.status(201).json({ photos: savedPhotos });
+  } catch (error) {
+    console.error('Error adding downloaded photos:', error);
+    res.status(500).json({ error: 'Failed to add photos' });
   }
 });
 

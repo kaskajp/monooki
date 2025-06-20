@@ -113,6 +113,15 @@ export class ItemsPage extends LitElement {
   @state()
   uploadingPhotos = false;
 
+  @state()
+  amazonUrl = '';
+
+  @state()
+  loadingAmazonData = false;
+  
+  @state()
+  downloadedImageData: Array<{filename: string, original_name: string, mime_type: string, size: number}> = [];
+
   // Add simple caching to prevent redundant API calls
   private static cachedData: {
     categories?: Category[];
@@ -430,6 +439,62 @@ export class ItemsPage extends LitElement {
       font-size: 24px;
       font-weight: 600;
       color: #f0f6fc;
+    }
+
+    .amazon-import-section {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .amazon-import-section h3 {
+      margin: 0 0 16px 0;
+      color: #f0f6fc;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .amazon-url-input {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .amazon-url-input input {
+      flex: 1;
+      padding: 12px;
+      background: var(--form-bg);
+      border: 1px solid var(--form-border);
+      border-radius: var(--radius-md);
+      color: var(--form-text);
+      font-size: 14px;
+      font-family: var(--font-family-primary);
+      transition: all var(--transition-normal);
+      box-sizing: border-box;
+    }
+
+    .amazon-url-input input::placeholder {
+      color: #8b949e;
+    }
+
+    .amazon-url-input input:focus {
+      outline: none;
+      border-color: #58a6ff;
+      box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
+    }
+
+    .amazon-url-input input:disabled {
+      background-color: #21262d;
+      opacity: 0.6;
+    }
+
+    .amazon-help {
+      margin: 0;
+      font-size: 14px;
+      color: #8b949e;
+      font-style: italic;
     }
 
     .form-grid {
@@ -890,6 +955,8 @@ export class ItemsPage extends LitElement {
     this.editingItem = null;
     this.customFieldValues = {};
     this.selectedFiles = [];
+    this.amazonUrl = '';
+    this.downloadedImageData = [];
   }
 
   // Public method to edit an item by ID (called from item view)
@@ -966,6 +1033,11 @@ export class ItemsPage extends LitElement {
           await this.uploadPhotos(savedItem.id);
         }
         
+        // Save downloaded images if any exist
+        if (this.downloadedImageData.length > 0) {
+          await this.saveDownloadedImages(savedItem.id);
+        }
+        
         // If creating a new item, navigate to its view page
         if (!this.editingItem) {
           window.location.href = `/items/${savedItem.id}`;
@@ -1022,6 +1094,76 @@ export class ItemsPage extends LitElement {
 
   private handleCustomFieldChange(fieldName: string, value: any) {
     this.customFieldValues = { ...this.customFieldValues, [fieldName]: value };
+  }
+
+  private async handleAmazonUrlParse() {
+    if (!this.amazonUrl.trim()) {
+      alert('Please enter an Amazon URL');
+      return;
+    }
+
+    this.loadingAmazonData = true;
+    
+    try {
+      const response = await fetch('/api/items/parse-amazon-url', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ url: this.amazonUrl.trim() })
+      });
+
+      const result = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to parse Amazon URL');
+      }
+
+      if (result.success && result.data) {
+        const data = result.data;
+        
+        // Auto-populate form fields
+        this.formData = {
+          ...this.formData,
+          name: data.name || this.formData.name,
+          description: data.description || this.formData.description,
+          model_number: data.model_number || this.formData.model_number,
+          purchase_price: data.purchase_price ? data.purchase_price.toString() : this.formData.purchase_price,
+          purchase_location: data.purchase_location || this.formData.purchase_location
+        };
+
+        // Handle downloaded images
+        if (data.downloadedImages && data.downloadedImages.length > 0) {
+          this.downloadedImageData = data.downloadedImages;
+          // Show preview of downloaded images
+          const imageFiles = [];
+          for (const img of data.downloadedImages) {
+            try {
+              // Create a blob from the downloaded image for preview
+              const response = await fetch(`/api/photos/files/${img.filename}`);
+              const blob = await response.blob();
+              const file = new File([blob], img.original_name, { type: img.mime_type });
+              imageFiles.push(file);
+            } catch (error) {
+              console.error('Error loading downloaded image:', error);
+            }
+          }
+          this.selectedFiles = imageFiles;
+        }
+
+        // Clear the URL field
+        this.amazonUrl = '';
+        
+        alert('Amazon product data loaded successfully!');
+      }
+      
+    } catch (error) {
+      console.error('Error parsing Amazon URL:', error);
+      alert(error instanceof Error ? error.message : 'Failed to parse Amazon URL');
+    } finally {
+      this.loadingAmazonData = false;
+    }
   }
 
   private handleRowClick(item: Item, event: Event) {
@@ -1093,6 +1235,33 @@ export class ItemsPage extends LitElement {
       alert('Error uploading photos');
     } finally {
       this.uploadingPhotos = false;
+    }
+  }
+
+  private async saveDownloadedImages(itemId: string) {
+    if (this.downloadedImageData.length === 0) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch(`/api/items/${itemId}/add-downloaded-photos`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ photos: this.downloadedImageData })
+      });
+
+      if (response.ok) {
+        this.downloadedImageData = [];
+      } else {
+        console.error('Failed to save downloaded images');
+        alert('Failed to save downloaded images');
+      }
+    } catch (error) {
+      console.error('Error saving downloaded images:', error);
+      alert('Error saving downloaded images');
     }
   }
 
@@ -1355,6 +1524,32 @@ export class ItemsPage extends LitElement {
         <div class="form-overlay" @click="${(e: Event) => e.target === e.currentTarget && this.hideForm()}">
           <div class="form-container">
             <h2>${this.editingItem ? 'Edit' : 'Add'} Item</h2>
+            
+            ${!this.editingItem ? html`
+              <div class="amazon-import-section">
+                <h3>Import from Amazon</h3>
+                <div class="amazon-url-input">
+                  <input
+                    type="url"
+                    .value="${this.amazonUrl}"
+                    @input="${(e: Event) => this.amazonUrl = (e.target as HTMLInputElement).value}"
+                    placeholder="Paste Amazon product URL here..."
+                    ?disabled="${this.loadingAmazonData}"
+                  />
+                  <app-button 
+                    type="button" 
+                    variant="secondary" 
+                    ?loading="${this.loadingAmazonData}"
+                    ?disabled="${!this.amazonUrl.trim() || this.loadingAmazonData}"
+                    @button-click="${this.handleAmazonUrlParse}"
+                  >
+                    ${this.loadingAmazonData ? 'Loading...' : 'Import'}
+                  </app-button>
+                </div>
+                <p class="amazon-help">Enter an Amazon product URL to automatically fill the form fields below.</p>
+              </div>
+            ` : ''}
+            
             <form @submit="${this.handleSubmit}">
               <div class="form-grid">
                 <div class="form-group form-group-full">
