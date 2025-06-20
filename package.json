@@ -1,6 +1,6 @@
 {
   "name": "monooki",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Self-hosted home inventory management system",
   "main": "dist/server.js",
   "scripts": {
@@ -12,7 +12,8 @@
     "build:frontend": "cd frontend && npm run build",
     "start": "node dist/server.js",
     "setup": "npm install && cd frontend && npm install",
-    "migrate": "ts-node src/database/migrate.ts"
+    "migrate": "ts-node src/database/migrate.ts",
+    "semantic-release": "semantic-release"
   },
   "keywords": [
     "inventory",
@@ -22,6 +23,10 @@
   ],
   "author": "",
   "license": "MIT",
+  "engines": {
+    "node": ">=20.8.1",
+    "npm": ">=10.0.0"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -36,6 +41,8 @@
     "uuid": "^9.0.1"
   },
   "devDependencies": {
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
@@ -45,6 +52,7 @@
     "@types/uuid": "^9.0.7",
     "concurrently": "^8.2.2",
     "nodemon": "^3.0.2",
+    "semantic-release": "^24.2.5",
     "ts-node": "^10.9.1",
     "typescript": "^5.3.2"
   }

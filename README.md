@@ -1,5 +1,7 @@
 # Monooki - Home Inventory Management System
 
+[![semantic-release: angular](https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
+
 A self-hosted web application for managing your home inventory with support for items, locations, categories, and photos.
 
 ## Features
