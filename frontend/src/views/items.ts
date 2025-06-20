@@ -629,6 +629,9 @@ export class ItemsPage extends LitElement {
   async connectedCallback() {
     super.connectedCallback();
     
+    // Check URL parameters for initial filter/sort state
+    this.parseUrlParameters();
+    
     // Load cached data first (synchronous)
     await this.loadCategories();
     await this.loadLocations(); 
@@ -636,6 +639,34 @@ export class ItemsPage extends LitElement {
     
     // Then load items (which isn't cached and is component-specific)
     await this.loadItems();
+  }
+
+  private parseUrlParameters() {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // Set sort if provided in URL
+    const sort = urlParams.get('sort');
+    if (sort && ['name', 'created_at', 'purchase_date', 'expiration_date', 'purchase_price', 'quantity'].includes(sort)) {
+      this.sortBy = sort;
+    }
+    
+    // Set category filter if provided in URL
+    const category = urlParams.get('category');
+    if (category) {
+      this.selectedCategory = category;
+    }
+    
+    // Set location filter if provided in URL
+    const location = urlParams.get('location');
+    if (location) {
+      this.selectedLocation = location;
+    }
+    
+    // Set search term if provided in URL
+    const search = urlParams.get('search');
+    if (search) {
+      this.searchTerm = search;
+    }
   }
 
   private async loadItems() {
