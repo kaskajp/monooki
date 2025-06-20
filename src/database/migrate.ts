@@ -210,9 +210,9 @@ const addExpirationField = async () => {
   
   try {
     // Check if items table exists first
-    const itemsTables = await db.all("SELECT name FROM sqlite_master WHERE type='table' AND name='items'");
-    if (itemsTables.length === 0) {
-      console.log('Items table does not exist yet, skipping expiration_date field migration...');
+    const tables = await db.all("SELECT name FROM sqlite_master WHERE type='table' AND name='items'");
+    if (tables.length === 0) {
+      console.log('Items table does not exist yet, skipping expiration field migration...');
       return;
     }
 
@@ -223,17 +223,43 @@ const addExpirationField = async () => {
     if (!hasExpirationDate) {
       console.log('Adding expiration_date field to items table...');
       await db.run('ALTER TABLE items ADD COLUMN expiration_date DATE');
-      await db.run('CREATE INDEX IF NOT EXISTS idx_items_expiration_date ON items(expiration_date)');
     }
     
-    console.log('Expiration date field migration completed successfully');
+    console.log('Expiration field migration completed successfully');
   } catch (error) {
-    console.error('Error adding expiration_date field:', error);
+    console.error('Error adding expiration field:', error);
     throw error;
   }
 };
 
-export { createTables, addLabelFields, addExpirationField };
+const addCurrencyField = async () => {
+  const db = getDatabase();
+  
+  try {
+    // Check if workspaces table exists first
+    const tables = await db.all("SELECT name FROM sqlite_master WHERE type='table' AND name='workspaces'");
+    if (tables.length === 0) {
+      console.log('Workspaces table does not exist yet, skipping currency field migration...');
+      return;
+    }
+
+    // Check if currency field exists in workspaces table
+    const workspaceColumns = await db.all("PRAGMA table_info(workspaces)");
+    const hasCurrency = workspaceColumns.some((col: any) => col.name === 'currency');
+    
+    if (!hasCurrency) {
+      console.log('Adding currency field to workspaces table...');
+      await db.run('ALTER TABLE workspaces ADD COLUMN currency TEXT DEFAULT \'USD\'');
+    }
+    
+    console.log('Currency field migration completed successfully');
+  } catch (error) {
+    console.error('Error adding currency field:', error);
+    throw error;
+  }
+};
+
+export { createTables, addLabelFields, addExpirationField, addCurrencyField };
 
 // Auto-run migrations
 const migrate = async () => {
@@ -243,6 +269,8 @@ const migrate = async () => {
     await addLabelFields();
     // Run expiration field migration
     await addExpirationField();
+    // Run currency field migration
+    await addCurrencyField();
   } catch (error) {
     console.error('Migration failed:', error);
     throw error;

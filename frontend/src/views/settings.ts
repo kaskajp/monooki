@@ -12,6 +12,13 @@ interface CustomField {
   updated_at: string;
 }
 
+interface CurrencyInfo {
+  code: string;
+  name: string;
+  symbol: string;
+  locale: string;
+}
+
 @customElement('settings-page')
 export class SettingsPage extends LitElement {
   @state()
@@ -51,6 +58,38 @@ export class SettingsPage extends LitElement {
   @state()
   labelSettingsLoading = false;
 
+  @state()
+  currencySettings = {
+    currency: 'USD'
+  };
+
+  @state()
+  currencySettingsLoading = false;
+
+  @state()
+  availableCurrencies: CurrencyInfo[] = [
+    { code: 'USD', name: 'US Dollar', symbol: '$', locale: 'en-US' },
+    { code: 'EUR', name: 'Euro', symbol: '€', locale: 'en-EU' },
+    { code: 'GBP', name: 'British Pound', symbol: '£', locale: 'en-GB' },
+    { code: 'JPY', name: 'Japanese Yen', symbol: '¥', locale: 'ja-JP' },
+    { code: 'CAD', name: 'Canadian Dollar', symbol: 'C$', locale: 'en-CA' },
+    { code: 'AUD', name: 'Australian Dollar', symbol: 'A$', locale: 'en-AU' },
+    { code: 'CHF', name: 'Swiss Franc', symbol: 'Fr', locale: 'de-CH' },
+    { code: 'CNY', name: 'Chinese Yuan', symbol: '¥', locale: 'zh-CN' },
+    { code: 'SEK', name: 'Swedish Krona', symbol: 'kr', locale: 'sv-SE' },
+    { code: 'NZD', name: 'New Zealand Dollar', symbol: 'NZ$', locale: 'en-NZ' },
+    { code: 'MXN', name: 'Mexican Peso', symbol: '$', locale: 'es-MX' },
+    { code: 'SGD', name: 'Singapore Dollar', symbol: 'S$', locale: 'en-SG' },
+    { code: 'HKD', name: 'Hong Kong Dollar', symbol: 'HK$', locale: 'en-HK' },
+    { code: 'NOK', name: 'Norwegian Krone', symbol: 'kr', locale: 'no-NO' },
+    { code: 'KRW', name: 'South Korean Won', symbol: '₩', locale: 'ko-KR' },
+    { code: 'TRY', name: 'Turkish Lira', symbol: '₺', locale: 'tr-TR' },
+    { code: 'RUB', name: 'Russian Ruble', symbol: '₽', locale: 'ru-RU' },
+    { code: 'INR', name: 'Indian Rupee', symbol: '₹', locale: 'en-IN' },
+    { code: 'BRL', name: 'Brazilian Real', symbol: 'R$', locale: 'pt-BR' },
+    { code: 'ZAR', name: 'South African Rand', symbol: 'R', locale: 'en-ZA' }
+  ];
+
   static styles = css`
     :host {
       display: block;
@@ -74,8 +113,6 @@ export class SettingsPage extends LitElement {
       font-weight: var(--font-weight-semibold);
       color: var(--color-text-primary);
     }
-
-
 
     .custom-fields-list {
       background: var(--color-bg-secondary);
@@ -476,11 +513,37 @@ export class SettingsPage extends LitElement {
     }
   }
 
+  private async loadCurrencySettings() {
+    this.currencySettingsLoading = true;
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/user/currency-settings', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const settings = await response.json();
+        this.currencySettings = {
+          currency: settings.currency || 'USD'
+        };
+      } else {
+        console.error('Failed to load currency settings');
+      }
+    } catch (error) {
+      console.error('Error loading currency settings:', error);
+    } finally {
+      this.currencySettingsLoading = false;
+    }
+  }
+
   async connectedCallback() {
     super.connectedCallback();
     await Promise.all([
       this.loadCustomFields(),
-      this.loadLabelSettings()
+      this.loadLabelSettings(),
+      this.loadCurrencySettings()
     ]);
   }
 
@@ -688,6 +751,51 @@ export class SettingsPage extends LitElement {
     }
   }
 
+  private async handleCurrencySettingsChange(e: Event) {
+    const target = e.target as HTMLSelectElement;
+    this.currencySettings = { 
+      ...this.currencySettings, 
+      currency: target.value 
+    };
+  }
+
+  private async saveCurrencySettings() {
+    this.currencySettingsLoading = true;
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/user/currency-settings', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(this.currencySettings)
+      });
+
+      if (response.ok) {
+        console.log('Currency settings saved successfully');
+      } else {
+        console.error('Failed to save currency settings');
+        alert('Failed to save currency settings');
+      }
+    } catch (error) {
+      console.error('Error saving currency settings:', error);
+      alert('Error saving currency settings');
+    } finally {
+      this.currencySettingsLoading = false;
+    }
+  }
+
+  private formatCurrencyPreview(amount: number): string {
+    const currency = this.availableCurrencies.find(c => c.code === this.currencySettings.currency);
+    const locale = currency?.locale || 'en-US';
+    
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: this.currencySettings.currency
+    }).format(amount);
+  }
+
   render() {
     if (this.loading && !this.customFields.length) {
       return html`<div class="loading">Loading settings...</div>`;
@@ -695,6 +803,48 @@ export class SettingsPage extends LitElement {
 
     return html`
       <h1>Settings</h1>
+
+      <div class="section">
+        <div class="header">
+          <h2 class="section-title">Currency Settings</h2>
+          <app-button variant="primary" @button-click="${this.saveCurrencySettings}" ?loading="${this.currencySettingsLoading}">
+            Save Currency Settings
+          </app-button>
+        </div>
+
+        <div class="currency-settings-form">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+            <div class="form-group">
+              <label for="currency">Currency</label>
+              <select
+                id="currency"
+                name="currency"
+                .value="${this.currencySettings.currency}"
+                @change="${this.handleCurrencySettingsChange}"
+              >
+                ${this.availableCurrencies.map(currency => html`
+                  <option value="${currency.code}" ?selected="${this.currencySettings.currency === currency.code}">
+                    ${currency.name} (${currency.code}) - ${currency.symbol}
+                  </option>
+                `)}
+              </select>
+              <small style="color: var(--color-text-secondary); font-size: var(--font-size-xs); margin-top: 0.25rem; display: block;">
+                Choose the currency to display prices in throughout the application
+              </small>
+            </div>
+            
+            <div class="form-group">
+              <label>Preview</label>
+              <div style="background: var(--color-bg-secondary); border: 1px solid var(--color-border-primary); border-radius: var(--radius-md); padding: 1rem;">
+                <strong>Example:</strong> 
+                <span style="background: var(--color-accent-primary); color: white; padding: 0.25rem 0.5rem; border-radius: var(--radius-sm); font-family: 'Courier New', monospace; margin-left: 0.5rem;">
+                  ${this.formatCurrencyPreview(123.45)}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="section">
         <div class="header">

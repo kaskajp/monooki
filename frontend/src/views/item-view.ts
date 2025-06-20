@@ -63,6 +63,9 @@ export class ItemView extends LitElement {
   @state()
   private showPhotoModal = false;
 
+  @state()
+  private userCurrency = 'USD';
+
   static styles = css`
     :host {
       display: block;
@@ -415,12 +418,13 @@ export class ItemView extends LitElement {
     }
   `;
 
-  connectedCallback() {
+  async connectedCallback() {
     super.connectedCallback();
-    if (this.itemId) {
-      this.loadItem();
-      this.loadCustomFields();
-    }
+    await Promise.all([
+      this.loadItem(),
+      this.loadCustomFields(),
+      this.loadUserCurrency()
+    ]);
   }
 
   updated(changedProperties: Map<string, any>) {
@@ -506,6 +510,25 @@ export class ItemView extends LitElement {
     }
   }
 
+  private async loadUserCurrency() {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/user/currency-settings', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const settings = await response.json();
+        this.userCurrency = settings.currency || 'USD';
+      }
+    } catch (error) {
+      console.error('Error loading currency settings:', error);
+      // Keep default USD if loading fails
+    }
+  }
+
   private handleEdit() {
     this.dispatchEvent(new CustomEvent('edit-item', {
       detail: { itemId: this.itemId },
@@ -574,9 +597,36 @@ export class ItemView extends LitElement {
 
   private formatCurrency(amount: number) {
     if (!amount) return '';
-    return new Intl.NumberFormat('en-US', {
+    
+    // Find the appropriate locale for the currency
+    const currencyLocales: { [key: string]: string } = {
+      'USD': 'en-US',
+      'EUR': 'en-EU', 
+      'GBP': 'en-GB',
+      'JPY': 'ja-JP',
+      'CAD': 'en-CA',
+      'AUD': 'en-AU',
+      'CHF': 'de-CH',
+      'CNY': 'zh-CN',
+      'SEK': 'sv-SE',
+      'NZD': 'en-NZ',
+      'MXN': 'es-MX',
+      'SGD': 'en-SG',
+      'HKD': 'en-HK',
+      'NOK': 'no-NO',
+      'KRW': 'ko-KR',
+      'TRY': 'tr-TR',
+      'RUB': 'ru-RU',
+      'INR': 'en-IN',
+      'BRL': 'pt-BR',
+      'ZAR': 'en-ZA'
+    };
+
+    const locale = currencyLocales[this.userCurrency] || 'en-US';
+    
+    return new Intl.NumberFormat(locale, {
       style: 'currency',
-      currency: 'USD'
+      currency: this.userCurrency
     }).format(amount);
   }
 

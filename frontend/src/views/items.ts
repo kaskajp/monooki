@@ -122,6 +122,9 @@ export class ItemsPage extends LitElement {
   @state()
   downloadedImageData: Array<{filename: string, original_name: string, mime_type: string, size: number}> = [];
 
+  @state()
+  userCurrency = 'USD';
+
   // Add simple caching to prevent redundant API calls
   private static cachedData: {
     categories?: Category[];
@@ -701,9 +704,29 @@ export class ItemsPage extends LitElement {
     await this.loadCategories();
     await this.loadLocations(); 
     await this.loadCustomFields();
+    await this.loadUserCurrency();
     
     // Then load items (which isn't cached and is component-specific)
     await this.loadItems();
+  }
+
+  private async loadUserCurrency() {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/user/currency-settings', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const settings = await response.json();
+        this.userCurrency = settings.currency || 'USD';
+      }
+    } catch (error) {
+      console.error('Error loading currency settings:', error);
+      // Keep default USD if loading fails
+    }
   }
 
   private parseUrlParameters() {
@@ -1199,6 +1222,41 @@ export class ItemsPage extends LitElement {
     return '';
   }
 
+  private formatCurrency(amount: number): string {
+    if (!amount) return '';
+    
+    // Find the appropriate locale for the currency
+    const currencyLocales: { [key: string]: string } = {
+      'USD': 'en-US',
+      'EUR': 'en-EU', 
+      'GBP': 'en-GB',
+      'JPY': 'ja-JP',
+      'CAD': 'en-CA',
+      'AUD': 'en-AU',
+      'CHF': 'de-CH',
+      'CNY': 'zh-CN',
+      'SEK': 'sv-SE',
+      'NZD': 'en-NZ',
+      'MXN': 'es-MX',
+      'SGD': 'en-SG',
+      'HKD': 'en-HK',
+      'NOK': 'no-NO',
+      'KRW': 'ko-KR',
+      'TRY': 'tr-TR',
+      'RUB': 'ru-RU',
+      'INR': 'en-IN',
+      'BRL': 'pt-BR',
+      'ZAR': 'en-ZA'
+    };
+
+    const locale = currencyLocales[this.userCurrency] || 'en-US';
+    
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency: this.userCurrency
+    }).format(amount);
+  }
+
   private async uploadPhotos(itemId: string) {
     if (this.selectedFiles.length === 0) return;
 
@@ -1492,7 +1550,7 @@ export class ItemsPage extends LitElement {
                   </td>
                   <td>
                     <div class="item-price">
-                      ${item.purchase_price ? `$${item.purchase_price}` : '—'}
+                      ${item.purchase_price ? this.formatCurrency(item.purchase_price) : '—'}
                     </div>
                   </td>
                   <td>

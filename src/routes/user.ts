@@ -24,6 +24,10 @@ const updateLabelSettingsSchema = Joi.object({
   labelNextNumber: Joi.number().integer().min(1).optional()
 });
 
+const updateCurrencySettingsSchema = Joi.object({
+  currency: Joi.string().length(3).required() // ISO 4217 currency codes are 3 characters
+});
+
 // Apply auth middleware to all routes
 router.use(authMiddleware);
 
@@ -192,6 +196,57 @@ router.put('/label-settings', async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error('Update label settings error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/user/currency-settings - Get workspace currency settings
+router.get('/currency-settings', async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const db = getDatabase();
+    
+    const workspace = await db.get(
+      'SELECT currency FROM workspaces WHERE id = ?',
+      [user.workspace_id]
+    );
+    
+    if (!workspace) {
+      return res.status(404).json({ error: 'Workspace not found' });
+    }
+    
+    res.json({
+      currency: workspace.currency || 'USD'
+    });
+  } catch (error) {
+    console.error('Get currency settings error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PUT /api/user/currency-settings - Update workspace currency settings
+router.put('/currency-settings', async (req: Request, res: Response) => {
+  try {
+    const { error, value } = updateCurrencySettingsSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+
+    const { currency } = value;
+    const user = (req as any).user;
+    const db = getDatabase();
+
+    await db.run(
+      'UPDATE workspaces SET currency = ? WHERE id = ?',
+      [currency, user.workspace_id]
+    );
+
+    res.json({
+      message: 'Currency settings updated successfully',
+      currency
+    });
+  } catch (error) {
+    console.error('Update currency settings error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
