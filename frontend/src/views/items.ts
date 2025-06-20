@@ -214,7 +214,7 @@ export class ItemsPage extends LitElement {
       background: var(--color-bg-secondary);
       border: 1px solid var(--color-border-primary);
       border-radius: var(--radius-lg);
-      overflow: hidden;
+      overflow-x: auto;
       width: 100%;
     }
 
@@ -1535,9 +1535,6 @@ export class ItemsPage extends LitElement {
                   </td>
                   <td>
                     <div class="item-name">${item.name}</div>
-                    ${item.description ? html`
-                      <div class="item-description">${item.description}</div>
-                    ` : ''}
                   </td>
                   <td>
                     <div class="item-category">${item.category?.name || '—'}</div>

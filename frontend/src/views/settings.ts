@@ -363,7 +363,7 @@ export class SettingsPage extends LitElement {
       background: var(--color-bg-secondary);
       border: 1px solid var(--color-border-primary);
       border-radius: var(--radius-lg);
-      overflow: hidden;
+      overflow-x: auto;
       width: 100%;
     }
 
@@ -1081,7 +1081,7 @@ export class SettingsPage extends LitElement {
                 <app-button type="button" variant="secondary" @button-click="${this.hideForm}">
                   Cancel
                 </app-button>
-                <app-button type="submit" variant="primary" ?loading="${this.loading}">
+                <app-button type="button" variant="primary" ?loading="${this.loading}" @button-click="${this.handleSubmit}">
                   ${this.editingField ? 'Update' : 'Create'}
                 </app-button>
               </div>
