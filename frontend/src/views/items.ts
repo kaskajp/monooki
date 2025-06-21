@@ -791,7 +791,10 @@ export class ItemsPage extends LitElement {
   async connectedCallback() {
     super.connectedCallback();
     
-    // Check URL parameters for initial filter/sort state
+    // Load sort preferences first (before URL parameters so URL can override)
+    this.loadSortPreferences();
+    
+    // Check URL parameters for initial filter/sort state (can override preferences)
     this.parseUrlParameters();
     
     // Load cached data first (synchronous)
@@ -863,6 +866,33 @@ export class ItemsPage extends LitElement {
     } catch (error) {
       console.error('Error saving column preferences:', error);
     }
+  }
+
+  private loadSortPreferences() {
+    try {
+      const saved = localStorage.getItem('items-sort-by');
+      if (saved && ['name', 'created_at', 'purchase_date', 'expiration_date', 'purchase_price', 'quantity'].includes(saved)) {
+        this.sortBy = saved;
+      }
+    } catch (error) {
+      console.error('Error loading sort preferences:', error);
+      // Fall back to default 'name' if there's an error
+      this.sortBy = 'name';
+    }
+  }
+
+  private saveSortPreferences() {
+    try {
+      localStorage.setItem('items-sort-by', this.sortBy);
+    } catch (error) {
+      console.error('Error saving sort preferences:', error);
+    }
+  }
+
+  private handleSortChange(e: Event) {
+    const target = e.target as HTMLSelectElement;
+    this.sortBy = target.value;
+    this.saveSortPreferences();
   }
 
   private async loadUserCurrency() {
@@ -1812,7 +1842,7 @@ export class ItemsPage extends LitElement {
         </div>
         <div class="filter-group">
           <label>Sort By</label>
-          <select .value="${this.sortBy}" @change="${(e: Event) => this.sortBy = (e.target as HTMLSelectElement).value}">
+          <select .value="${this.sortBy}" @change="${(e: Event) => this.handleSortChange(e)}">
             <option value="name">Name</option>
             <option value="created_at">Date Created</option>
             <option value="purchase_date">Purchase Date</option>
