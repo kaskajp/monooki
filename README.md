@@ -10,7 +10,11 @@ A self-hosted web application for managing your home inventory with support for 
 - **Item Management** - Track items with photos, locations, categories, and custom fields
 - **Location Management** - Organize items by rooms or locations
 - **Category Management** - Categorize items for easy organization
-- **Search & Filter** - Find items by name, category, or location
+- **Custom Fields** - Add custom attributes to track additional item information
+- **Amazon Integration** - Parse Amazon URLs to auto-populate item details
+- **Expiring Items** - Track and monitor items with expiration dates
+- **Label Generation** - Automatic label ID generation for physical item tracking
+- **Search & Filter** - Find items by name, category, location, or expiration status
 - **Photo Storage** - Upload and manage photos locally (not cloud-based)
 - **Secure Authentication** - JWT-based authentication with bcrypt password hashing
 - **RESTful API** - Clean API endpoints for all operations
@@ -28,7 +32,7 @@ A self-hosted web application for managing your home inventory with support for 
 
 ### Prerequisites
 
-- Node.js 18+ and npm
+- Node.js 20.8.1+ and npm 10.0.0+
 - Git
 
 ### Development Setup
@@ -60,7 +64,7 @@ A self-hosted web application for managing your home inventory with support for 
    npm run dev
    ```
 
-   This starts both backend (port 3000) and frontend (port 5175) servers.
+   This starts both backend (port 3010) and frontend (port 5175) servers.
 
 6. **Open your browser**
    
@@ -88,7 +92,7 @@ A self-hosted web application for managing your home inventory with support for 
    # Run the container
    docker run -d \
      --name monooki \
-     -p 3000:3000 \
+     -p 3010:3010 \
      -e JWT_SECRET=your-secret-key \
      -e NODE_ENV=production \
      -v monooki_data:/app/data \
@@ -107,13 +111,30 @@ A self-hosted web application for managing your home inventory with support for 
 | POST | `/api/logout` | User logout |
 | POST | `/api/reset-password` | Password reset request |
 
+### User Management Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/user/profile` | Get user profile |
+| PUT | `/api/user/workspace` | Update workspace settings |
+| PUT | `/api/user/password` | Change user password |
+| GET | `/api/user/label-settings` | Get label configuration |
+| PUT | `/api/user/label-settings` | Update label configuration |
+| GET | `/api/user/currency-settings` | Get currency settings |
+| PUT | `/api/user/currency-settings` | Update currency settings |
+| POST | `/api/user/preview-label` | Preview label format |
+| DELETE | `/api/user/delete-account` | Delete user account |
+
 ### Items Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/items` | Get all items (with search/filter) |
+| GET | `/api/items/expiring` | Get items expiring within specified days |
 | GET | `/api/items/:id` | Get item by ID |
 | POST | `/api/items` | Create new item |
+| POST | `/api/items/parse-amazon-url` | Parse Amazon URL for item details |
+| POST | `/api/items/:itemId/add-downloaded-photos` | Add photos from Amazon parsing |
 | PUT | `/api/items/:id` | Update item |
 | DELETE | `/api/items/:id` | Delete item |
 
@@ -137,6 +158,24 @@ A self-hosted web application for managing your home inventory with support for 
 | PUT | `/api/categories/:id` | Update category |
 | DELETE | `/api/categories/:id` | Delete category |
 
+### Custom Fields Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/custom-fields` | Get all custom fields |
+| POST | `/api/custom-fields` | Create new custom field |
+| PUT | `/api/custom-fields/:id` | Update custom field |
+| DELETE | `/api/custom-fields/:id` | Delete custom field |
+
+### Photos Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/photos/items/:itemId` | Upload photos for an item |
+| GET | `/api/photos/items/:itemId` | Get photos for an item |
+| DELETE | `/api/photos/:photoId` | Delete a photo |
+| GET | `/api/photos/files/:filename` | Serve photo file |
+
 ### Authentication
 
 All protected endpoints require a JWT token in the Authorization header:
@@ -148,11 +187,12 @@ Authorization: Bearer <token>
 
 The application uses SQLite with the following tables:
 
-- **workspaces** - Multi-tenant workspaces
+- **workspaces** - Multi-tenant workspaces with label configuration
 - **users** - User accounts with role-based access
-- **items** - Inventory items with all tracking fields
+- **items** - Inventory items with all tracking fields including labels and expiration
 - **locations** - Physical locations/rooms
 - **categories** - Item categories
+- **custom_fields** - Custom field definitions for items
 - **photos** - Photo attachments for items/locations
 - **attachments** - File attachments for items
 
@@ -160,11 +200,26 @@ The application uses SQLite with the following tables:
 
 Key environment variables:
 
-- `JWT_SECRET` - Secret key for JWT tokens (required)
+### Required
+- `JWT_SECRET` - Secret key for JWT tokens (required in production)
+
+### Optional
 - `NODE_ENV` - Environment (development/production)
-- `PORT` - Server port (default: 3000)
-- `DB_PATH` - SQLite database file path
-- `FRONTEND_URL` - Frontend URL for CORS
+- `PORT` - Server port (default: 3010)
+- `DB_PATH` - SQLite database file path (default: data/monooki.db)
+- `FRONTEND_URL` - Frontend URL for CORS (default: http://localhost:5175)
+- `JWT_EXPIRES_IN` - JWT token expiration (default: 7d)
+
+### Email Configuration (Optional) - Not implemented yet
+- `SMTP_HOST` - SMTP server hostname
+- `SMTP_PORT` - SMTP server port (default: 587)
+- `SMTP_USER` - SMTP username
+- `SMTP_PASS` - SMTP password
+- `FROM_EMAIL` - From email address
+
+### File Upload Configuration (Optional) - Not implemented yet
+- `MAX_FILE_SIZE` - Maximum file size in bytes (default: 10MB)
+- `ALLOWED_FILE_TYPES` - Comma-separated list of allowed MIME types
 
 ## Security Features
 
@@ -229,7 +284,6 @@ For support, please create an issue in the repository or contact the maintainers
 
 ## Roadmap
 
-- [ ] Mobile app support
 - [ ] Import/export functionality
 - [ ] Advanced reporting
 - [ ] Barcode scanning
