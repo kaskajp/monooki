@@ -1,3 +1,10 @@
+# [1.0.0-beta.12](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.11...v1.0.0-beta.12) (2025-06-21)
+
+
+### Bug Fixes
+
+* **docs:** Updated readme and license information ([bc5c339](https://github.com/kaskajp/monooki/commit/bc5c339ef8c5c7eb02edaf73301cc58d4c93c836))
+
 # [1.0.0-beta.11](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.10...v1.0.0-beta.11) (2025-06-21)
 
 
