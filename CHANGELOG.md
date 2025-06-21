@@ -1,3 +1,10 @@
+# [1.0.0-beta.6](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.5...v1.0.0-beta.6) (2025-06-21)
+
+
+### Features
+
+* **frontend:** Save default columns to localStorage ([a525477](https://github.com/kaskajp/monooki/commit/a52547772468d997f88f28001e9cacaba91a43cc))
+
 # [1.0.0-beta.5](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.4...v1.0.0-beta.5) (2025-06-20)
 
 
