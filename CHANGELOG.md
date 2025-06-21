@@ -1,3 +1,10 @@
+# [1.0.0-beta.9](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.8...v1.0.0-beta.9) (2025-06-21)
+
+
+### Bug Fixes
+
+* **frontend:** Correct icon for column preferences ([6b6c727](https://github.com/kaskajp/monooki/commit/6b6c727e4973426c810a53b09f13304de4673a93))
+
 # [1.0.0-beta.8](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.7...v1.0.0-beta.8) (2025-06-21)
 
 
