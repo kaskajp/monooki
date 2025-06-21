@@ -1,3 +1,10 @@
+# [1.0.0-beta.7](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.6...v1.0.0-beta.7) (2025-06-21)
+
+
+### Features
+
+* **frontend:** Custom fields in column preferences ([a624218](https://github.com/kaskajp/monooki/commit/a624218ee0650add3778aacac24e45433b073a04))
+
 # [1.0.0-beta.6](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.5...v1.0.0-beta.6) (2025-06-21)
 
 
