@@ -67,6 +67,9 @@ export class SettingsPage extends LitElement {
   currencySettingsLoading = false;
 
   @state()
+  deletingAccount = false;
+
+  @state()
   availableCurrencies: CurrencyInfo[] = [
     { code: 'USD', name: 'US Dollar', symbol: '$', locale: 'en-US' },
     { code: 'EUR', name: 'Euro', symbol: '€', locale: 'en-EU' },
@@ -456,6 +459,60 @@ export class SettingsPage extends LitElement {
       color: var(--color-text-secondary);
       font-size: var(--font-size-sm);
     }
+
+    .danger-zone {
+      margin-top: 3rem;
+      padding-top: 2rem;
+      border-top: 2px solid #30363d;
+    }
+
+    .danger-zone-content {
+      background: rgba(248, 81, 73, 0.05);
+      border: 1px solid rgba(248, 81, 73, 0.2);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-2xl);
+    }
+
+    .danger-zone h2 {
+      color: #f85149;
+      font-size: var(--font-size-xl);
+      font-weight: var(--font-weight-semibold);
+      margin: 0 0 var(--spacing-lg) 0;
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+
+    .danger-zone-warning {
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .danger-zone-warning h4 {
+      color: #f85149;
+      margin: 0 0 var(--spacing-sm) 0;
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .danger-zone-warning p {
+      color: var(--color-text-secondary);
+      margin: 0;
+      font-size: var(--font-size-sm);
+      line-height: var(--line-height-relaxed);
+    }
+
+    .danger-zone-warning ul {
+      margin: var(--spacing-md) 0 0 0;
+      padding-left: var(--spacing-lg);
+      color: var(--color-text-secondary);
+      font-size: var(--font-size-sm);
+    }
+
+    .danger-zone-warning li {
+      margin-bottom: var(--spacing-xs);
+    }
   `;
 
   private async loadLabelSettings() {
@@ -796,6 +853,80 @@ export class SettingsPage extends LitElement {
     }).format(amount);
   }
 
+  private async handleDeleteAccount() {
+    // First confirmation
+    const firstConfirm = confirm(
+      "⚠️ WARNING: This will permanently delete your entire account and workspace!\n\n" +
+      "This action will delete:\n" +
+      "• All your items and their photos\n" +
+      "• All categories and locations\n" +
+      "• All custom fields\n" +
+      "• Your entire workspace\n" +
+      "• Your user account\n\n" +
+      "This action CANNOT be undone.\n\n" +
+      "Are you absolutely sure you want to continue?"
+    );
+
+    if (!firstConfirm) return;
+
+    // Second confirmation with typing requirement
+    const confirmText = "DELETE MY ACCOUNT";
+    const typedConfirmation = prompt(
+      `To confirm account deletion, please type exactly: ${confirmText}\n\n` +
+      "This will permanently delete ALL your data and cannot be undone.",
+      ""
+    );
+
+    if (typedConfirmation !== confirmText) {
+      if (typedConfirmation !== null) {
+        alert("Confirmation text did not match. Account deletion cancelled.");
+      }
+      return;
+    }
+
+    // Final confirmation
+    const finalConfirm = confirm(
+      "🚨 FINAL WARNING 🚨\n\n" +
+      "You are about to permanently delete your account and ALL data.\n" +
+      "This action is IRREVERSIBLE.\n\n" +
+      "Click OK to proceed with deletion, or Cancel to abort."
+    );
+
+    if (!finalConfirm) return;
+
+    this.deletingAccount = true;
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/user/delete-account', {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        // Clear local storage
+        localStorage.removeItem('token');
+        
+        // Show success message
+        alert('Your account and all data have been permanently deleted.');
+        
+        // Redirect to login page
+        window.location.href = '/login';
+      } else {
+        const errorData = await response.json();
+        console.error('Failed to delete account:', errorData);
+        alert(`Failed to delete account: ${errorData.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      alert('Network error occurred while trying to delete account. Please try again.');
+    } finally {
+      this.deletingAccount = false;
+    }
+  }
+
   render() {
     if (this.loading && !this.customFields.length) {
       return html`<div class="loading">Loading settings...</div>`;
@@ -1089,6 +1220,42 @@ export class SettingsPage extends LitElement {
           </div>
         </div>
       ` : ''}
+
+      <div class="danger-zone">
+        <div class="danger-zone-content">
+          <h2>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>warning-sign</title><g fill="currentColor"><circle data-stroke="none" cx="8" cy="12" r="1" fill="currentColor" stroke="none"></circle><line x1="8" y1="4.5" x2="8" y2="9.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></line><path d="M.741,12.776,6.97,1.208a1.17,1.17,0,0,1,2.06,0l6.229,11.568a1.17,1.17,0,0,1-1.03,1.724H1.771A1.17,1.17,0,0,1,.741,12.776Z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+            Danger Zone
+          </h2>
+          
+          <div class="danger-zone-warning">
+            <h4>Permanent Account Deletion</h4>
+            <p>Once you delete your account, there is no going back. This action will permanently:</p>
+            <ul>
+              <li>Delete all your items, photos, and attachments</li>
+              <li>Remove all categories, locations, and custom fields</li>
+              <li>Destroy your entire workspace and all associated data</li>
+              <li>Cancel any active subscriptions or services</li>
+              <li>Delete your user account and profile</li>
+            </ul>
+            <p><strong>This action cannot be undone and your data cannot be recovered.</strong></p>
+          </div>
+
+          <div style="display: flex; justify-content: flex-start;">
+            <app-button 
+              variant="danger" 
+              class="danger-button"
+              ?loading="${this.deletingAccount}"
+              @button-click="${this.handleDeleteAccount}"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+                <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+              </svg>
+              ${this.deletingAccount ? 'Deleting Account...' : 'Delete Account & All Data'}
+            </app-button>
+          </div>
+        </div>
+      </div>
     `;
   }
 } 

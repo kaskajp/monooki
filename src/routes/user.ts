@@ -280,4 +280,58 @@ router.post('/preview-label', async (req: Request, res: Response) => {
   }
 });
 
+// DELETE /api/user/delete-account - Permanently delete user account and all data
+router.delete('/delete-account', async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user; // From auth middleware
+    const db = getDatabase();
+
+    // Get workspace ID for cleanup
+    const workspaceId = user.workspace_id;
+
+    // Start transaction for atomic deletion
+    await db.run('BEGIN TRANSACTION');
+
+    try {
+      // Delete all photos (files will be handled separately if needed)
+      await db.run(`
+        DELETE FROM photos 
+        WHERE item_id IN (SELECT id FROM items WHERE workspace_id = ?)
+      `, [workspaceId]);
+
+      // Delete all items
+      await db.run('DELETE FROM items WHERE workspace_id = ?', [workspaceId]);
+
+      // Delete all custom fields
+      await db.run('DELETE FROM custom_fields WHERE workspace_id = ?', [workspaceId]);
+
+      // Delete all categories
+      await db.run('DELETE FROM categories WHERE workspace_id = ?', [workspaceId]);
+
+      // Delete all locations
+      await db.run('DELETE FROM locations WHERE workspace_id = ?', [workspaceId]);
+
+      // Delete all users in this workspace (should just be the current user for single-user workspaces)
+      await db.run('DELETE FROM users WHERE workspace_id = ?', [workspaceId]);
+
+      // Delete the workspace itself
+      await db.run('DELETE FROM workspaces WHERE id = ?', [workspaceId]);
+
+      // Commit the transaction
+      await db.run('COMMIT');
+
+      res.json({
+        message: 'Account and all associated data have been permanently deleted'
+      });
+    } catch (transactionError) {
+      // Rollback on error
+      await db.run('ROLLBACK');
+      throw transactionError;
+    }
+  } catch (error) {
+    console.error('Delete account error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router; 
