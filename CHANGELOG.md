@@ -1,3 +1,10 @@
+# [1.0.0-beta.10](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.9...v1.0.0-beta.10) (2025-06-21)
+
+
+### Bug Fixes
+
+* **auth:** Fixed login and create account buttons ([b1a50df](https://github.com/kaskajp/monooki/commit/b1a50df1bb2dc0e4381e5ef9ec26b01508182299))
+
 # [1.0.0-beta.9](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.8...v1.0.0-beta.9) (2025-06-21)
 
 
