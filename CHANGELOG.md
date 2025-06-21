@@ -1,3 +1,10 @@
+# [1.0.0-beta.8](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.7...v1.0.0-beta.8) (2025-06-21)
+
+
+### Features
+
+* **frontend:** Remember sort by choice ([948461f](https://github.com/kaskajp/monooki/commit/948461f63f337f266cae22627f7745cfa361e895))
+
 # [1.0.0-beta.7](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.6...v1.0.0-beta.7) (2025-06-21)
 
 
