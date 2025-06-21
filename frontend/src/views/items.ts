@@ -138,6 +138,18 @@ export class ItemsPage extends LitElement {
     created: true
   };
 
+  private defaultColumns = {
+    photo: true,
+    label: true,
+    name: true,
+    category: true,
+    location: true,
+    quantity: true,
+    price: true,
+    expiration: true,
+    created: true
+  };
+
   @state()
   showColumnSelector = false;
 
@@ -779,6 +791,9 @@ export class ItemsPage extends LitElement {
   async connectedCallback() {
     super.connectedCallback();
     
+    // Load column preferences first
+    this.loadColumnPreferences();
+    
     // Check URL parameters for initial filter/sort state
     this.parseUrlParameters();
     
@@ -804,6 +819,34 @@ export class ItemsPage extends LitElement {
     const target = event.target as Element;
     if (this.showColumnSelector && !target.closest('.column-selector')) {
       this.showColumnSelector = false;
+    }
+  }
+
+  private loadColumnPreferences() {
+    try {
+      const saved = localStorage.getItem('items-visible-columns');
+      if (saved) {
+        const savedColumns = JSON.parse(saved);
+        // Merge with defaults to handle new columns that might be added in future updates
+        this.visibleColumns = {
+          ...this.defaultColumns,
+          ...savedColumns,
+          // Always ensure name column is visible
+          name: true
+        };
+      }
+    } catch (error) {
+      console.error('Error loading column preferences:', error);
+      // Fall back to defaults if there's an error
+      this.visibleColumns = { ...this.defaultColumns };
+    }
+  }
+
+  private saveColumnPreferences() {
+    try {
+      localStorage.setItem('items-visible-columns', JSON.stringify(this.visibleColumns));
+    } catch (error) {
+      console.error('Error saving column preferences:', error);
     }
   }
 
@@ -1335,6 +1378,9 @@ export class ItemsPage extends LitElement {
       ...this.visibleColumns,
       [column]: !this.visibleColumns[column]
     };
+    
+    // Save preferences to localStorage
+    this.saveColumnPreferences();
   }
 
   private formatCurrency(amount: number): string {
