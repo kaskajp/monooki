@@ -1700,7 +1700,7 @@ export class ItemsPage extends LitElement {
                 transition: all var(--transition-normal);
               "
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>columns</title><g fill="currentColor"><rect x="1" y="3" width="3" height="10" rx="0.5" ry="0.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></rect><rect x="6" y="3" width="3" height="10" rx="0.5" ry="0.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></rect><rect x="11" y="3" width="3" height="10" rx="0.5" ry="0.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"></rect></g></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><title>row-table</title><g fill="#FFFFFF"><line x1="0.5" y1="5.5" x2="15.5" y2="5.5" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round"></line><line x1="5.5" y1="0.5" x2="5.5" y2="15.5" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round"></line><path d="M14,15.5H2A1.5,1.5,0,0,1,.5,14V2A1.5,1.5,0,0,1,2,.5H14A1.5,1.5,0,0,1,15.5,2V14A1.5,1.5,0,0,1,14,15.5Z" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round"></path></g></svg>
               Columns
             </button>
             ${this.showColumnSelector ? html`
