@@ -1,3 +1,10 @@
+# [1.0.0-beta.11](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.10...v1.0.0-beta.11) (2025-06-21)
+
+
+### Features
+
+* **api:** Ability to delete account and workspace ([3900d48](https://github.com/kaskajp/monooki/commit/3900d4814f531222351d4842a38708dc6786984f))
+
 # [1.0.0-beta.10](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.9...v1.0.0-beta.10) (2025-06-21)
 
 
