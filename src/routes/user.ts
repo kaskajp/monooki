@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import Joi from 'joi';
+import { randomUUID } from 'crypto';
 import { hashPassword, comparePassword } from '../utils/auth';
 import { authMiddleware } from '../utils/auth';
 import getDatabase from '../database/connection';
@@ -26,6 +27,20 @@ const updateLabelSettingsSchema = Joi.object({
 
 const updateCurrencySettingsSchema = Joi.object({
   currency: Joi.string().length(3).required() // ISO 4217 currency codes are 3 characters
+});
+
+const inviteUserSchema = Joi.object({
+  email: Joi.string().email().required(),
+  role: Joi.string().valid('admin', 'user').required(),
+  password: Joi.string().min(8).required()
+});
+
+const updateUserRoleSchema = Joi.object({
+  role: Joi.string().valid('admin', 'user').required()
+});
+
+const updateUserStatusSchema = Joi.object({
+  is_active: Joi.boolean().required()
 });
 
 // Apply auth middleware to all routes
@@ -276,6 +291,231 @@ router.post('/preview-label', async (req: Request, res: Response) => {
     res.json({ preview });
   } catch (error) {
     console.error('Preview label error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /api/user/workspace/users - Get all users in the workspace
+router.get('/workspace/users', async (req: Request, res: Response) => {
+  try {
+    const user = (req as any).user;
+    const db = getDatabase();
+
+    // Check if user is admin
+    if (user.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    // Get all users in the workspace
+    const users = await db.all(`
+      SELECT 
+        id,
+        email,
+        role,
+        workspace_id,
+        created_at,
+        last_login,
+        CASE WHEN is_active = 1 THEN 1 ELSE 0 END as is_active
+      FROM users 
+      WHERE workspace_id = ?
+      ORDER BY created_at DESC
+    `, [user.workspace_id]);
+
+    res.json(users);
+  } catch (error) {
+    console.error('Get workspace users error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /api/user/workspace/invite - Invite a new user to the workspace
+router.post('/workspace/invite', async (req: Request, res: Response) => {
+  try {
+    const { error, value } = inviteUserSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+
+    const { email, role, password } = value;
+    const user = (req as any).user;
+    const db = getDatabase();
+
+    // Check if user is admin
+    if (user.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    // Check if user with this email already exists in the workspace
+    const existingUser = await db.get(
+      'SELECT id FROM users WHERE email = ? AND workspace_id = ?',
+      [email, user.workspace_id]
+    );
+
+    if (existingUser) {
+      return res.status(409).json({ error: 'User with this email already exists in the workspace' });
+    }
+
+    // Hash the provided password
+    const passwordHash = await hashPassword(password);
+    const userId = randomUUID();
+
+    // Insert new user
+    await db.run(`
+      INSERT INTO users (id, email, password_hash, role, workspace_id, is_active, created_at)
+      VALUES (?, ?, ?, ?, ?, 1, datetime('now'))
+    `, [userId, email, passwordHash, role, user.workspace_id]);
+
+    res.json({
+      message: 'User created successfully',
+      userId: userId,
+      email,
+      role
+    });
+  } catch (error) {
+    console.error('Invite user error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PUT /api/user/workspace/users/:userId/role - Update user role
+router.put('/workspace/users/:userId/role', async (req: Request, res: Response) => {
+  try {
+    const { error, value } = updateUserRoleSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+
+    const { role } = value;
+    const { userId } = req.params;
+    const user = (req as any).user;
+    const db = getDatabase();
+
+    // Check if user is admin
+    if (user.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    // Check if target user exists in the same workspace
+    const targetUser = await db.get(
+      'SELECT id, role FROM users WHERE id = ? AND workspace_id = ?',
+      [userId, user.workspace_id]
+    );
+
+    if (!targetUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Prevent users from changing their own role
+    if (userId === user.id) {
+      return res.status(400).json({ error: 'Cannot change your own role' });
+    }
+
+    // Update user role
+    await db.run(
+      'UPDATE users SET role = ? WHERE id = ? AND workspace_id = ?',
+      [role, userId, user.workspace_id]
+    );
+
+    res.json({
+      message: 'User role updated successfully',
+      userId,
+      role
+    });
+  } catch (error) {
+    console.error('Update user role error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// PUT /api/user/workspace/users/:userId/status - Update user status (active/inactive)
+router.put('/workspace/users/:userId/status', async (req: Request, res: Response) => {
+  try {
+    const { error, value } = updateUserStatusSchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+
+    const { is_active } = value;
+    const { userId } = req.params;
+    const user = (req as any).user;
+    const db = getDatabase();
+
+    // Check if user is admin
+    if (user.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    // Check if target user exists in the same workspace
+    const targetUser = await db.get(
+      'SELECT id, is_active FROM users WHERE id = ? AND workspace_id = ?',
+      [userId, user.workspace_id]
+    );
+
+    if (!targetUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Prevent users from deactivating themselves
+    if (userId === user.id) {
+      return res.status(400).json({ error: 'Cannot change your own status' });
+    }
+
+    // Update user status
+    await db.run(
+      'UPDATE users SET is_active = ? WHERE id = ? AND workspace_id = ?',
+      [is_active ? 1 : 0, userId, user.workspace_id]
+    );
+
+    res.json({
+      message: `User ${is_active ? 'activated' : 'deactivated'} successfully`,
+      userId,
+      is_active
+    });
+  } catch (error) {
+    console.error('Update user status error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// DELETE /api/user/workspace/users/:userId - Remove user from workspace
+router.delete('/workspace/users/:userId', async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const user = (req as any).user;
+    const db = getDatabase();
+
+    // Check if user is admin
+    if (user.role !== 'admin') {
+      return res.status(403).json({ error: 'Admin access required' });
+    }
+
+    // Check if target user exists in the same workspace
+    const targetUser = await db.get(
+      'SELECT id FROM users WHERE id = ? AND workspace_id = ?',
+      [userId, user.workspace_id]
+    );
+
+    if (!targetUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Prevent users from removing themselves
+    if (userId === user.id) {
+      return res.status(400).json({ error: 'Cannot remove yourself' });
+    }
+
+    // Remove user from workspace
+    await db.run(
+      'DELETE FROM users WHERE id = ? AND workspace_id = ?',
+      [userId, user.workspace_id]
+    );
+
+    res.json({
+      message: 'User removed successfully',
+      userId
+    });
+  } catch (error) {
+    console.error('Remove user error:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 });

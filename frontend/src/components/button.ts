@@ -42,6 +42,7 @@ export class AppButton extends LitElement {
       transition: all var(--transition-normal);
       line-height: 1;
       box-sizing: border-box;
+      white-space: nowrap;
     }
 
     /* Sizes */

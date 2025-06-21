@@ -148,6 +148,7 @@ button {
   gap: var(--spacing-sm);
   transition: all var(--transition-normal);
   line-height: 1;
+  white-space: nowrap;
 }
 
 .btn-primary {

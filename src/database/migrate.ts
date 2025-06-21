@@ -259,7 +259,40 @@ const addCurrencyField = async () => {
   }
 };
 
-export { createTables, addLabelFields, addExpirationField, addCurrencyField };
+const addUserManagementFields = async () => {
+  const db = getDatabase();
+  
+  try {
+    // Check if users table exists first
+    const tables = await db.all("SELECT name FROM sqlite_master WHERE type='table' AND name='users'");
+    if (tables.length === 0) {
+      console.log('Users table does not exist yet, skipping user management fields migration...');
+      return;
+    }
+
+    // Check if is_active field exists in users table
+    const userColumns = await db.all("PRAGMA table_info(users)");
+    const hasIsActive = userColumns.some((col: any) => col.name === 'is_active');
+    const hasLastLogin = userColumns.some((col: any) => col.name === 'last_login');
+    
+    if (!hasIsActive) {
+      console.log('Adding is_active field to users table...');
+      await db.run('ALTER TABLE users ADD COLUMN is_active BOOLEAN DEFAULT 1');
+    }
+
+    if (!hasLastLogin) {
+      console.log('Adding last_login field to users table...');
+      await db.run('ALTER TABLE users ADD COLUMN last_login DATETIME');
+    }
+      
+    console.log('User management fields migration completed successfully');
+  } catch (error) {
+    console.error('Error adding user management fields:', error);
+    throw error;
+  }
+};
+
+export { createTables, addLabelFields, addExpirationField, addCurrencyField, addUserManagementFields };
 
 // Auto-run migrations
 const migrate = async () => {
@@ -271,6 +304,8 @@ const migrate = async () => {
     await addExpirationField();
     // Run currency field migration
     await addCurrencyField();
+    // Run user management fields migration
+    await addUserManagementFields();
   } catch (error) {
     console.error('Migration failed:', error);
     throw error;

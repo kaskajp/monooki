@@ -10,6 +10,9 @@ import './views/items.js';
 import './views/item-view.js';
 import './views/settings.js';
 import './views/profile.js';
+import './views/account-settings.js';
+import './views/custom-fields.js';
+import './views/user-management.js';
 import './components/button.js';
 import './components/command-center.js';
 
@@ -39,6 +42,9 @@ export class MonookiApp extends LitElement {
     { path: '/categories', render: () => html`<categories-page></categories-page>` },
     { path: '/settings', render: () => html`<settings-page></settings-page>` },
     { path: '/profile', render: () => html`<profile-page></profile-page>` },
+    { path: '/account-settings', render: () => html`<account-settings-page></account-settings-page>` },
+    { path: '/custom-fields', render: () => html`<custom-fields-page></custom-fields-page>` },
+    { path: '/user-management', render: () => html`<user-management-page></user-management-page>` },
   ]);
 
   static styles = css`

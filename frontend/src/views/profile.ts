@@ -11,8 +11,7 @@ export class ProfilePage extends LitElement {
   private formData = {
     currentPassword: '',
     newPassword: '',
-    confirmPassword: '',
-    workspaceName: ''
+    confirmPassword: ''
   };
 
   @state()
@@ -188,60 +187,13 @@ export class ProfilePage extends LitElement {
 
       if (response.ok) {
         this.userProfile = await response.json();
-        this.formData = {
-          ...this.formData,
-          workspaceName: this.userProfile.workspaceName || ''
-        };
       }
     } catch (error) {
       console.error('Error loading user profile:', error);
     }
   }
 
-  private async handleWorkspaceUpdate(e: Event) {
-    e.preventDefault();
-    
-    if (!this.formData.workspaceName.trim()) {
-      return;
-    }
 
-    this.loading = true;
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/user/workspace', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ workspaceName: this.formData.workspaceName })
-      });
-
-      if (response.ok) {
-        // Update local profile data
-        this.userProfile = {
-          ...this.userProfile,
-          workspaceName: this.formData.workspaceName
-        };
-        
-        // Notify navbar to update
-        this.dispatchEvent(new CustomEvent('workspace-updated', { 
-          detail: { workspaceName: this.formData.workspaceName },
-          bubbles: true,
-          composed: true
-        }));
-        
-        this.showSuccessMessage('Workspace name updated successfully!');
-      } else {
-        this.showErrorMessage('Failed to update workspace name');
-      }
-    } catch (error) {
-      console.error('Error updating workspace:', error);
-      this.showErrorMessage('An error occurred while updating workspace name');
-    } finally {
-      this.loading = false;
-    }
-  }
 
   private async handlePasswordUpdate(e: Event) {
     e.preventDefault();
@@ -352,39 +304,7 @@ export class ProfilePage extends LitElement {
           </div>
         </div>
 
-        <!-- Workspace Settings Section -->
-        <div class="profile-section">
-          <h2 class="section-title">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 16 16" class="icon">
-              <rect x="2" y="3" width="12" height="10" rx="2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
-              <path d="M7 7h2" stroke="currentColor" stroke-linecap="round"/>
-            </svg>
-            Workspace Settings
-          </h2>
-          
-          <form @submit="${this.handleWorkspaceUpdate}">
-            <div class="form-group">
-              <label for="workspaceName">Workspace Name</label>
-              <input
-                type="text"
-                id="workspaceName"
-                .value="${this.formData.workspaceName}"
-                @input="${(e: Event) => {
-                  const target = e.target as HTMLInputElement;
-                  this.formData = { ...this.formData, workspaceName: target.value };
-                }}"
-                placeholder="Enter workspace name"
-                required
-              />
-            </div>
-            
-            <div class="form-actions">
-              <app-button type="submit" variant="primary" ?loading="${this.loading}">
-                Update Workspace
-              </app-button>
-            </div>
-          </form>
-        </div>
+
 
         <!-- Password Settings Section -->
         <div class="profile-section">
