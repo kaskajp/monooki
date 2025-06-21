@@ -1,3 +1,10 @@
+# [1.0.0-beta.13](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.12...v1.0.0-beta.13) (2025-06-21)
+
+
+### Features
+
+* **frontend:** User management ([677afa5](https://github.com/kaskajp/monooki/commit/677afa5e8373d2cf9503f1205ef67160713377c1))
+
 # [1.0.0-beta.12](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.11...v1.0.0-beta.12) (2025-06-21)
 
 
