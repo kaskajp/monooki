@@ -151,7 +151,6 @@ export class AppNavbar extends LitElement {
 
     .logout-btn:hover {
       background: var(--color-bg-tertiary);
-      color: var(--color-danger);
     }
 
     .logout-btn .icon {

@@ -158,10 +158,11 @@ export class RegisterForm extends LitElement {
         </div>
         
         <app-button
-          type="submit"
+          type="button"
           variant="primary"
           class="submit-btn"
           ?loading="${this.loading}"
+          @button-click="${this.handleSubmit}"
         >
           Create account
         </app-button>

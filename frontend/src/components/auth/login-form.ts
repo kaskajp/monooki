@@ -142,10 +142,11 @@ export class LoginForm extends LitElement {
         </div>
         
         <app-button
-          type="submit"
+          type="button"
           variant="primary"
           class="submit-btn"
           ?loading="${this.loading}"
+          @button-click="${this.handleSubmit}"
         >
           Sign in
         </app-button>
