@@ -126,7 +126,7 @@ export class ItemsPage extends LitElement {
   userCurrency = 'USD';
 
   @state()
-  visibleColumns = {
+  visibleColumns: Record<string, boolean> = {
     photo: true,
     label: true,
     name: true,
@@ -791,9 +791,6 @@ export class ItemsPage extends LitElement {
   async connectedCallback() {
     super.connectedCallback();
     
-    // Load column preferences first
-    this.loadColumnPreferences();
-    
     // Check URL parameters for initial filter/sort state
     this.parseUrlParameters();
     
@@ -802,6 +799,9 @@ export class ItemsPage extends LitElement {
     await this.loadLocations(); 
     await this.loadCustomFields();
     await this.loadUserCurrency();
+    
+    // Load column preferences after custom fields are loaded
+    this.loadColumnPreferences();
     
     // Then load items (which isn't cached and is component-specific)
     await this.loadItems();
@@ -825,20 +825,35 @@ export class ItemsPage extends LitElement {
   private loadColumnPreferences() {
     try {
       const saved = localStorage.getItem('items-visible-columns');
+      let savedColumns = {};
+      
       if (saved) {
-        const savedColumns = JSON.parse(saved);
-        // Merge with defaults to handle new columns that might be added in future updates
-        this.visibleColumns = {
-          ...this.defaultColumns,
-          ...savedColumns,
-          // Always ensure name column is visible
-          name: true
-        };
+        savedColumns = JSON.parse(saved);
       }
+
+      // Start with default columns
+      this.visibleColumns = { ...this.defaultColumns };
+      
+      // Add custom fields (default to false so they're hidden by default)
+      this.customFieldDefs.forEach(field => {
+        this.visibleColumns[`custom_${field.id}`] = false;
+      });
+      
+      // Apply saved preferences
+      this.visibleColumns = {
+        ...this.visibleColumns,
+        ...savedColumns,
+        // Always ensure name column is visible
+        name: true
+      };
     } catch (error) {
       console.error('Error loading column preferences:', error);
       // Fall back to defaults if there's an error
       this.visibleColumns = { ...this.defaultColumns };
+      // Still add custom fields even on error
+      this.customFieldDefs.forEach(field => {
+        this.visibleColumns[`custom_${field.id}`] = false;
+      });
     }
   }
 
@@ -1370,7 +1385,7 @@ export class ItemsPage extends LitElement {
     this.showColumnSelector = !this.showColumnSelector;
   }
 
-  private toggleColumn(column: keyof typeof this.visibleColumns) {
+  private toggleColumn(column: string) {
     // Don't allow hiding the name column (it's essential)
     if (column === 'name') return;
     
@@ -1530,6 +1545,32 @@ export class ItemsPage extends LitElement {
       }
     } catch (error) {
       console.error('Error loading photos:', error);
+    }
+  }
+
+  private renderCustomFieldValue(field: CustomField, item: Item): string {
+    const value = item.custom_fields?.[field.name];
+    
+    if (value === null || value === undefined || value === '') {
+      return '—';
+    }
+    
+    switch (field.field_type) {
+      case 'checkbox':
+        return value ? 'Yes' : 'No';
+      case 'date':
+        if (value) {
+          try {
+            return new Date(value).toLocaleDateString();
+          } catch {
+            return String(value);
+          }
+        }
+        return '—';
+      case 'number':
+        return String(value);
+      default:
+        return String(value);
     }
   }
 
@@ -1717,6 +1758,21 @@ export class ItemsPage extends LitElement {
                   />
                   <label for="col-created">Created</label>
                 </div>
+                ${this.customFieldDefs.length > 0 ? html`
+                  <hr style="border: none; border-top: 1px solid var(--color-border-primary); margin: var(--spacing-md) 0;">
+                  <h4 style="margin: 0 0 var(--spacing-md) 0; color: var(--color-text-secondary); font-size: var(--font-size-xs); text-transform: uppercase; letter-spacing: 0.5px;">Custom Fields</h4>
+                  ${this.customFieldDefs.map(field => html`
+                    <div class="column-option">
+                      <input
+                        type="checkbox"
+                        id="col-custom-${field.id}"
+                        .checked="${this.visibleColumns[`custom_${field.id}`] || false}"
+                        @change="${() => this.toggleColumn(`custom_${field.id}`)}"
+                      />
+                      <label for="col-custom-${field.id}">${field.name}</label>
+                    </div>
+                  `)}
+                ` : ''}
               </div>
             ` : ''}
           </div>
@@ -1785,6 +1841,9 @@ export class ItemsPage extends LitElement {
                 ${this.visibleColumns.price ? html`<th>Price</th>` : ''}
                 ${this.visibleColumns.expiration ? html`<th>Expiration</th>` : ''}
                 ${this.visibleColumns.created ? html`<th>Created</th>` : ''}
+                ${this.customFieldDefs.map(field => 
+                  this.visibleColumns[`custom_${field.id}`] ? html`<th>${field.name}</th>` : ''
+                )}
                 <th class="actions-cell">Actions</th>
               </tr>
             </thead>
@@ -1848,6 +1907,15 @@ export class ItemsPage extends LitElement {
                       <div class="item-date">${new Date(item.created_at).toLocaleDateString()}</div>
                     </td>
                   ` : ''}
+                  ${this.customFieldDefs.map(field => 
+                    this.visibleColumns[`custom_${field.id}`] ? html`
+                      <td>
+                        <div class="item-custom-field" style="color: var(--color-text-secondary); font-size: var(--font-size-sm);">
+                          ${this.renderCustomFieldValue(field, item)}
+                        </div>
+                      </td>
+                    ` : ''
+                  )}
                   <td class="actions-cell">
                     <div class="item-actions">
                       <app-button variant="secondary" size="sm" icon-only @button-click="${() => this.showEditForm(item)}">

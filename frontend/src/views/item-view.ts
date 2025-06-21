@@ -658,9 +658,10 @@ export class ItemView extends LitElement {
       return html``;
     }
 
-    const customFieldsWithValues = this.customFieldDefs.filter(field => 
-      this.item?.custom_fields?.[field.id] !== undefined
-    );
+    const customFieldsWithValues = this.customFieldDefs.filter(field => {
+      const value = this.item?.custom_fields?.[field.name];
+      return value !== undefined && value !== null && value !== '';
+    });
 
     if (!customFieldsWithValues.length) {
       return html``;
@@ -677,7 +678,7 @@ export class ItemView extends LitElement {
               <div class="info-item">
                 <span class="info-label">${field.name}</span>
                 <span class="info-value">
-                  ${this.formatCustomFieldValue(field, this.item?.custom_fields?.[field.id])}
+                  ${this.formatCustomFieldValue(field, this.item?.custom_fields?.[field.name])}
                 </span>
               </div>
             `)}
