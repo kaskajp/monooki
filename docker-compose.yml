@@ -4,21 +4,21 @@ services:
     container_name: monooki
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3010:3010"
     environment:
       - NODE_ENV=production
-      - PORT=3000
+      - PORT=3010
       - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
       - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
       - DB_PATH=/app/data/monooki.db
-      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:5175}
     volumes:
       - monooki_data:/app/data
       - monooki_uploads:/app/uploads
     networks:
       - monooki_network
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/health"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3010/health"]
       interval: 30s
       timeout: 10s
       retries: 3
