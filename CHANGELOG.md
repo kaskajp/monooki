@@ -1,3 +1,11 @@
+# [1.1.0-beta.1](https://github.com/kaskajp/monooki/compare/v1.0.0...v1.1.0-beta.1) (2025-06-23)
+
+
+### Features
+
+* **frontend:** Login page logo ([49ee3d0](https://github.com/kaskajp/monooki/commit/49ee3d07b8b0bd85fd2b66a5a1966178eca3371d))
+
+# [1.0.0-beta.14](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.13...v1.0.0-beta.14) (2025-06-23)
 # 1.0.0 (2025-06-22)
 
 
@@ -13,6 +21,7 @@
 
 ### Features
 
+* **frontend:** Login page logo ([49ee3d0](https://github.com/kaskajp/monooki/commit/49ee3d07b8b0bd85fd2b66a5a1966178eca3371d))
 * **api:** Ability to delete account and workspace ([3900d48](https://github.com/kaskajp/monooki/commit/3900d4814f531222351d4842a38708dc6786984f))
 * Currency settings ([7f16de0](https://github.com/kaskajp/monooki/commit/7f16de0ef32cf858e7d3fb913fbc86cc1954bd6a))
 * **frontend:** added favicon ([d74a78d](https://github.com/kaskajp/monooki/commit/d74a78d48cfa2d7052c55c7664c8af6e774df344))
