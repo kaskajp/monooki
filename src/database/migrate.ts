@@ -143,7 +143,6 @@ const createTables = async () => {
     await db.run('CREATE INDEX IF NOT EXISTS idx_items_location ON items(location_id)');
     await db.run('CREATE INDEX IF NOT EXISTS idx_items_category ON items(category_id)');
     await db.run('CREATE INDEX IF NOT EXISTS idx_items_name ON items(name)');
-    await db.run('CREATE INDEX IF NOT EXISTS idx_items_label_id ON items(label_id)');
     await db.run('CREATE INDEX IF NOT EXISTS idx_categories_workspace ON categories(workspace_id)');
     await db.run('CREATE INDEX IF NOT EXISTS idx_locations_workspace ON locations(workspace_id)');
     await db.run('CREATE INDEX IF NOT EXISTS idx_photos_item ON photos(item_id)');

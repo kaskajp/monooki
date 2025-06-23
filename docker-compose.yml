@@ -8,7 +8,7 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3010
-      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-in-production}
+      - JWT_SECRET=${JWT_SECRET:-XgU2Fp37EzHq6X3RhPqEndPMhCfYTWLE}
       - JWT_EXPIRES_IN=${JWT_EXPIRES_IN:-7d}
       - DB_PATH=/app/data/monooki.db
       - FRONTEND_URL=${FRONTEND_URL:-http://localhost:5175}
@@ -23,25 +23,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-
-  # Optional: Add a reverse proxy for production
-  nginx:
-    image: nginx:alpine
-    container_name: monooki-nginx
-    restart: unless-stopped
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./ssl:/etc/nginx/ssl:ro
-    depends_on:
-      - monooki
-    networks:
-      - monooki_network
-    profiles:
-      # This service only runs when explicitly specified
-      - production
 
 volumes:
   monooki_data:
