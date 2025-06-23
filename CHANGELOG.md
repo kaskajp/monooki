@@ -1,9 +1,29 @@
 # [1.0.0-beta.14](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.13...v1.0.0-beta.14) (2025-06-23)
+# 1.0.0 (2025-06-22)
+
+
+### Bug Fixes
+
+* **auth:** Fixed login and create account buttons ([b1a50df](https://github.com/kaskajp/monooki/commit/b1a50df1bb2dc0e4381e5ef9ec26b01508182299))
+* **ci:** add package-lock.json files for GitHub Actions caching ([e715f80](https://github.com/kaskajp/monooki/commit/e715f80231a21e2005fae1ba0fe120cbcf701020))
+* **docs:** Updated readme and license information ([bc5c339](https://github.com/kaskajp/monooki/commit/bc5c339ef8c5c7eb02edaf73301cc58d4c93c836))
+* **frontend:** Correct icon for column preferences ([6b6c727](https://github.com/kaskajp/monooki/commit/6b6c727e4973426c810a53b09f13304de4673a93))
+* **frontend:** resolve TypeScript unused variable errors ([18d8a84](https://github.com/kaskajp/monooki/commit/18d8a84bcfa300ccf415ac34010731e9e349075a))
+* **frontend:** Responsive tables and fixed button clicks ([3e4797f](https://github.com/kaskajp/monooki/commit/3e4797fe655c5861c3566cad6c02f024c88c67b1))
 
 
 ### Features
 
 * **frontend:** Login page logo ([49ee3d0](https://github.com/kaskajp/monooki/commit/49ee3d07b8b0bd85fd2b66a5a1966178eca3371d))
+* **api:** Ability to delete account and workspace ([3900d48](https://github.com/kaskajp/monooki/commit/3900d4814f531222351d4842a38708dc6786984f))
+* Currency settings ([7f16de0](https://github.com/kaskajp/monooki/commit/7f16de0ef32cf858e7d3fb913fbc86cc1954bd6a))
+* **frontend:** added favicon ([d74a78d](https://github.com/kaskajp/monooki/commit/d74a78d48cfa2d7052c55c7664c8af6e774df344))
+* **frontend:** Column chooser for items view ([d1dc775](https://github.com/kaskajp/monooki/commit/d1dc7754afb1895f3a4507522beeb4bbf8abdbd0))
+* **frontend:** Custom fields in column preferences ([a624218](https://github.com/kaskajp/monooki/commit/a624218ee0650add3778aacac24e45433b073a04))
+* **frontend:** Remember sort by choice ([948461f](https://github.com/kaskajp/monooki/commit/948461f63f337f266cae22627f7745cfa361e895))
+* **frontend:** Save default columns to localStorage ([a525477](https://github.com/kaskajp/monooki/commit/a52547772468d997f88f28001e9cacaba91a43cc))
+* **frontend:** User management ([677afa5](https://github.com/kaskajp/monooki/commit/677afa5e8373d2cf9503f1205ef67160713377c1))
+* setup automatic versioning with semantic-release ([d1eecec](https://github.com/kaskajp/monooki/commit/d1eececd9ebdf6fa211a411c07b2a885883daeed))
 
 # [1.0.0-beta.13](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.12...v1.0.0-beta.13) (2025-06-21)
 
