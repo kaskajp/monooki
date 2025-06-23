@@ -1,3 +1,10 @@
+## [1.1.2](https://github.com/kaskajp/monooki/compare/v1.1.1...v1.1.2) (2025-06-23)
+
+
+### Bug Fixes
+
+* **backend:** Puppeteer fix for Docker ([1d71dd0](https://github.com/kaskajp/monooki/commit/1d71dd031c61c4b7171baf09ffa4769a38386b95))
+
 ## [1.1.2-beta.1](https://github.com/kaskajp/monooki/compare/v1.1.1...v1.1.2-beta.1) (2025-06-23)
 
 
