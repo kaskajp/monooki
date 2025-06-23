@@ -1,3 +1,10 @@
+# [1.0.0-beta.14](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.13...v1.0.0-beta.14) (2025-06-23)
+
+
+### Features
+
+* **frontend:** Login page logo ([49ee3d0](https://github.com/kaskajp/monooki/commit/49ee3d07b8b0bd85fd2b66a5a1966178eca3371d))
+
 # [1.0.0-beta.13](https://github.com/kaskajp/monooki/compare/v1.0.0-beta.12...v1.0.0-beta.13) (2025-06-21)
 
 
