@@ -29,12 +29,19 @@ export class AmazonScraper {
   private static async launchBrowser() {
     return await puppeteer.launch({
       headless: true,
+      // Use the system-installed Chromium in Docker
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || undefined,
       args: [
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
         '--disable-accelerated-2d-canvas',
         '--disable-gpu',
+        '--disable-web-security',
+        '--disable-features=VizDisplayCompositor',
+        '--no-zygote',
+        '--no-first-run',
+        '--single-process',
         '--window-size=1920x1080'
       ]
     });

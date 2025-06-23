@@ -84,6 +84,17 @@ A self-hosted web application for managing your home inventory with support for 
    docker-compose up -d
    ```
 
+Upgrading to the latest version:
+```bash
+# Pull the latest changes (if using git)
+git pull
+
+# Rebuild with the new Dockerfile
+docker-compose down
+docker-compose build --no-cache
+docker-compose up -d
+```
+
 2. **Build and run manually**
    ```bash
    # Build the Docker image
