@@ -25,14 +25,14 @@ data/
 
 # Uploaded files
 uploads/
-*.jpg
-*.jpeg
-*.png
-*.gif
-*.webp
-*.pdf
-*.doc
-*.docx
+uploads/*.jpg
+uploads/*.jpeg
+uploads/*.png
+uploads/*.gif
+uploads/*.webp
+uploads/*.pdf
+uploads/*.doc
+uploads/*.docx
 
 # Logs
 logs/
@@ -87,7 +87,7 @@ jspm_packages/
 
 # Gatsby files
 .cache/
-public
+# public (commented out to allow frontend/public for static assets)
 
 # Storybook build outputs
 .out
