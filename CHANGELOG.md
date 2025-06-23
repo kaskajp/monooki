@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/kaskajp/monooki/compare/v1.1.0...v1.1.1) (2025-06-23)
+
+
+### Bug Fixes
+
+* **frontend:** Favicon fix ([af3ed83](https://github.com/kaskajp/monooki/commit/af3ed837ac279a6511ccbcd4b3c328ba9f04fc8e))
+
 ## [1.1.1-beta.1](https://github.com/kaskajp/monooki/compare/v1.1.0...v1.1.1-beta.1) (2025-06-23)
 
 
