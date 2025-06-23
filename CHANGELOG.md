@@ -1,3 +1,10 @@
+## [1.1.3-beta.1](https://github.com/kaskajp/monooki/compare/v1.1.2...v1.1.3-beta.1) (2025-06-23)
+
+
+### Bug Fixes
+
+* **backend:** More Puppeteer fixes ([7494127](https://github.com/kaskajp/monooki/commit/7494127e456e122c600162d8d69b4c02accfd673))
+
 ## [1.1.2](https://github.com/kaskajp/monooki/compare/v1.1.1...v1.1.2) (2025-06-23)
 
 
