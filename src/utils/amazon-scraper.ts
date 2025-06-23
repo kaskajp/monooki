@@ -37,11 +37,6 @@ export class AmazonScraper {
         '--disable-dev-shm-usage',
         '--disable-accelerated-2d-canvas',
         '--disable-gpu',
-        '--disable-web-security',
-        '--disable-features=VizDisplayCompositor',
-        '--no-zygote',
-        '--no-first-run',
-        '--single-process',
         '--window-size=1920x1080'
       ]
     });

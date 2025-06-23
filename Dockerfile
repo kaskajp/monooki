@@ -34,7 +34,8 @@ RUN apk add --no-cache \
 
 # Tell Puppeteer to skip installing Chrome. We'll be using the installed version.
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser \
+    NODE_OPTIONS="--max-old-space-size=1024"
 
 # Create app directory and user
 RUN addgroup -g 1001 -S nodejs
