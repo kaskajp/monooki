@@ -1,3 +1,10 @@
+## [1.1.7](https://github.com/kaskajp/monooki/compare/v1.1.6...v1.1.7) (2025-06-24)
+
+
+### Bug Fixes
+
+* **frontend:** Fixed spacing issues for custom fields in add item form ([11dfa32](https://github.com/kaskajp/monooki/commit/11dfa32a2097284fe1d54d70881421646be493bb))
+
 ## [1.1.7-beta.1](https://github.com/kaskajp/monooki/compare/v1.1.6...v1.1.7-beta.1) (2025-06-24)
 
 
