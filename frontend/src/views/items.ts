@@ -622,6 +622,16 @@ export class ItemsPage extends LitElement {
       font-weight: 600;
     }
 
+    .custom-fields-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .custom-fields-container .form-group:last-child {
+      margin-bottom: 0;
+    }
+
     .photos-section {
       grid-column: 1 / -1;
       border: 1px solid #30363d;
@@ -2232,7 +2242,7 @@ export class ItemsPage extends LitElement {
                 ${this.customFieldDefs.length > 0 ? html`
                   <div class="custom-fields-section">
                     <h4>Additional Information</h4>
-                    <div class="form-grid">
+                    <div class="custom-fields-container">
                       ${this.customFieldDefs.map(field => html`
                         <div class="form-group">
                           ${field.field_type === 'checkbox' ? html`
