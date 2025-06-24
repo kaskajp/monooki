@@ -1,3 +1,10 @@
+## [1.1.6-beta.1](https://github.com/kaskajp/monooki/compare/v1.1.5...v1.1.6-beta.1) (2025-06-24)
+
+
+### Bug Fixes
+
+* **frontend:** Fixed select styling ([75b592e](https://github.com/kaskajp/monooki/commit/75b592e69f18b12b2f50c24f39409a2a62d9c7e3))
+
 ## [1.1.5](https://github.com/kaskajp/monooki/compare/v1.1.4...v1.1.5) (2025-06-24)
 
 
