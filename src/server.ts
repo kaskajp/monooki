@@ -26,7 +26,7 @@ app.use(helmet());
 // Rate limiting - more generous limits for development and normal usage
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: process.env.NODE_ENV === 'production' ? 1000 : 10000, // 1000 requests per 15min in production, 10000 in development
+  max: process.env.NODE_ENV === 'production' ? 10000 : 100000, // 1000 requests per 15min in production, 10000 in development
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers

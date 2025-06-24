@@ -1,3 +1,10 @@
+## [1.1.4-beta.1](https://github.com/kaskajp/monooki/compare/v1.1.3...v1.1.4-beta.1) (2025-06-24)
+
+
+### Bug Fixes
+
+* **backend:** Increased rate limits ([b3dbf6b](https://github.com/kaskajp/monooki/commit/b3dbf6bc0688c78dbb95ab89a7cab3cbe7011c9e))
+
 ## [1.1.3](https://github.com/kaskajp/monooki/compare/v1.1.2...v1.1.3) (2025-06-23)
 
 
