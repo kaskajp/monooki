@@ -1,3 +1,10 @@
+## [1.1.5-beta.1](https://github.com/kaskajp/monooki/compare/v1.1.4...v1.1.5-beta.1) (2025-06-24)
+
+
+### Bug Fixes
+
+* **frontend:** Fixed checkboxes having multiple labels ([e6cd4b7](https://github.com/kaskajp/monooki/commit/e6cd4b78141785750df694ef9517dba4645d72c5))
+
 ## [1.1.4](https://github.com/kaskajp/monooki/compare/v1.1.3...v1.1.4) (2025-06-24)
 
 
