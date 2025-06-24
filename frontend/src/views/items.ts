@@ -786,6 +786,25 @@ export class ItemsPage extends LitElement {
     .name-column {
       min-width: 200px;
     }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .checkbox-group input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+    }
+
+    .checkbox-group label {
+      margin: 0;
+      font-size: 14px;
+      cursor: pointer;
+      color: var(--color-text-primary);
+      font-weight: 500;
+    }
   `;
 
   async connectedCallback() {
@@ -1637,16 +1656,8 @@ export class ItemsPage extends LitElement {
           />
         `;
       case 'checkbox':
-        return html`
-          <div class="checkbox-group">
-            <input
-              type="checkbox"
-              .checked="${value === true || value === 'true'}"
-              @change="${(e: Event) => this.handleCustomFieldChange(field.name, (e.target as HTMLInputElement).checked)}"
-            />
-            <label>${field.name}</label>
-          </div>
-        `;
+        // Checkbox is now handled in the main render method
+        return html``;
       case 'enum':
         return html`
           <select
@@ -2202,10 +2213,24 @@ export class ItemsPage extends LitElement {
                     <div class="form-grid">
                       ${this.customFieldDefs.map(field => html`
                         <div class="form-group">
-                          <label for="custom_${field.id}">
-                            ${field.name}${field.required ? ' *' : ''}
-                          </label>
-                          ${this.renderCustomFieldInput(field)}
+                          ${field.field_type === 'checkbox' ? html`
+                            <div class="checkbox-group">
+                              <input
+                                type="checkbox"
+                                id="custom_${field.id}"
+                                .checked="${(this.customFieldValues[field.name] === true || this.customFieldValues[field.name] === 'true')}"
+                                @change="${(e: Event) => this.handleCustomFieldChange(field.name, (e.target as HTMLInputElement).checked)}"
+                              />
+                              <label for="custom_${field.id}">
+                                ${field.name}${field.required ? ' *' : ''}
+                              </label>
+                            </div>
+                          ` : html`
+                            <label for="custom_${field.id}">
+                              ${field.name}${field.required ? ' *' : ''}
+                            </label>
+                            ${this.renderCustomFieldInput(field)}
+                          `}
                         </div>
                       `)}
                     </div>
