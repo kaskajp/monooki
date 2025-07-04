@@ -228,6 +228,8 @@ export class NotificationsPage extends LitElement {
       color: #f0f6fc;
     }
 
+
+
     @media (max-width: 768px) {
       :host {
         padding: 1rem;
@@ -268,6 +270,7 @@ export class NotificationsPage extends LitElement {
         const settings = await response.json();
         this.smtpSettings = {
           ...settings,
+          secure: Boolean(settings.secure), // Convert to boolean (SQLite returns 1/0)
           password: '' // Don't populate password for security
         };
         this.isConfigured = true;
@@ -289,13 +292,24 @@ export class NotificationsPage extends LitElement {
       this.isLoading = true;
       const token = localStorage.getItem('token');
       
+      // Only send the fields that are part of the SMTP configuration schema
+      const settingsToSave = {
+        host: this.smtpSettings.host,
+        port: this.smtpSettings.port,
+        secure: Boolean(this.smtpSettings.secure),
+        username: this.smtpSettings.username,
+        password: this.smtpSettings.password,
+        from_email: this.smtpSettings.from_email,
+        from_name: this.smtpSettings.from_name
+      };
+      
       const response = await fetch('/api/notifications/smtp-settings', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(this.smtpSettings)
+        body: JSON.stringify(settingsToSave)
       });
 
       if (response.ok) {
@@ -354,6 +368,14 @@ export class NotificationsPage extends LitElement {
       ...this.smtpSettings,
       [field]: value
     };
+    
+    // Auto-fill username with from_email if username is empty
+    if (field === 'from_email' && typeof value === 'string' && !this.smtpSettings.username) {
+      this.smtpSettings = {
+        ...this.smtpSettings,
+        username: value
+      };
+    }
   }
 
   render() {
@@ -391,6 +413,8 @@ export class NotificationsPage extends LitElement {
             </div>
           </div>
         </div>
+
+
         
         <form @submit=${(e: Event) => { e.preventDefault(); this.saveSmtpSettings(); }}>
           <div class="form-group">
@@ -459,6 +483,7 @@ export class NotificationsPage extends LitElement {
               placeholder="your-email@gmail.com"
               required
             />
+            <div class="help-text">Use your full email address (e.g., user@gmail.com) for most providers</div>
           </div>
 
           <div class="form-group">
@@ -472,7 +497,7 @@ export class NotificationsPage extends LitElement {
               ?required=${!this.isConfigured}
             />
             <div class="help-text">
-              ${this.isConfigured ? 'Leave empty to keep current password' : 'Use an app password for Gmail and other providers'}
+              ${this.isConfigured ? 'Leave empty to keep current password' : 'For Gmail/Outlook: Use App Password (not your regular password) when 2FA is enabled'}
             </div>
           </div>
 
