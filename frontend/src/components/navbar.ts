@@ -320,6 +320,12 @@ export class AppNavbar extends LitElement {
                 Settings
               </a>
             </li>
+            <li>
+              <a href="/notifications" class="nav-link ${this.isActive('/notifications') ? 'active' : ''}">
+                <svg xmlns="http://www.w3.org/2000/svg" height="16" width="16" viewBox="0 0 16 16"><title>16 alarm</title><g stroke-miterlimit="10" fill="#FFFFFF" class="nc-icon-wrapper"><path data-color="color-2" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" d=" M10,13.5c0,1.105-0.895,2-2,2s-2-0.895-2-2"></path> <line fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" x1="0.5" y1="11.5" x2="15.5" y2="11.5"></line> <path fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round" d="M14.5,11.5H15 c-1.105,0-2.5-0.895-2.5-2V5c0-2.485-2.015-4.5-4.5-4.5h0C5.515,0.5,3.5,2.515,3.5,5v4.5c0,1.105-0.895,2-2,2"></path> </g></svg>
+                Notifications
+              </a>
+            </li>
           </ul>
         </div>
 

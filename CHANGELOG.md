@@ -1,3 +1,17 @@
+# [1.2.0-beta.2](https://github.com/kaskajp/monooki/compare/v1.2.0-beta.1...v1.2.0-beta.2) (2025-07-04)
+
+
+### Features
+
+* **frontend:** Email notifications ([0416748](https://github.com/kaskajp/monooki/commit/04167482f09d32bf832ccf443a289aa433f7e00a))
+
+# [1.2.0-beta.1](https://github.com/kaskajp/monooki/compare/v1.1.8...v1.2.0-beta.1) (2025-07-04)
+
+
+### Features
+
+* **frontend:** Added expired items dashboard card ([242c26b](https://github.com/kaskajp/monooki/commit/242c26b855c3a0484afaae144cbf6adaa3ebd2ff))
+
 ## [1.1.8](https://github.com/kaskajp/monooki/compare/v1.1.7...v1.1.8) (2025-07-04)
 
 

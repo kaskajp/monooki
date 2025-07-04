@@ -201,6 +201,39 @@ router.get('/expiring', async (req: any, res: any) => {
   }
 });
 
+// GET /api/items/expired - Get items that have already expired
+router.get('/expired', async (req: any, res: any) => {
+  try {
+    const workspace_id = req.user.workspace_id;
+    const db = getDatabase();
+
+    const expiredItems = await db.all(`
+      SELECT i.*,
+             c.name as category_name, 
+             l.name as location_name
+      FROM items i
+      LEFT JOIN categories c ON i.category_id = c.id
+      LEFT JOIN locations l ON i.location_id = l.id
+      WHERE i.workspace_id = ? 
+        AND i.expiration_date IS NOT NULL 
+        AND i.expiration_date != ''
+        AND date(i.expiration_date) < date('now')
+      ORDER BY date(i.expiration_date) DESC
+    `, [workspace_id]);
+
+    // Parse custom_fields JSON
+    const processedItems = expiredItems.map(item => ({
+      ...item,
+      custom_fields: item.custom_fields ? JSON.parse(item.custom_fields) : {}
+    }));
+
+    res.json(processedItems);
+  } catch (error) {
+    console.error('Get expired items error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // GET /api/items/:id - Get item by ID  
 router.get('/:id', async (req: any, res: any) => {
   try {
