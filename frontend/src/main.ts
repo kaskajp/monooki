@@ -1,3 +1,6 @@
+// Import URLPattern polyfill for browser compatibility
+import 'urlpattern-polyfill';
+
 import { LitElement, html, css } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { Router } from '@lit-labs/router';
