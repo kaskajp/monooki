@@ -16,6 +16,7 @@ import './views/profile.js';
 import './views/account-settings.js';
 import './views/custom-fields.js';
 import './views/user-management.js';
+import './views/notifications.js';
 import './components/button.js';
 import './components/command-center.js';
 
@@ -49,6 +50,7 @@ export class MonookiApp extends LitElement {
     { path: '/account-settings', render: () => html`<account-settings-page></account-settings-page>` },
     { path: '/custom-fields', render: () => html`<custom-fields-page></custom-fields-page>` },
     { path: '/user-management', render: () => html`<user-management-page></user-management-page>` },
+    { path: '/notifications', render: () => html`<notifications-page></notifications-page>` },
   ]);
 
   static styles = css`

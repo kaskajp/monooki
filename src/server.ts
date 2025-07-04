@@ -13,9 +13,11 @@ import locationRoutes from './routes/locations';
 import categoryRoutes from './routes/categories';
 import customFieldRoutes from './routes/custom-fields';
 import photoRoutes from './routes/photos';
+import notificationRoutes from './routes/notifications';
 
 // Initialize database
 import migrate from './database/migrate';
+import EmailService from './utils/email-service';
 
 const app = express();
 const PORT = process.env.PORT || 3010;
@@ -54,6 +56,7 @@ app.use('/api/locations', locationRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/custom-fields', customFieldRoutes);
 app.use('/api/photos', photoRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // Serve uploaded files
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
@@ -88,6 +91,10 @@ const startServer = async () => {
   try {
     console.log('Initializing database...');
     await migrate();
+    
+    // Initialize email service cron jobs
+    const emailService = EmailService.getInstance();
+    emailService.initializeCronJobs();
     
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);

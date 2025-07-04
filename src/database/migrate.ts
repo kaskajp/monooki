@@ -291,7 +291,54 @@ const addUserManagementFields = async () => {
   }
 };
 
-export { createTables, addLabelFields, addExpirationField, addCurrencyField, addUserManagementFields };
+const addNotificationTables = async () => {
+  const db = getDatabase();
+  
+  try {
+    // Create smtp_settings table
+    await db.run(`
+      CREATE TABLE IF NOT EXISTS smtp_settings (
+        id TEXT PRIMARY KEY,
+        host TEXT NOT NULL,
+        port INTEGER NOT NULL,
+        secure BOOLEAN NOT NULL DEFAULT 0,
+        username TEXT NOT NULL,
+        password TEXT NOT NULL,
+        from_email TEXT NOT NULL,
+        from_name TEXT NOT NULL,
+        workspace_id TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE,
+        UNIQUE(workspace_id)
+      )
+    `);
+
+    // Check if users table exists first
+    const tables = await db.all("SELECT name FROM sqlite_master WHERE type='table' AND name='users'");
+    if (tables.length === 0) {
+      console.log('Users table does not exist yet, skipping notification preferences migration...');
+      return;
+    }
+
+    // Check if notification_frequency field exists in users table
+    const userColumns = await db.all("PRAGMA table_info(users)");
+    const hasNotificationFrequency = userColumns.some((col: any) => col.name === 'notification_frequency');
+    
+    if (!hasNotificationFrequency) {
+      console.log('Adding notification_frequency field to users table...');
+      await db.run('ALTER TABLE users ADD COLUMN notification_frequency TEXT CHECK(notification_frequency IN (\'none\', \'daily\', \'weekly\')) DEFAULT \'none\'');
+      await db.run('ALTER TABLE users ADD COLUMN last_notification_sent DATETIME');
+    }
+
+    console.log('Notification tables and fields migration completed successfully');
+  } catch (error) {
+    console.error('Error adding notification tables:', error);
+    throw error;
+  }
+};
+
+export { createTables, addLabelFields, addExpirationField, addCurrencyField, addUserManagementFields, addNotificationTables };
 
 // Auto-run migrations
 const migrate = async () => {
@@ -305,6 +352,8 @@ const migrate = async () => {
     await addCurrencyField();
     // Run user management fields migration
     await addUserManagementFields();
+    // Run notification tables migration
+    await addNotificationTables();
   } catch (error) {
     console.error('Migration failed:', error);
     throw error;

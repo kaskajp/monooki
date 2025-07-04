@@ -17,6 +17,18 @@ export class ProfilePage extends LitElement {
   @state()
   private userProfile: any = null;
 
+  @state()
+  private notificationPreferences = {
+    notification_frequency: 'none',
+    last_notification_sent: null
+  };
+
+  @state()
+  private smtpConfigured = false;
+
+  @state()
+  private loadingNotifications = false;
+
   static styles = css`
     :host {
       display: block;
@@ -111,8 +123,6 @@ export class ProfilePage extends LitElement {
       border-top: 1px solid var(--color-border-primary);
     }
 
-
-
     .user-info-display {
       display: flex;
       flex-direction: column;
@@ -167,11 +177,83 @@ export class ProfilePage extends LitElement {
       margin-top: var(--spacing-sm);
       line-height: 1.4;
     }
+
+    .notification-option {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--spacing-md);
+      margin-bottom: var(--spacing-lg);
+      padding: var(--spacing-md);
+      border: 1px solid var(--color-border-primary);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--transition-normal);
+    }
+
+    .notification-option:hover {
+      background: var(--color-bg-tertiary);
+    }
+
+    .notification-option.selected {
+      border-color: var(--color-accent-primary);
+      background: var(--color-bg-tertiary);
+    }
+
+    .notification-option input[type="radio"] {
+      margin: 0;
+      width: auto;
+    }
+
+    .notification-option-content {
+      flex: 1;
+    }
+
+    .notification-option-title {
+      font-weight: var(--font-weight-medium);
+      color: var(--color-text-primary);
+      margin: 0 0 var(--spacing-xs) 0;
+    }
+
+    .notification-option-description {
+      font-size: var(--font-size-xs);
+      color: var(--color-text-secondary);
+      margin: 0;
+    }
+
+    .smtp-warning {
+      background: var(--color-warning-bg);
+      color: var(--color-warning-text);
+      padding: var(--spacing-md);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--spacing-lg);
+      font-size: var(--font-size-sm);
+      border: 1px solid var(--color-warning-border);
+    }
+
+    .smtp-warning a {
+      color: var(--color-accent-primary);
+      text-decoration: none;
+    }
+
+    .smtp-warning a:hover {
+      text-decoration: underline;
+    }
+
+    .disabled-option {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .disabled-option:hover {
+      background: transparent;
+    }
   `;
 
   connectedCallback() {
     super.connectedCallback();
     this.loadUserProfile();
+    this.loadNotificationPreferences();
+    this.checkSmtpStatus();
   }
 
   private async loadUserProfile() {
@@ -193,7 +275,44 @@ export class ProfilePage extends LitElement {
     }
   }
 
+  private async loadNotificationPreferences() {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
 
+      const response = await fetch('/api/notifications/preferences', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        this.notificationPreferences = await response.json();
+      }
+    } catch (error) {
+      console.error('Error loading notification preferences:', error);
+    }
+  }
+
+  private async checkSmtpStatus() {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const response = await fetch('/api/notifications/smtp-status', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        this.smtpConfigured = data.configured;
+      }
+    } catch (error) {
+      console.error('Error checking SMTP status:', error);
+    }
+  }
 
   private async handlePasswordUpdate(e: Event) {
     e.preventDefault();
@@ -245,6 +364,40 @@ export class ProfilePage extends LitElement {
       this.showErrorMessage('An error occurred while updating password');
     } finally {
       this.loading = false;
+    }
+  }
+
+  private async updateNotificationPreferences(frequency: string) {
+    try {
+      this.loadingNotifications = true;
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch('/api/notifications/preferences', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          notification_frequency: frequency
+        })
+      });
+
+      if (response.ok) {
+        this.notificationPreferences = {
+          ...this.notificationPreferences,
+          notification_frequency: frequency
+        };
+        this.showSuccessMessage('Notification preferences updated successfully!');
+      } else {
+        const error = await response.json();
+        this.showErrorMessage(error.error || 'Failed to update notification preferences');
+      }
+    } catch (error) {
+      console.error('Error updating notification preferences:', error);
+      this.showErrorMessage('An error occurred while updating notification preferences');
+    } finally {
+      this.loadingNotifications = false;
     }
   }
 
@@ -303,8 +456,6 @@ export class ProfilePage extends LitElement {
             </div>
           </div>
         </div>
-
-
 
         <!-- Password Settings Section -->
         <div class="profile-section">
@@ -371,6 +522,89 @@ export class ProfilePage extends LitElement {
               </app-button>
             </div>
           </form>
+        </div>
+
+        <!-- Notification Settings Section -->
+        <div class="profile-section">
+          <h2 class="section-title">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 16 16" class="icon">
+              <path d="M8 2a3 3 0 0 1 3 3v2.5l1.5 1.5v1H3.5v-1L5 7.5V5a3 3 0 0 1 3-3z" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M6.5 13.5a1.5 1.5 0 0 0 3 0" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Email Notifications
+          </h2>
+
+          ${!this.smtpConfigured ? html`
+            <div class="smtp-warning">
+              <strong>Email notifications are not available.</strong><br>
+              SMTP settings must be configured first. 
+              <a href="/notifications">Configure SMTP settings</a> to enable email notifications.
+            </div>
+          ` : ''}
+
+          <div class="form-group">
+            <label>Notification Frequency</label>
+            
+            <div class="notification-option ${this.notificationPreferences.notification_frequency === 'none' ? 'selected' : ''}" @click=${() => !this.loadingNotifications && this.updateNotificationPreferences('none')}>
+              <input
+                type="radio"
+                name="notification_frequency"
+                value="none"
+                .checked=${this.notificationPreferences.notification_frequency === 'none'}
+                @change=${() => this.updateNotificationPreferences('none')}
+                ?disabled=${this.loadingNotifications}
+              />
+              <div class="notification-option-content">
+                <div class="notification-option-title">No Notifications</div>
+                <div class="notification-option-description">
+                  You will not receive any email notifications about expired or expiring items.
+                </div>
+              </div>
+            </div>
+
+            <div class="notification-option ${this.notificationPreferences.notification_frequency === 'daily' ? 'selected' : ''} ${!this.smtpConfigured ? 'disabled-option' : ''}" @click=${() => !this.loadingNotifications && this.smtpConfigured && this.updateNotificationPreferences('daily')}>
+              <input
+                type="radio"
+                name="notification_frequency"
+                value="daily"
+                .checked=${this.notificationPreferences.notification_frequency === 'daily'}
+                @change=${() => this.updateNotificationPreferences('daily')}
+                ?disabled=${this.loadingNotifications || !this.smtpConfigured}
+              />
+              <div class="notification-option-content">
+                <div class="notification-option-title">Daily Notifications</div>
+                <div class="notification-option-description">
+                  Receive daily email summaries of expired and expiring items (sent at 9 AM).
+                </div>
+              </div>
+            </div>
+
+            <div class="notification-option ${this.notificationPreferences.notification_frequency === 'weekly' ? 'selected' : ''} ${!this.smtpConfigured ? 'disabled-option' : ''}" @click=${() => !this.loadingNotifications && this.smtpConfigured && this.updateNotificationPreferences('weekly')}>
+              <input
+                type="radio"
+                name="notification_frequency"
+                value="weekly"
+                .checked=${this.notificationPreferences.notification_frequency === 'weekly'}
+                @change=${() => this.updateNotificationPreferences('weekly')}
+                ?disabled=${this.loadingNotifications || !this.smtpConfigured}
+              />
+              <div class="notification-option-content">
+                <div class="notification-option-title">Weekly Notifications</div>
+                <div class="notification-option-description">
+                  Receive weekly email summaries of expired and expiring items (sent on Mondays at 9 AM).
+                </div>
+              </div>
+            </div>
+
+            ${this.notificationPreferences.last_notification_sent ? html`
+              <div class="info-item" style="margin-top: var(--spacing-lg);">
+                <span class="info-label">Last notification sent</span>
+                <span class="info-value">
+                  ${new Date(this.notificationPreferences.last_notification_sent).toLocaleString()}
+                </span>
+              </div>
+            ` : ''}
+          </div>
         </div>
       </div>
     `;
