@@ -290,4 +290,100 @@ router.get('/smtp-status', async (req: any, res: any) => {
   }
 });
 
+// POST /api/notifications/trigger - Manually trigger notifications for testing
+router.post('/trigger', async (req: any, res: any) => {
+  try {
+    const workspace_id = req.user.workspace_id;
+    const userId = req.user.id;
+    const userEmail = req.user.email;
+    const db = getDatabase();
+
+    // Check if SMTP settings are configured
+    const smtpSettings = await db.get(`
+      SELECT host, port, secure, username, password, from_email, from_name
+      FROM smtp_settings
+      WHERE workspace_id = ?
+    `, [workspace_id]);
+
+    if (!smtpSettings) {
+      return res.status(400).json({ error: 'SMTP settings not configured' });
+    }
+
+    // Check if user has notifications enabled
+    const user = await db.get(`
+      SELECT notification_frequency FROM users WHERE id = ?
+    `, [userId]);
+
+    if (!user || user.notification_frequency === 'none') {
+      return res.status(400).json({ error: 'Notifications are disabled for this user' });
+    }
+
+    // Get expired items
+    const expiredItems = await db.all(`
+      SELECT i.name, i.expiration_date, l.name as location_name
+      FROM items i
+      LEFT JOIN locations l ON i.location_id = l.id
+      WHERE i.workspace_id = ? 
+        AND i.expiration_date IS NOT NULL 
+        AND i.expiration_date != ''
+        AND date(i.expiration_date) < date('now')
+      ORDER BY date(i.expiration_date) DESC
+      LIMIT 50
+    `, [workspace_id]);
+
+    // Get expiring items (within 30 days)
+    const expiringItems = await db.all(`
+      SELECT i.name, i.expiration_date, l.name as location_name
+      FROM items i
+      LEFT JOIN locations l ON i.location_id = l.id
+      WHERE i.workspace_id = ? 
+        AND i.expiration_date IS NOT NULL 
+        AND i.expiration_date != ''
+        AND date(i.expiration_date) <= date('now', '+30 days')
+        AND date(i.expiration_date) >= date('now')
+      ORDER BY date(i.expiration_date) ASC
+      LIMIT 50
+    `, [workspace_id]);
+
+    // Check if there are items to notify about
+    if (expiredItems.length === 0 && expiringItems.length === 0) {
+      return res.json({ 
+        message: 'No expired or expiring items found to notify about',
+        expiredCount: 0,
+        expiringCount: 0 
+      });
+    }
+
+    // Import EmailService dynamically to avoid circular dependency
+    const EmailService = require('../utils/email-service').default;
+    const emailService = EmailService.getInstance();
+
+    const notificationData = {
+      expiredItems,
+      expiringItems,
+      userEmail,
+      userName: userEmail.split('@')[0] // Use email prefix as name
+    };
+
+    // Send notification
+    await emailService.sendNotification(notificationData, smtpSettings);
+
+    // Update last notification sent
+    await db.run(`
+      UPDATE users 
+      SET last_notification_sent = CURRENT_TIMESTAMP
+      WHERE id = ?
+    `, [userId]);
+
+    res.json({ 
+      message: 'Notification sent successfully',
+      expiredCount: expiredItems.length,
+      expiringCount: expiringItems.length
+    });
+  } catch (error) {
+    console.error('Manual trigger notification error:', error);
+    res.status(500).json({ error: 'Failed to send notification: ' + (error instanceof Error ? error.message : 'Unknown error') });
+  }
+});
+
 export default router; 

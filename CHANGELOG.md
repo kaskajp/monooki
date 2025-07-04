@@ -1,3 +1,10 @@
+# [1.3.0-beta.1](https://github.com/kaskajp/monooki/compare/v1.2.1...v1.3.0-beta.1) (2025-07-04)
+
+
+### Features
+
+* **frontend:** Send test email notification ([f92d983](https://github.com/kaskajp/monooki/commit/f92d983281082de2055ba7184e93a1c735b5b03f))
+
 ## [1.2.1](https://github.com/kaskajp/monooki/compare/v1.2.0...v1.2.1) (2025-07-04)
 
 
