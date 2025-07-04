@@ -354,6 +354,38 @@ export class NotificationsPage extends LitElement {
     }
   }
 
+  private async triggerNotification() {
+    try {
+      this.isLoading = true;
+      const token = localStorage.getItem('token');
+      
+      const response = await fetch('/api/notifications/trigger', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        if (result.expiredCount > 0 || result.expiringCount > 0) {
+          this.showMessage(`Notification sent! Found ${result.expiredCount} expired and ${result.expiringCount} expiring items.`, 'success');
+        } else {
+          this.showMessage('No expired or expiring items found to notify about.', 'success');
+        }
+      } else {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to trigger notification');
+      }
+    } catch (error) {
+      console.error('Error triggering notification:', error);
+      this.showMessage(error instanceof Error ? error.message : 'Failed to trigger notification', 'error');
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
   private showMessage(message: string, type: 'success' | 'error') {
     this.message = message;
     this.messageType = type;
@@ -534,8 +566,19 @@ export class NotificationsPage extends LitElement {
               <button type="button" class="btn btn-secondary" @click=${this.testSmtp} ?disabled=${this.isLoading}>
                 ${this.isLoading ? 'Testing...' : 'Send Test Email'}
               </button>
+              
+              <button type="button" class="btn btn-secondary" @click=${this.triggerNotification} ?disabled=${this.isLoading}>
+                ${this.isLoading ? 'Sending...' : 'Test Notification'}
+              </button>
             ` : ''}
           </div>
+          
+          ${this.isConfigured ? html`
+            <div class="help-text" style="margin-top: 1rem;">
+              <strong>Send Test Email:</strong> Sends a basic SMTP test email to verify your configuration.<br>
+              <strong>Test Notification:</strong> Triggers a real notification email with your current expired/expiring items (requires notification preferences enabled).
+            </div>
+          ` : ''}
         </form>
       </div>
     `;
