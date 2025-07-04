@@ -187,13 +187,19 @@ router.post('/test-smtp', async (req: any, res: any) => {
     let errorMessage = 'Failed to send test email. ';
     
     if (error instanceof Error) {
-      if (error.message.includes('wrong version number') || error.message.includes('SSL')) {
+      const message = error.message.toLowerCase();
+      
+      if (message.includes('wrong version number') || message.includes('ssl')) {
         errorMessage += 'SSL/TLS configuration mismatch. Try: For Gmail use port 587 with STARTTLS, or port 465 with SSL/TLS.';
-      } else if (error.message.includes('authentication') || error.message.includes('auth')) {
-        errorMessage += 'Authentication failed. Please check your username and password.';
-      } else if (error.message.includes('connection') || error.message.includes('timeout')) {
+      } else if (message.includes('550 5.1.1') || message.includes('mailbox does not exist')) {
+        errorMessage += 'Authentication failed - mailbox does not exist. Please check: 1) Username should be your full email address for most providers, 2) Email address exists, 3) Password is correct, 4) Enable "Less secure app access" or use App Password for Gmail/Outlook.';
+      } else if (message.includes('535') || message.includes('authentication') || message.includes('auth')) {
+        errorMessage += 'Authentication failed. Please check: 1) Username (try full email address), 2) Password is correct, 3) Enable 2FA and use App Password for Gmail/Outlook, 4) Enable "Less secure app access" if not using App Password.';
+      } else if (message.includes('534') || message.includes('username and password not accepted')) {
+        errorMessage += 'Username or password not accepted. For Gmail: Enable 2FA and use App Password. For Outlook: Use App Password. Try full email address as username.';
+      } else if (message.includes('connection') || message.includes('timeout')) {
         errorMessage += 'Cannot connect to SMTP server. Please check the host and port.';
-      } else if (error.message.includes('ENOTFOUND')) {
+      } else if (message.includes('enotfound')) {
         errorMessage += 'SMTP host not found. Please check the hostname.';
       } else {
         errorMessage += `Error: ${error.message}`;
