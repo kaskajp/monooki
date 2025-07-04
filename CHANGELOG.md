@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/kaskajp/monooki/compare/v1.2.0...v1.2.1) (2025-07-04)
+
+
+### Bug Fixes
+
+* **frontend:** Issue with SMTP settings ([a5e0b86](https://github.com/kaskajp/monooki/commit/a5e0b86a612ec7b2799f0b1619f2f75e2f97add5))
+
 ## [1.2.1-beta.1](https://github.com/kaskajp/monooki/compare/v1.2.0...v1.2.1-beta.1) (2025-07-04)
 
 
