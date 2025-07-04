@@ -1,3 +1,10 @@
+# [1.2.0-beta.1](https://github.com/kaskajp/monooki/compare/v1.1.8...v1.2.0-beta.1) (2025-07-04)
+
+
+### Features
+
+* **frontend:** Added expired items dashboard card ([242c26b](https://github.com/kaskajp/monooki/commit/242c26b855c3a0484afaae144cbf6adaa3ebd2ff))
+
 ## [1.1.8](https://github.com/kaskajp/monooki/compare/v1.1.7...v1.1.8) (2025-07-04)
 
 
