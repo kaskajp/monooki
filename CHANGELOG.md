@@ -1,3 +1,10 @@
+## [1.1.8-beta.1](https://github.com/kaskajp/monooki/compare/v1.1.7...v1.1.8-beta.1) (2025-07-04)
+
+
+### Bug Fixes
+
+* **frontend:** Added URLPattern polyfill ([c5a13c0](https://github.com/kaskajp/monooki/commit/c5a13c0b101459747a968ca9a46077a37d2c8f94))
+
 ## [1.1.7-beta.2](https://github.com/kaskajp/monooki/compare/v1.1.7-beta.1...v1.1.7-beta.2) (2025-07-04)
 ## [1.1.7](https://github.com/kaskajp/monooki/compare/v1.1.6...v1.1.7) (2025-06-24)
 
