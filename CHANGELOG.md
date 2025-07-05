@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/kaskajp/monooki/compare/v1.3.0...v1.3.1) (2025-07-05)
+
+
+### Bug Fixes
+
+* **api:** Fixed issue with pagination for items ([aa91816](https://github.com/kaskajp/monooki/commit/aa9181650ce295f0f076d30e66341ed92e7b9110))
+
 ## [1.3.1-beta.1](https://github.com/kaskajp/monooki/compare/v1.3.0...v1.3.1-beta.1) (2025-07-05)
 
 
