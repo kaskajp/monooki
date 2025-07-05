@@ -95,7 +95,7 @@ router.post('/parse-amazon-url', async (req: any, res: any) => {
 // GET /api/items - Get all items with optional search/filter
 router.get('/', async (req: any, res: any) => {
   try {
-    const { search, category_id, location_id, sort = 'name', order = 'ASC', page = 1, limit = 50 } = req.query;
+    const { search, category_id, location_id, sort = 'name', order = 'ASC', page = 1, limit = 1000 } = req.query;
     const workspace_id = req.user.workspace_id;
     const db = getDatabase();
 
@@ -141,10 +141,13 @@ router.get('/', async (req: any, res: any) => {
     const sortOrder = order.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
     query += ` ORDER BY i.${sortField} ${sortOrder}`;
 
-    // Add pagination
-    const offset = (parseInt(page) - 1) * parseInt(limit);
-    query += ` LIMIT ? OFFSET ?`;
-    params.push(parseInt(limit), offset);
+    // Add pagination (only if limit is reasonable)
+    const limitValue = parseInt(limit);
+    if (limitValue > 0 && limitValue < 1000) {
+      const offset = (parseInt(page) - 1) * limitValue;
+      query += ` LIMIT ? OFFSET ?`;
+      params.push(limitValue, offset);
+    }
 
     const items = await db.all(query, params);
 
